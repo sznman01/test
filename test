@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日本旅遊規劃 App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            base: '#F8F9FA',
+            primary: '#BC002D',
+            accent: '#FFB7C5',
+            secondary: '#00A86B',
+          },
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body { background-color: #F8F9FA; }
+    .backdrop-blur-md { backdrop-filter: blur(10px); }
+    .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+    .rounded-2xl { border-radius: 1.5rem; }
+  </style>
+</head>
+<body class="font-sans text-gray-800">
+
+  <!-- 側邊欄導航 (桌面) -->
+  <aside class="hidden md:block fixed top-0 left-0 h-full w-64 bg-base/80 backdrop-blur-md p-4 shadow-sm">
+    <div class="flex items-center mb-8">
+      <span class="text-primary text-xl font-bold">✈️ 日本旅遊</span>
+    </div>
+    <nav class="space-y-4">
+      <a href="#dashboard" class="block px-4 py-2 rounded-xl hover:bg-accent/20">🏠 首頁</a>
+      <a href="#trip-detail" class="block px-4 py-2 rounded-xl hover:bg-accent/20">📅 行程規劃</a>
+      <a href="#budget" class="block px-4 py-2 rounded-xl hover:bg-accent/20">💰 預算追蹤</a>
+      <a href="#toolbox" class="block px-4 py-2 rounded-xl hover:bg-accent/20">🔧 旅行工具</a>
+    </nav>
+    <div class="absolute bottom-4 left-4 right-4 bg-accent/20 p-4 rounded-2xl text-center text-sm">
+      開始規劃你的下一趟旅行！
+    </div>
+  </aside>
+
+  <!-- 移動版 Header -->
+  <header class="md:hidden flex justify-between items-center p-4 bg-base/80 backdrop-blur-md shadow-sm">
+    <span class="text-primary font-bold">✈️ 日本旅遊</span>
+    <button onclick="toggleMobileMenu()" class="text-primary">☰</button>
+  </header>
+  <div id="mobile-menu" class="hidden md:hidden fixed top-0 left-0 h-full w-64 bg-base/80 backdrop-blur-md p-4 shadow-sm z-50">
+    <button onclick="toggleMobileMenu()" class="absolute top-4 right-4">×</button>
+    <nav class="space-y-4 mt-12">
+      <a href="#dashboard" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">🏠 首頁</a>
+      <a href="#trip-detail" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">📅 行程規劃</a>
+      <a href="#budget" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">💰 預算追蹤</a>
+      <a href="#toolbox" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">🔧 旅行工具</a>
+    </nav>
+  </div>
+
+  <!-- 主內容 -->
+  <main class="md:ml-64 p-6 max-w-7xl mx-auto">
+
+    <!-- Dashboard 頁面 -->
+    <section id="dashboard" class="mb-12">
+      <h1 class="text-3xl font-bold text-primary mb-2">我的旅程</h1>
+      <p class="text-gray-600 mb-6">開始規劃你的下一趟旅行</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- 示例 Trip Card -->
+        <div class="rounded-2xl shadow-sm bg-white p-4 hover:shadow-md transition-shadow">
+          <img src="https://example.com/tokyo.jpg" alt="東京櫻花季" class="rounded-xl mb-4 w-full h-40 object-cover">
+          <h3 class="font-bold text-primary">2026 東京櫻花季之行</h3>
+          <div class="flex items-center text-sm text-gray-600 mb-2">
+            <span>📅 2026-03-25 - 2026-04-02</span>
+          </div>
+          <div class="text-sm mb-2">距離出發：58 天</div>
+          <div class="w-full bg-gray-200 rounded-full h-2.5">
+            <div class="bg-primary h-2.5 rounded-full" style="width: 40%"></div>
+          </div>
+          <div class="flex justify-end mt-4">
+            <button class="text-gray-500">⋯</button>
+          </div>
+        </div>
+        <!-- 新增按鈕 -->
+        <button onclick="openModal('create-trip')" class="rounded-2xl shadow-sm bg-white p-4 border-2 border-dashed border-accent text-accent flex items-center justify-center hover:shadow-md transition-shadow">
+          + 新增旅程
+        </button>
+      </div>
+    </section>
+
+    <!-- Trip Detail 頁面 -->
+    <section id="trip-detail" class="mb-12">
+      <h1 class="text-3xl font-bold text-primary mb-6">行程規劃</h1>
+      <div class="flex flex-col md:flex-row gap-6">
+        <!-- Day Selector -->
+        <div class="w-full md:w-1/4 space-y-4">
+          <div class="rounded-2xl shadow-sm bg-white p-4">
+            <h4 class="font-bold mb-2">Day 1 - 2026-03-25</h4>
+            <div class="flex items-center text-sm">
+              <span>☀️ 晴天 15°C - 22°C</span>
+              <span class="ml-auto">2 活動</span>
+            </div>
+          </div>
+          <!-- 更多 Day -->
+        </div>
+        <!-- 活動時間軸 -->
+        <div class="flex-1 space-y-6">
+          <div class="relative pl-4 border-l-2 border-primary">
+            <div class="mb-8">
+              <span class="absolute -left-3 bg-white px-2 text-sm">10:00</span>
+              <div class="flex items-center">
+                <span class="text-blue-500 mr-2">📷</span>
+                <div>
+                  <h4>淺草寺</h4>
+                  <p class="text-sm">景點，免費</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <span class="absolute -left-3 bg-white px-2 text-sm">12:30</span>
+              <div class="flex items-center">
+                <span class="text-orange-500 mr-2">🍽️</span>
+                <div>
+                  <h4>一蘭拉麵</h4>
+                  <p class="text-sm">1500 JPY</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button onclick="openModal('add-activity')" class="bg-primary text-white px-4 py-2 rounded-xl">+ 新增活動</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Budget 頁面 -->
+    <section id="budget" class="mb-12">
+      <h1 class="text-3xl font-bold text-primary mb-6">預算追蹤</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="rounded-2xl shadow-sm bg-white p-4">
+          <h3 class="font-bold">總預算：200,000 JPY</h3>
+          <h3>已花費：15,000 JPY</h3>
+          <h3 class="text-secondary">剩餘：185,000 JPY</h3>
+        </div>
+        <div class="rounded-2xl shadow-sm bg-white p-4">
+          <!-- 簡化圓餅圖 (使用 SVG) -->
+          <svg viewBox="0 0 36 36" class="w-32 h-32 mx-auto">
+            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#BC002D" stroke-width="3" stroke-dasharray="40, 100"></path>
+          </svg>
+          <p class="text-center">40% 已用</p>
+        </div>
+      </div>
+      <div class="mt-6 space-y-4">
+        <div class="flex items-center p-4 rounded-2xl shadow-sm bg-white">
+          <span class="text-orange-500 mr-2">🍽️</span>
+          <div class="flex-1">
+            <h4>餐飲</h4>
+            <div class="w-full bg-gray-200 rounded-full h-1.5">
+              <div class="bg-primary h-1.5 rounded-full" style="width: 20%"></div>
+            </div>
+          </div>
+          <span>15,000 JPY (20%)</span>
+        </div>
+        <!-- 更多類別 -->
+      </div>
+    </section>
+
+    <!-- Toolbox 頁面 -->
+    <section id="toolbox">
+      <h1 class="text-3xl font-bold text-primary mb-6">旅行工具箱</h1>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 檢查清單 -->
+        <div class="rounded-2xl shadow-sm bg-white p-4">
+          <h3 class="font-bold mb-4">出發前檢查清單</h3>
+          <div class="space-y-2">
+            <label class="flex items-center">
+              <input type="checkbox" class="mr-2">
+              ✈️ 護照、簽證
+            </label>
+            <!-- 更多項目 -->
+          </div>
+          <button class="mt-4 text-primary">+ 新增項目</button>
+        </div>
+        <!-- 貨幣轉換器 -->
+        <div class="rounded-2xl shadow-sm bg-white p-4">
+          <h3 class="font-bold mb-4">貨幣轉換器</h3>
+          <div class="flex items-center justify-between">
+            <input type="number" placeholder="JPY" class="w-1/2 p-2 border rounded-xl" id="jpy">
+            <span class="mx-2">⇄</span>
+            <input type="number" placeholder="HKD" class="w-1/2 p-2 border rounded-xl" id="hkd">
+          </div>
+          <p class="text-sm text-gray-600 mt-2">當前匯率：1 JPY = 0.055 HKD</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 彈窗 (Modal) 示例 -->
+  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl p-6 w-96 max-w-full">
+      <h3 class="font-bold text-primary mb-4" id="modal-title"></h3>
+      <!-- 內容根據 modal 類型變化 -->
+      <button onclick="closeModal()" class="mt-4 bg-primary text-white px-4 py-2 rounded-xl">關閉</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    function openModal(type) {
+      const modal = document.getElementById('modal');
+      const title = document.getElementById('modal-title');
+      if (type === 'create-trip') {
+        title.textContent = '新增旅程';
+        // 添加表單元素 (這裡簡化)
+      } else if (type === 'add-activity') {
+        title.textContent = '新增活動';
+        // 添加表單
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    // 簡單貨幣轉換邏輯 (靜態匯率)
+    const jpyInput = document.getElementById('jpy');
+    const hkdInput = document.getElementById('hkd');
+    const rate = 0.055;
+    jpyInput.addEventListener('input', () => hkdInput.value = (jpyInput.value * rate).toFixed(2));
+    hkdInput.addEventListener('input', () => jpyInput.value = (hkdInput.value / rate).toFixed(2));
+  </script>
+
+</body>
+</html>
