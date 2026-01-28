@@ -1,244 +1,1279 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>日本旅遊規劃 App</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            base: '#F8F9FA',
-            primary: '#BC002D',
-            accent: '#FFB7C5',
-            secondary: '#00A86B',
-          },
-          fontFamily: {
-            sans: ['Inter', 'Noto Sans JP', 'sans-serif'],
-          },
-        },
-      },
-    }
-  </script>
-  <style>
-    body { background-color: #F8F9FA; }
-    .backdrop-blur-md { backdrop-filter: blur(10px); }
-    .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-    .rounded-2xl { border-radius: 1.5rem; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本旅遊規劃 - Travel Planner Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #BC002D;
+            --accent-pink: #FFB7C5;
+            --accent-green: #00A86B;
+            --dark-gray: #2D3436;
+            --light-bg: #F8F9FA;
+            --white: #FFFFFF;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-gray);
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 256px;
+            background-color: var(--white);
+            border-right: 1px solid #E8E8E8;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark-gray);
+        }
+
+        .nav-item:hover {
+            background-color: var(--light-bg);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary-red), #8B001F);
+            color: var(--white);
+        }
+
+        .sidebar-tip {
+            margin-top: auto;
+            padding: 12px;
+            background-color: var(--accent-pink);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--dark-gray);
+            text-align: center;
+        }
+
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 200;
+            background: var(--primary-red);
+            color: var(--white);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            margin-left: 256px;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .page-header {
+            margin-bottom: 32px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* SHOPPING LIST PAGE */
+        .shopping-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .shopping-header {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .shopping-stat {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .shopping-stat-num {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .shopping-stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .shopping-filter {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 12px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid #E8E8E8;
+            background: var(--white);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+        }
+
+        .shopping-item {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .shopping-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-top: 2px;
+            accent-color: var(--primary-red);
+        }
+
+        .shopping-item.completed {
+            opacity: 0.6;
+        }
+
+        .shopping-item.completed .item-name {
+            text-decoration: line-through;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .item-category {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        .item-delete {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* RESERVATIONS PAGE */
+        .reservations-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .reservation-card {
+            background: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .reservation-header {
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-red), #8B001F);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .reservation-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .reservation-type {
+            font-size: 18px;
+        }
+
+        .reservation-body {
+            padding: 16px;
+        }
+
+        .reservation-field {
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .reservation-label {
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .reservation-value {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        .reservation-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .res-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .res-btn-edit {
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .res-btn-delete {
+            background: #FFE8E8;
+            color: var(--primary-red);
+        }
+
+        /* TRIP DETAIL IMPROVEMENTS */
+        .trip-detail-header {
+            background: linear-gradient(135deg, var(--primary-red), #8B001F);
+            color: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .trip-detail-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .trip-detail-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .trip-detail-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .trip-countdown-large {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .trip-dates-detail {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+
+        .trip-progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            max-width: 200px;
+        }
+
+        .trip-progress-fill {
+            height: 100%;
+            background: var(--accent-pink);
+        }
+
+        /* DAY SELECTOR - HORIZONTAL */
+        .day-selector-horizontal {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        .day-selector-horizontal::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .day-selector-horizontal::-webkit-scrollbar-thumb {
+            background: var(--primary-red);
+            border-radius: 2px;
+        }
+
+        .day-btn {
+            flex-shrink: 0;
+            padding: 16px;
+            background: var(--light-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            min-width: 100px;
+        }
+
+        .day-btn:hover {
+            border-color: var(--primary-red);
+        }
+
+        .day-btn.active {
+            background: var(--primary-red);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        .day-btn-date {
+            font-size: 11px;
+            opacity: 0.7;
+            margin-top: 4px;
+        }
+
+        .day-btn-weather {
+            font-size: 16px;
+            margin: 4px 0;
+        }
+
+        .day-btn-temp {
+            font-size: 11px;
+            opacity: 0.8;
+        }
+
+        /* WEATHER DISPLAY */
+        .weather-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .weather-icon {
+            font-size: 40px;
+        }
+
+        .weather-info {
+            flex: 1;
+        }
+
+        .weather-condition {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .weather-details {
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            margin: auto;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            display: block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E8E8E8;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(188, 0, 45, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #8B001F;
+        }
+
+        .btn-secondary {
+            background: var(--light-bg);
+            color: var(--dark-gray);
+        }
+
+        /* ACTIVITY TIMELINE */
+        .timeline {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+        }
+
+        .activity-list {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .activity-list::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary-red), var(--accent-pink));
+        }
+
+        .activity-item {
+            position: relative;
+            margin-bottom: 24px;
+            background: var(--light-bg);
+            padding: 16px;
+            border-radius: 12px;
+            cursor: grab;
+        }
+
+        .activity-dot {
+            position: absolute;
+            left: -33px;
+            top: 20px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 3px solid var(--primary-red);
+        }
+
+        .activity-time {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .activity-location {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: flex;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                width: 80%;
+                max-width: 250px;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .shopping-container {
+                grid-template-columns: 1fr;
+            }
+
+            .day-selector-horizontal {
+                overflow-x: auto;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
-<body class="font-sans text-gray-800">
+<body>
+    <div class="mobile-toggle" onclick="toggleSidebar()">☰</div>
 
-  <!-- 側邊欄導航 (桌面) -->
-  <aside class="hidden md:block fixed top-0 left-0 h-full w-64 bg-base/80 backdrop-blur-md p-4 shadow-sm">
-    <div class="flex items-center mb-8">
-      <span class="text-primary text-xl font-bold">✈️ 日本旅遊</span>
-    </div>
-    <nav class="space-y-4">
-      <a href="#dashboard" class="block px-4 py-2 rounded-xl hover:bg-accent/20">🏠 首頁</a>
-      <a href="#trip-detail" class="block px-4 py-2 rounded-xl hover:bg-accent/20">📅 行程規劃</a>
-      <a href="#budget" class="block px-4 py-2 rounded-xl hover:bg-accent/20">💰 預算追蹤</a>
-      <a href="#toolbox" class="block px-4 py-2 rounded-xl hover:bg-accent/20">🔧 旅行工具</a>
-    </nav>
-    <div class="absolute bottom-4 left-4 right-4 bg-accent/20 p-4 rounded-2xl text-center text-sm">
-      開始規劃你的下一趟旅行！
-    </div>
-  </aside>
-
-  <!-- 移動版 Header -->
-  <header class="md:hidden flex justify-between items-center p-4 bg-base/80 backdrop-blur-md shadow-sm">
-    <span class="text-primary font-bold">✈️ 日本旅遊</span>
-    <button onclick="toggleMobileMenu()" class="text-primary">☰</button>
-  </header>
-  <div id="mobile-menu" class="hidden md:hidden fixed top-0 left-0 h-full w-64 bg-base/80 backdrop-blur-md p-4 shadow-sm z-50">
-    <button onclick="toggleMobileMenu()" class="absolute top-4 right-4">×</button>
-    <nav class="space-y-4 mt-12">
-      <a href="#dashboard" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">🏠 首頁</a>
-      <a href="#trip-detail" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">📅 行程規劃</a>
-      <a href="#budget" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">💰 預算追蹤</a>
-      <a href="#toolbox" class="block px-4 py-2 rounded-xl hover:bg-accent/20" onclick="toggleMobileMenu()">🔧 旅行工具</a>
-    </nav>
-  </div>
-
-  <!-- 主內容 -->
-  <main class="md:ml-64 p-6 max-w-7xl mx-auto">
-
-    <!-- Dashboard 頁面 -->
-    <section id="dashboard" class="mb-12">
-      <h1 class="text-3xl font-bold text-primary mb-2">我的旅程</h1>
-      <p class="text-gray-600 mb-6">開始規劃你的下一趟旅行</p>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- 示例 Trip Card -->
-        <div class="rounded-2xl shadow-sm bg-white p-4 hover:shadow-md transition-shadow">
-          <img src="https://example.com/tokyo.jpg" alt="東京櫻花季" class="rounded-xl mb-4 w-full h-40 object-cover">
-          <h3 class="font-bold text-primary">2026 東京櫻花季之行</h3>
-          <div class="flex items-center text-sm text-gray-600 mb-2">
-            <span>📅 2026-03-25 - 2026-04-02</span>
-          </div>
-          <div class="text-sm mb-2">距離出發：58 天</div>
-          <div class="w-full bg-gray-200 rounded-full h-2.5">
-            <div class="bg-primary h-2.5 rounded-full" style="width: 40%"></div>
-          </div>
-          <div class="flex justify-end mt-4">
-            <button class="text-gray-500">⋯</button>
-          </div>
-        </div>
-        <!-- 新增按鈕 -->
-        <button onclick="openModal('create-trip')" class="rounded-2xl shadow-sm bg-white p-4 border-2 border-dashed border-accent text-accent flex items-center justify-center hover:shadow-md transition-shadow">
-          + 新增旅程
-        </button>
-      </div>
-    </section>
-
-    <!-- Trip Detail 頁面 -->
-    <section id="trip-detail" class="mb-12">
-      <h1 class="text-3xl font-bold text-primary mb-6">行程規劃</h1>
-      <div class="flex flex-col md:flex-row gap-6">
-        <!-- Day Selector -->
-        <div class="w-full md:w-1/4 space-y-4">
-          <div class="rounded-2xl shadow-sm bg-white p-4">
-            <h4 class="font-bold mb-2">Day 1 - 2026-03-25</h4>
-            <div class="flex items-center text-sm">
-              <span>☀️ 晴天 15°C - 22°C</span>
-              <span class="ml-auto">2 活動</span>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span>✈️</span> 日本旅遊
             </div>
-          </div>
-          <!-- 更多 Day -->
-        </div>
-        <!-- 活動時間軸 -->
-        <div class="flex-1 space-y-6">
-          <div class="relative pl-4 border-l-2 border-primary">
-            <div class="mb-8">
-              <span class="absolute -left-3 bg-white px-2 text-sm">10:00</span>
-              <div class="flex items-center">
-                <span class="text-blue-500 mr-2">📷</span>
-                <div>
-                  <h4>淺草寺</h4>
-                  <p class="text-sm">景點，免費</p>
+
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="showPage('shopping')">
+                    <span>🛍️</span> 待購清單
                 </div>
-              </div>
-            </div>
-            <div>
-              <span class="absolute -left-3 bg-white px-2 text-sm">12:30</span>
-              <div class="flex items-center">
-                <span class="text-orange-500 mr-2">🍽️</span>
-                <div>
-                  <h4>一蘭拉麵</h4>
-                  <p class="text-sm">1500 JPY</p>
+                <div class="nav-item" onclick="showPage('reservations')">
+                    <span>🎫</span> 預約管理
                 </div>
-              </div>
+                <div class="nav-item" onclick="showPage('tripDetail')">
+                    <span>📅</span> 行程規劃
+                </div>
+                <div class="nav-item" onclick="showPage('budget')">
+                    <span>💰</span> 預算追蹤
+                </div>
+                <div class="nav-item" onclick="showPage('toolbox')">
+                    <span>🔧</span> 旅行工具
+                </div>
+            </nav>
+
+            <div class="sidebar-tip">
+                💡 所有數據已自動保存
             </div>
-          </div>
-          <button onclick="openModal('add-activity')" class="bg-primary text-white px-4 py-2 rounded-xl">+ 新增活動</button>
-        </div>
-      </div>
-    </section>
+        </aside>
 
-    <!-- Budget 頁面 -->
-    <section id="budget" class="mb-12">
-      <h1 class="text-3xl font-bold text-primary mb-6">預算追蹤</h1>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="rounded-2xl shadow-sm bg-white p-4">
-          <h3 class="font-bold">總預算：200,000 JPY</h3>
-          <h3>已花費：15,000 JPY</h3>
-          <h3 class="text-secondary">剩餘：185,000 JPY</h3>
-        </div>
-        <div class="rounded-2xl shadow-sm bg-white p-4">
-          <!-- 簡化圓餅圖 (使用 SVG) -->
-          <svg viewBox="0 0 36 36" class="w-32 h-32 mx-auto">
-            <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#BC002D" stroke-width="3" stroke-dasharray="40, 100"></path>
-          </svg>
-          <p class="text-center">40% 已用</p>
-        </div>
-      </div>
-      <div class="mt-6 space-y-4">
-        <div class="flex items-center p-4 rounded-2xl shadow-sm bg-white">
-          <span class="text-orange-500 mr-2">🍽️</span>
-          <div class="flex-1">
-            <h4>餐飲</h4>
-            <div class="w-full bg-gray-200 rounded-full h-1.5">
-              <div class="bg-primary h-1.5 rounded-full" style="width: 20%"></div>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- SHOPPING LIST PAGE -->
+            <div id="shopping" class="page active">
+                <div class="page-header">
+                    <h1 class="page-title">待購清單</h1>
+                    <p class="page-subtitle">分類管理購物項目</p>
+                </div>
+
+                <div class="shopping-header">
+                    <div class="shopping-stat">
+                        <div class="shopping-stat-num" id="pendingCount">0</div>
+                        <div class="shopping-stat-label">待購買</div>
+                    </div>
+                    <div class="shopping-stat">
+                        <div class="shopping-stat-num" id="purchasedCount">0</div>
+                        <div class="shopping-stat-label">已購買</div>
+                    </div>
+                </div>
+
+                <div class="shopping-filter">
+                    <button class="filter-btn active" onclick="filterShopping('all')">全部</button>
+                    <button class="filter-btn" onclick="filterShopping('pending')">待購買</button>
+                    <button class="filter-btn" onclick="filterShopping('purchased')">已購買</button>
+                    <button class="filter-btn" onclick="openAddShoppingModal()" style="margin-left: auto; background: var(--primary-red); color: var(--white);">+ 新增</button>
+                </div>
+
+                <div id="shoppingList" class="shopping-container"></div>
             </div>
-          </div>
-          <span>15,000 JPY (20%)</span>
-        </div>
-        <!-- 更多類別 -->
-      </div>
-    </section>
 
-    <!-- Toolbox 頁面 -->
-    <section id="toolbox">
-      <h1 class="text-3xl font-bold text-primary mb-6">旅行工具箱</h1>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- 檢查清單 -->
-        <div class="rounded-2xl shadow-sm bg-white p-4">
-          <h3 class="font-bold mb-4">出發前檢查清單</h3>
-          <div class="space-y-2">
-            <label class="flex items-center">
-              <input type="checkbox" class="mr-2">
-              ✈️ 護照、簽證
-            </label>
-            <!-- 更多項目 -->
-          </div>
-          <button class="mt-4 text-primary">+ 新增項目</button>
-        </div>
-        <!-- 貨幣轉換器 -->
-        <div class="rounded-2xl shadow-sm bg-white p-4">
-          <h3 class="font-bold mb-4">貨幣轉換器</h3>
-          <div class="flex items-center justify-between">
-            <input type="number" placeholder="JPY" class="w-1/2 p-2 border rounded-xl" id="jpy">
-            <span class="mx-2">⇄</span>
-            <input type="number" placeholder="HKD" class="w-1/2 p-2 border rounded-xl" id="hkd">
-          </div>
-          <p class="text-sm text-gray-600 mt-2">當前匯率：1 JPY = 0.055 HKD</p>
-        </div>
-      </div>
-    </section>
+            <!-- RESERVATIONS PAGE -->
+            <div id="reservations" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">預約管理</h1>
+                    <p class="page-subtitle">機票、住宿、租車預約</p>
+                </div>
 
-  </main>
+                <div style="margin-bottom: 24px;">
+                    <button class="btn btn-primary" onclick="openAddReservationModal()" style="width: auto; padding: 12px 24px;">+ 新增預約</button>
+                </div>
 
-  <!-- 彈窗 (Modal) 示例 -->
-  <div id="modal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-2xl p-6 w-96 max-w-full">
-      <h3 class="font-bold text-primary mb-4" id="modal-title"></h3>
-      <!-- 內容根據 modal 類型變化 -->
-      <button onclick="closeModal()" class="mt-4 bg-primary text-white px-4 py-2 rounded-xl">關閉</button>
+                <div id="reservationsList" class="reservations-container"></div>
+            </div>
+
+            <!-- TRIP DETAIL PAGE -->
+            <div id="tripDetail" class="page">
+                <div class="trip-detail-header">
+                    <div class="trip-detail-content">
+                        <h1 class="trip-detail-title" id="tripTitle">2026 日本的旅</h1>
+                        <div class="trip-countdown-large" id="countdownTimer">6天 10小時 06分鐘</div>
+                        <div class="trip-dates-detail" id="tripDates">2026年01月14日 出發</div>
+                        <div style="display: flex; gap: 16px; margin-top: 16px;">
+                            <div>
+                                <span style="opacity: 0.9; font-size: 12px;">進度</span>
+                                <div class="trip-progress-bar">
+                                    <div class="trip-progress-fill" id="progressFill" style="width: 40%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="day-selector-horizontal" id="daySelectorHorizontal"></div>
+
+                <div class="weather-card">
+                    <div class="weather-icon" id="weatherIcon">☀️</div>
+                    <div class="weather-info">
+                        <div class="weather-condition" id="weatherCondition">晴天</div>
+                        <div class="weather-details" id="weatherDetails">12°C ~ 20°C | 隱雲時晴</div>
+                    </div>
+                </div>
+
+                <div class="timeline">
+                    <div id="activityList" style="position: relative; padding-left: 40px;">
+                        <p style="text-align: center; color: #999; padding: 40px 20px;">選擇日期查看活動安排</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddActivityModal()" style="width: 100%; margin-top: 16px;">+ 新增活動</button>
+                </div>
+            </div>
+
+            <!-- BUDGET PAGE -->
+            <div id="budget" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">預算追蹤</h1>
+                    <p class="page-subtitle">實時掌握旅行花費</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                    <div style="background: var(--white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow);">
+                        <div style="font-size: 12px; color: #999; font-weight: 600;">總預算</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--dark-gray); margin-top: 8px;" id="totalBudget">¥50,000</div>
+                    </div>
+                    <div style="background: var(--white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow);">
+                        <div style="font-size: 12px; color: #999; font-weight: 600;">已花費</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--primary-red); margin-top: 8px;" id="spentBudget">¥0</div>
+                    </div>
+                    <div style="background: var(--white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow);">
+                        <div style="font-size: 12px; color: #999; font-weight: 600;">剩餘</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--accent-green); margin-top: 8px;" id="remainingBudget">¥50,000</div>
+                    </div>
+                </div>
+
+                <div style="background: var(--white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow);">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+
+            <!-- TOOLBOX PAGE -->
+            <div id="toolbox" class="page">
+                <div class="page-header">
+                    <h1 class="page-title">旅行工具箱</h1>
+                    <p class="page-subtitle">出發前檢查清單 & 貨幣轉換</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                    <div style="background: var(--white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow);">
+                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">✈️ 出發前檢查清單</div>
+                        <div id="checklistItems"></div>
+                        <input type="text" id="newChecklistItem" placeholder="新增項目..." style="width: 100%; padding: 8px; border: 1px solid #E8E8E8; border-radius: 8px; margin-top: 12px;">
+                        <button class="btn btn-primary" onclick="addChecklistItem()" style="width: 100%; margin-top: 8px;">新增</button>
+                    </div>
+
+                    <div style="background: var(--white); padding: 24px; border-radius: 16px; box-shadow: var(--shadow);">
+                        <div style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">💱 貨幣轉換器</div>
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 12px; color: #999; font-weight: 600;">日圓 (JPY)</label>
+                            <input type="number" id="jpyInput" placeholder="0" oninput="convertCurrency()" style="width: 100%; padding: 12px; border: 1px solid #E8E8E8; border-radius: 8px; margin-top: 4px;">
+                        </div>
+                        <div style="text-align: center; margin: 12px 0;">⇄</div>
+                        <div>
+                            <label style="font-size: 12px; color: #999; font-weight: 600;">港幣 (HKD)</label>
+                            <input type="number" id="hkdInput" placeholder="0" oninput="convertCurrency(true)" style="width: 100%; padding: 12px; border: 1px solid #E8E8E8; border-radius: 8px; margin-top: 4px;">
+                        </div>
+                        <div style="font-size: 12px; color: #999; text-align: center; margin-top: 12px;">匯率: 1 JPY = 0.055 HKD</div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-  </div>
 
-  <script>
-    function toggleMobileMenu() {
-      const menu = document.getElementById('mobile-menu');
-      menu.classList.toggle('hidden');
-    }
+    <!-- MODALS -->
+    <div class="modal" id="addShoppingModal">
+        <div class="modal-content">
+            <div class="modal-header">新增購物項目</div>
+            <form onsubmit="addShopping(event)">
+                <div class="form-group">
+                    <label class="form-label">物品名稱</label>
+                    <input type="text" class="form-input" id="shoppingName" required placeholder="例如：保暖褲">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">分類</label>
+                    <select class="form-select" id="shoppingCategory">
+                        <option>服飾</option>
+                        <option>鞋類</option>
+                        <option>護膚品</option>
+                        <option>食品</option>
+                        <option>其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">估計價格 (JPY)</label>
+                    <input type="number" class="form-input" id="shoppingPrice" placeholder="0">
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addShoppingModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    function openModal(type) {
-      const modal = document.getElementById('modal');
-      const title = document.getElementById('modal-title');
-      if (type === 'create-trip') {
-        title.textContent = '新增旅程';
-        // 添加表單元素 (這裡簡化)
-      } else if (type === 'add-activity') {
-        title.textContent = '新增活動';
-        // 添加表單
-      }
-      modal.classList.remove('hidden');
-    }
+    <div class="modal" id="addReservationModal">
+        <div class="modal-content">
+            <div class="modal-header">新增預約</div>
+            <form onsubmit="addReservation(event)">
+                <div class="form-group">
+                    <label class="form-label">預約類型</label>
+                    <select class="form-select" id="reservationType" required>
+                        <option value="Flight">機票</option>
+                        <option value="Hotel">住宿</option>
+                        <option value="Rental">租車</option>
+                        <option value="Activity">活動</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">標題</label>
+                    <input type="text" class="form-input" id="reservationTitle" required placeholder="例如：Hotel IL Cuore Namba">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">預訂編號</label>
+                        <input type="text" class="form-input" id="reservationNumber" placeholder="例如：6321782342">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">確認時間</label>
+                        <input type="date" class="form-input" id="reservationDate">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">詳細信息</label>
+                    <textarea class="form-textarea" id="reservationDetails" placeholder="例如：飯店地址、入住時間等..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addReservationModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    function closeModal() {
-      document.getElementById('modal').classList.add('hidden');
-    }
+    <div class="modal" id="addActivityModal">
+        <div class="modal-content">
+            <div class="modal-header">新增活動</div>
+            <form onsubmit="addActivity(event)">
+                <div class="form-group">
+                    <label class="form-label">活動類型</label>
+                    <select class="form-select" id="activityType">
+                        <option>景點</option>
+                        <option>餐廳</option>
+                        <option>住宿</option>
+                        <option>交通</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">時間</label>
+                    <input type="time" class="form-input" id="activityTime" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">地點名稱</label>
+                    <input type="text" class="form-input" id="activityName" required placeholder="例如：淺草寺">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">營業時間 (選填)</label>
+                    <input type="text" class="form-input" id="activityHours" placeholder="例如：10:00-18:00">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">門票 (JPY)</label>
+                    <input type="number" class="form-input" id="activityTicket" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">特色介紹</label>
+                    <textarea class="form-textarea" id="activityDescription" placeholder="例如：東京最古老的寺廟..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="btn btn-primary">新增</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addActivityModal')">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    // 簡單貨幣轉換邏輯 (靜態匯率)
-    const jpyInput = document.getElementById('jpy');
-    const hkdInput = document.getElementById('hkd');
-    const rate = 0.055;
-    jpyInput.addEventListener('input', () => hkdInput.value = (jpyInput.value * rate).toFixed(2));
-    hkdInput.addEventListener('input', () => jpyInput.value = (hkdInput.value / rate).toFixed(2));
-  </script>
+    <script>
+        const EXCHANGE_RATE = 0.055;
+        let shoppingList = JSON.parse(localStorage.getItem('shoppingList')) || [];
+        let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+        let activities = JSON.parse(localStorage.getItem('activities')) || [];
+        let checklists = JSON.parse(localStorage.getItem('checklists')) || [
+            { item: '護照、簽證', completed: false },
+            { item: '信用卡、現金', completed: false },
+            { item: '手機、充電器', completed: false },
+            { item: '行李打包', completed: false },
+            { item: '飯店預訂確認', completed: false },
+            { item: '機票確認', completed: false }
+        ];
+        let currentDay = 1;
+        let totalDays = 7;
 
+        // PAGE NAVIGATION
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(pageId).classList.add('active');
+            event.target.closest('.nav-item').classList.add('active');
+
+            if (pageId === 'shopping') renderShopping();
+            else if (pageId === 'reservations') renderReservations();
+            else if (pageId === 'tripDetail') renderTripDetail();
+            else if (pageId === 'budget') renderBudget();
+            else if (pageId === 'toolbox') renderToolbox();
+
+            if (window.innerWidth < 768) {
+                document.querySelector('.sidebar').classList.remove('open');
+            }
+        }
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('open');
+        }
+
+        // SHOPPING LIST
+        function renderShopping(filter = 'all') {
+            const container = document.getElementById('shoppingList');
+            container.innerHTML = '';
+
+            let filtered = shoppingList;
+            if (filter === 'pending') filtered = shoppingList.filter(i => !i.purchased);
+            if (filter === 'purchased') filtered = shoppingList.filter(i => i.purchased);
+
+            const pending = shoppingList.filter(i => !i.purchased).length;
+            const purchased = shoppingList.filter(i => i.purchased).length;
+
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('purchasedCount').textContent = purchased;
+
+            filtered.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = `shopping-item ${item.purchased ? 'completed' : ''}`;
+                itemEl.innerHTML = `
+                    <input type="checkbox" ${item.purchased ? 'checked' : ''} onchange="toggleShopping(${index})">
+                    <div class="item-info">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-category">${item.category} ${item.price ? '· ¥' + item.price : ''}</div>
+                    </div>
+                    <button type="button" class="item-delete" onclick="deleteShopping(${index})">×</button>
+                `;
+                container.appendChild(itemEl);
+            });
+        }
+
+        function filterShopping(filter) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            renderShopping(filter);
+        }
+
+        function openAddShoppingModal() {
+            document.getElementById('addShoppingModal').classList.add('active');
+        }
+
+        function addShopping(e) {
+            e.preventDefault();
+            shoppingList.push({
+                name: document.getElementById('shoppingName').value,
+                category: document.getElementById('shoppingCategory').value,
+                price: document.getElementById('shoppingPrice').value,
+                purchased: false
+            });
+            localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+            closeModal('addShoppingModal');
+            renderShopping();
+            document.getElementById('addShoppingModal').querySelector('form').reset();
+        }
+
+        function toggleShopping(index) {
+            shoppingList[index].purchased = !shoppingList[index].purchased;
+            localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+            renderShopping();
+        }
+
+        function deleteShopping(index) {
+            shoppingList.splice(index, 1);
+            localStorage.setItem('shoppingList', JSON.stringify(shoppingList));
+            renderShopping();
+        }
+
+        // RESERVATIONS
+        function renderReservations() {
+            const container = document.getElementById('reservationsList');
+            container.innerHTML = '';
+
+            reservations.forEach((res, index) => {
+                const typeEmoji = { 'Flight': '✈️', 'Hotel': '🏨', 'Rental': '🚗', 'Activity': '🎫' };
+                const resEl = document.createElement('div');
+                resEl.className = 'reservation-card';
+                resEl.innerHTML = `
+                    <div class="reservation-header">
+                        <div class="reservation-badge">${res.type}</div>
+                        <div class="reservation-type">${typeEmoji[res.type] || '📋'} ${res.title}</div>
+                    </div>
+                    <div class="reservation-body">
+                        ${res.number ? `<div class="reservation-field"><div class="reservation-label">預訂編號</div><div class="reservation-value">${res.number}</div></div>` : ''}
+                        ${res.date ? `<div class="reservation-field"><div class="reservation-label">確認日期</div><div class="reservation-value">${res.date}</div></div>` : ''}
+                        ${res.details ? `<div class="reservation-field"><div class="reservation-label">詳細信息</div><div class="reservation-value">${res.details}</div></div>` : ''}
+                        <div class="reservation-actions">
+                            <button class="res-btn res-btn-edit" onclick="deleteReservation(${index})">刪除</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(resEl);
+            });
+        }
+
+        function openAddReservationModal() {
+            document.getElementById('addReservationModal').classList.add('active');
+        }
+
+        function addReservation(e) {
+            e.preventDefault();
+            reservations.push({
+                type: document.getElementById('reservationType').value,
+                title: document.getElementById('reservationTitle').value,
+                number: document.getElementById('reservationNumber').value,
+                date: document.getElementById('reservationDate').value,
+                details: document.getElementById('reservationDetails').value
+            });
+            localStorage.setItem('reservations', JSON.stringify(reservations));
+            closeModal('addReservationModal');
+            renderReservations();
+            document.getElementById('addReservationModal').querySelector('form').reset();
+        }
+
+        function deleteReservation(index) {
+            reservations.splice(index, 1);
+            localStorage.setItem('reservations', JSON.stringify(reservations));
+            renderReservations();
+        }
+
+        // TRIP DETAIL
+        function renderTripDetail() {
+            document.getElementById('daySelectorHorizontal').innerHTML = '';
+
+            for (let i = 1; i <= totalDays; i++) {
+                const btn = document.createElement('div');
+                btn.className = `day-btn ${i === currentDay ? 'active' : ''}`;
+                btn.innerHTML = `
+                    <div>${['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'][i-1]}</div>
+                    <div>${14 + i - 1}</div>
+                    <div class="day-btn-weather">☀️</div>
+                    <div class="day-btn-temp">12°C</div>
+                `;
+                btn.onclick = () => { currentDay = i; renderTripDetail(); };
+                document.getElementById('daySelectorHorizontal').appendChild(btn);
+            }
+
+            renderActivityList();
+            updateCountdown();
+        }
+
+        function renderActivityList() {
+            const dayActivities = activities.filter(a => a.day === currentDay);
+            const container = document.getElementById('activityList');
+
+            if (dayActivities.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px 20px;">暫無安排活動</p>';
+            } else {
+                container.innerHTML = '';
+                dayActivities.forEach(act => {
+                    const item = document.createElement('div');
+                    item.className = 'activity-item';
+                    item.innerHTML = `
+                        <div class="activity-dot"></div>
+                        <div class="activity-time">🕐 ${act.time}</div>
+                        <div class="activity-location">📍 ${act.name}</div>
+                        ${act.hours ? `<div style="font-size: 12px; color: #999;">⏰ ${act.hours}</div>` : ''}
+                        ${act.ticket ? `<div style="font-size: 12px; color: var(--primary-red); font-weight: 600;">🎫 ¥${act.ticket}</div>` : ''}
+                        ${act.description ? `<div style="font-size: 13px; margin-top: 8px;">${act.description}</div>` : ''}
+                    `;
+                    container.appendChild(item);
+                });
+            }
+        }
+
+        function openAddActivityModal() {
+            document.getElementById('addActivityModal').classList.add('active');
+        }
+
+        function addActivity(e) {
+            e.preventDefault();
+            activities.push({
+                day: currentDay,
+                time: document.getElementById('activityTime').value,
+                name: document.getElementById('activityName').value,
+                type: document.getElementById('activityType').value,
+                hours: document.getElementById('activityHours').value,
+                ticket: document.getElementById('activityTicket').value,
+                description: document.getElementById('activityDescription').value
+            });
+            localStorage.setItem('activities', JSON.stringify(activities));
+            closeModal('addActivityModal');
+            renderTripDetail();
+            document.getElementById('addActivityModal').querySelector('form').reset();
+        }
+
+        function updateCountdown() {
+            const start = new Date('2026-01-14');
+            const now = new Date();
+            const diff = start - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById('countdownTimer').textContent = `${Math.max(0, days)}天 ${hours}小時 ${minutes}分鐘`;
+        }
+
+        // BUDGET
+        function renderBudget() {
+            const total = 50000;
+            const spent = activities.reduce((acc, a) => acc + (parseInt(a.ticket) || 0), 0);
+            const remaining = total - spent;
+
+            document.getElementById('totalBudget').textContent = `¥${total.toLocaleString()}`;
+            document.getElementById('spentBudget').textContent = `¥${spent.toLocaleString()}`;
+            document.getElementById('remainingBudget').textContent = `¥${remaining.toLocaleString()}`;
+        }
+
+        // TOOLBOX
+        function renderToolbox() {
+            const container = document.getElementById('checklistItems');
+            container.innerHTML = '';
+
+            checklists.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.style.cssText = 'display: flex; gap: 12px; padding: 12px; margin-bottom: 8px; background: #F8F9FA; border-radius: 8px;';
+                itemEl.innerHTML = `
+                    <input type="checkbox" ${item.completed ? 'checked' : ''} onchange="toggleChecklist(${index})" style="width: 18px; cursor: pointer;">
+                    <span style="flex: 1; ${item.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${item.item}</span>
+                `;
+                container.appendChild(itemEl);
+            });
+        }
+
+        function toggleChecklist(index) {
+            checklists[index].completed = !checklists[index].completed;
+            localStorage.setItem('checklists', JSON.stringify(checklists));
+            renderToolbox();
+        }
+
+        function addChecklistItem() {
+            const input = document.getElementById('newChecklistItem');
+            if (input.value.trim()) {
+                checklists.push({ item: input.value, completed: false });
+                localStorage.setItem('checklists', JSON.stringify(checklists));
+                input.value = '';
+                renderToolbox();
+            }
+        }
+
+        function convertCurrency(fromHkd = false) {
+            const jpy = document.getElementById('jpyInput');
+            const hkd = document.getElementById('hkdInput');
+
+            if (fromHkd) {
+                jpy.value = (parseFloat(hkd.value) / EXCHANGE_RATE).toFixed(0);
+            } else {
+                hkd.value = (parseFloat(jpy.value) * EXCHANGE_RATE).toFixed(2);
+            }
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // INITIALIZE
+        renderShopping();
+        renderTripDetail();
+        setInterval(updateCountdown, 1000);
+    </script>
 </body>
 </html>
