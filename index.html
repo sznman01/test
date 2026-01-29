@@ -93,6 +93,27 @@
     .date-pill {
       min-width: 76px;
     }
+
+    .timeline-item {
+      cursor: grab;
+    }
+
+    .timeline-item:active {
+      cursor: grabbing;
+    }
+
+    .sticky-date-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background-color: #FFF7EB;
+      padding: 12px 16px;
+      border-bottom: 2px solid #E9D5C8;
+    }
+
+    .itinerary-content {
+      padding-bottom: 100px;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -113,7 +134,6 @@
             <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
             <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
           </div>
-
           <div v-else class="space-y-4">
             <div 
               v-for="(trip, index) in trips" 
@@ -181,7 +201,7 @@
       </div>
     </template>
 
-    <!-- 單一行程詳情頁（重新設計結構） -->
+    <!-- 單一行程詳情頁（重新設計） -->
     <template v-if="currentPage === 'detail'">
       <!-- 頂部封面 -->
       <div class="relative">
@@ -191,7 +211,6 @@
         <div v-else class="w-full h-56 flex items-center justify-center" style="background: linear-gradient(135deg,#E99D99,#D88888);">
           <span class="text-5xl text-white">🌍</span>
         </div>
-        <!-- 返回按鈕疊在封面上 -->
         <button 
           @click="backToHome"
           class="absolute top-4 left-4 bg-white/90 rounded-full p-2 shadow-md text-gray-700"
@@ -200,10 +219,8 @@
         </button>
       </div>
 
-      <!-- 內容區：以大卡片分段 -->
-      <div class="flex-1 overflow-y-auto p-4 space-y-4" style="background-color:#FFF7EB;">
-        
-        <!-- 行程名稱 + 地點卡 -->
+      <!-- 行程名稱卡片 -->
+      <div class="px-4 pt-4">
         <div class="cute-card rounded-2xl p-4 border" style="border-color:#E9D5C8;">
           <h1 class="text-xl font-bold text-gray-800 mb-1">{{ currentTripData.title }}</h1>
           <p class="text-gray-600 mb-1">📍 {{ currentTripData.location }}</p>
@@ -211,17 +228,16 @@
             📅 {{ formatDateRangeEnglish(currentTripData.dates) }} · ⏱️ {{ calculateDays(currentTripData.dates) }} 天
           </p>
         </div>
+      </div>
 
-        <!-- 倒數計時器卡 -->
+      <!-- 倒數計時器卡 -->
+      <div class="px-4 pt-4">
         <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
           <p class="text-sm text-gray-600">距離出發</p>
           <div class="flex items-baseline gap-2">
-            <span class="text-4xl font-extrabold text-gray-900">
-              {{ countdownDaysText }}
-            </span>
+            <span class="text-4xl font-extrabold text-gray-900">{{ countdownDaysText }}</span>
             <span class="text-sm text-gray-600" v-if="countdownDays >= 0">天</span>
           </div>
-          <!-- 進度條 -->
           <div class="mt-2">
             <div class="w-full h-3 rounded-full bg-[#FFE3DD] overflow-hidden relative">
               <div 
@@ -231,7 +247,6 @@
                   background: 'linear-gradient(90deg,#E99D99,#D88888)'
                 }"
               ></div>
-              <!-- 飛機 icon -->
               <div 
                 class="absolute -top-3 text-lg"
                 :style="{ left: `calc(${countdownProgress}% - 10px)` }"
@@ -240,98 +255,143 @@
               </div>
             </div>
           </div>
-          <p class="text-xs text-gray-500 mt-1">
-            出發日期：{{ formatDateDisplay(currentTripData.startDate) }}
-          </p>
+          <p class="text-xs text-gray-500 mt-1">出發日期：{{ formatDateDisplay(currentTripData.startDate) }}</p>
         </div>
-
-        <!-- 日期選擇卡：水平滾動 -->
-        <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
-          <p class="text-sm text-gray-700 mb-1">選擇日期</p>
-          <div class="flex items-center justify-between mb-2 text-xs text-gray-500">
-            <span>左右滑動查看其他日子</span>
-          </div>
-          <div class="flex gap-2 overflow-x-auto pb-1">
-            <button
-              v-for="(day, idx) in dateOptions"
-              :key="day.date"
-              class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
-              :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
-              :style="selectedDateIndex === idx 
-                ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
-                : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
-              @click="selectedDateIndex = idx"
-            >
-              <div>{{ day.weekday }}</div>
-              <div class="mt-1">{{ day.day }}</div>
-            </button>
-          </div>
-        </div>
-
-        <!-- 該日行程卡（簡單版，暫用 placeholder 文案） -->
-        <div class="cute-card rounded-2xl p-4 border space-y-2" style="border-color:#E9D5C8;">
-          <p class="text-sm text-gray-500 mb-1">
-            {{ currentSelectedDateLabel }}
-          </p>
-          <p class="text-gray-800 font-semibold">
-            暫未設定當日詳細行程
-          </p>
-          <p class="text-gray-500 text-sm">
-            你之後可以擴充：為每一日加入時段、活動、餐廳等等。
-          </p>
-        </div>
-
       </div>
 
-      <!-- 底部導航欄（保持原有 7 個 Tab） -->
+      <!-- 日期選擇卡：水平滾動（sticky） -->
+      <div class="sticky-date-header">
+        <p class="text-sm text-gray-700 mb-2">選擇日期</p>
+        <div class="flex gap-2 overflow-x-auto pb-1">
+          <button
+            v-for="(day, idx) in dateOptions"
+            :key="day.date"
+            class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
+            :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
+            :style="selectedDateIndex === idx 
+              ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
+              : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
+            @click="selectedDateIndex = idx"
+          >
+            <div>{{ day.weekday }}</div>
+            <div class="mt-1">{{ day.day }}</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 詳細行程內容區 -->
+      <div class="flex-1 overflow-y-auto" style="background-color:#FFF7EB;">
+        <div class="itinerary-content px-4">
+          <!-- 日期標題卡 -->
+          <div class="cute-card rounded-2xl p-4 border mt-4 space-y-1" style="border-color:#E9D5C8;">
+            <p class="text-xs text-gray-500">{{ currentSelectedDateLabel }}</p>
+            <h2 class="text-lg font-bold text-gray-800">Day {{ getCurrentDayNumber() }}</h2>
+            <p class="text-sm text-gray-600">{{ getDayActivityTitle() }}</p>
+          </div>
+
+          <!-- 天氣卡 -->
+          <div class="cute-card rounded-2xl p-4 border mt-4 space-y-2" style="border-color:#E9D5C8;">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-3xl">{{ getCurrentDayWeather().icon }}</span>
+                <div>
+                  <p class="text-2xl font-bold text-gray-800">{{ getCurrentDayWeather().temp }}°C</p>
+                  <p class="text-xs text-gray-500">體感 {{ getCurrentDayWeather().feelsLike }}°C</p>
+                </div>
+              </div>
+            </div>
+            <p class="text-sm text-gray-600 mt-2">{{ getCurrentDayWeather().description }}</p>
+          </div>
+
+          <!-- 酒店/住宿資訊卡 -->
+          <div v-if="getCurrentDayAccommodation()" class="cute-card rounded-2xl p-4 border mt-4 space-y-3" style="border-color:#E9D5C8;">
+            <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8]">
+              <span class="text-2xl">🏨</span>
+              <div class="flex-1">
+                <p class="text-sm text-gray-500">住宿</p>
+                <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation().name }}</p>
+              </div>
+            </div>
+            <a 
+              :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
+              target="_blank"
+              class="text-xs text-[#E99D99] hover:underline flex items-center gap-1"
+            >
+              📍 在 Google Maps 查看
+            </a>
+          </div>
+
+          <!-- 活動時間軸卡 -->
+          <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border mt-4 space-y-3" style="border-color:#E9D5C8;">
+            <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
+            
+            <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
+              <!-- 連線 -->
+              <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
+              
+              <!-- 圓點 + 時間圓圈 + 內容 -->
+              <div class="flex gap-3">
+                <!-- 時間圓圈 -->
+                <div class="relative mt-1">
+                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
+                    {{ activity.time || '—' }}
+                  </div>
+                </div>
+
+                <!-- 活動內容 -->
+                <div class="flex-1">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                      <p class="text-sm font-semibold text-gray-800">{{ activity.name }}</p>
+                      <p class="text-xs text-gray-600 mt-1">{{ getActivityIcon(activity.type) }} {{ activity.location }}</p>
+                      <a 
+                        :href="`https://www.google.com/maps/search/${encodeURIComponent(activity.location)}`"
+                        target="_blank"
+                        class="text-xs text-[#E99D99] hover:underline mt-1 inline-block"
+                      >
+                        📍 導航
+                      </a>
+                    </div>
+                    <button class="text-gray-400 hover:text-gray-600 p-1">⋯</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="cute-card rounded-2xl p-4 border mt-4 text-center" style="border-color:#E9D5C8;">
+            <p class="text-gray-500 text-sm">暫無行程安排</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部導航欄 -->
       <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t shadow-2xl" style="background-color: #FFF7EB; border-color: #E9D5C8;">
         <div class="flex justify-around items-center">
-          <button 
-            @click="activeTab = 'itinerary'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'itinerary' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'itinerary'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'itinerary' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">✈️</span>
             <span>行程</span>
           </button>
-          <button 
-            @click="activeTab = 'reservation'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'reservation' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'reservation' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">🏨</span>
             <span>預約</span>
           </button>
-          <button 
-            @click="activeTab = 'expense'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'expense' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'expense' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">💰</span>
             <span>記賬</span>
           </button>
-          <button 
-            @click="activeTab = 'shopping'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'shopping' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'shopping' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">🛍️</span>
             <span>購物</span>
           </button>
-          <button 
-            @click="activeTab = 'checklist'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'checklist' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'checklist' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">✓</span>
             <span>準備</span>
           </button>
-          <button 
-            @click="activeTab = 'members'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'members' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'members' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">👥</span>
             <span>成員</span>
           </button>
-          <button 
-            @click="activeTab = 'settings'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'settings' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="activeTab = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'settings' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">⚙️</span>
             <span>設定</span>
           </button>
@@ -339,7 +399,7 @@
       </nav>
     </template>
 
-    <!-- 新增/編輯表單 (彈出) -->
+    <!-- 新增/編輯表單 -->
     <div v-if="showAddForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
@@ -349,104 +409,38 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">旅行封面圖片</label>
             <div class="relative">
-              <input 
-                type="file"
-                accept="image/*"
-                @change="handleImageChange"
-                class="hidden"
-                id="imageFileInput"
-              >
-              <button
-                type="button"
-                @click="openFilePicker"
-                class="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-50 transition-all flex items-center justify-center gap-2 font-medium"
-                :style="{ borderColor: '#E99D99', backgroundColor: '#FFFBF7', color: '#8B6B6B' }"
-              >
+              <input type="file" accept="image/*" @change="handleImageChange" class="hidden" id="imageFileInput">
+              <button type="button" @click="openFilePicker" class="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-50 transition-all flex items-center justify-center gap-2 font-medium" :style="{ borderColor: '#E99D99', backgroundColor: '#FFFBF7', color: '#8B6B6B' }">
                 📷 點擊選擇圖片
               </button>
             </div>
             <img v-if="formData.coverImage" :src="formData.coverImage" :alt="formData.title" class="image-preview">
           </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">行程名稱</label>
-            <input 
-              v-model="formData.title" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input"
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="例如：香港自由行"
-            >
+            <input v-model="formData.title" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：香港自由行">
           </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
-            <input 
-              v-model="formData.location" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input"
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="例如：香港"
-            >
+            <input v-model="formData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：香港">
           </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
-            <input 
-              v-model="formData.startDate" 
-              type="date"
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input"
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-            >
+            <input v-model="formData.startDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
           </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
-            <input 
-              v-model="formData.endDate" 
-              type="date"
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input"
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-            >
+            <input v-model="formData.endDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
           </div>
-
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
-            <textarea 
-              v-model="formData.description" 
-              rows="3"
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none form-input"
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="計劃中的亮點、注意事項..."
-            ></textarea>
+            <textarea v-model="formData.description" rows="3" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="計劃中的亮點、注意事項..."></textarea>
           </div>
-
           <div class="flex gap-3 pt-4">
-            <button 
-              type="submit" 
-              class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg"
-              style="background-color: #E99D99;"
-            >
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
               💾 保存
             </button>
-            <button 
-              type="button"
-              @click="closeForm" 
-              class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all"
-              style="background-color: #E9D5C8;"
-            >
+            <button type="button" @click="closeForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
               ❌ 取消
             </button>
           </div>
@@ -460,18 +454,10 @@
         <h2 class="text-xl font-bold text-center mb-4 text-gray-800">確定刪除嗎？</h2>
         <p class="text-center text-gray-600 mb-6">{{ trips[deletingIndex] ? trips[deletingIndex].title : '' }} 將被永久刪除</p>
         <div class="flex gap-3">
-          <button 
-            @click="handleConfirmDelete" 
-            class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all"
-            style="background-color: #E99D99;"
-          >
+          <button @click="handleConfirmDelete" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all" style="background-color: #E99D99;">
             刪除
           </button>
-          <button 
-            @click="showDeleteConfirm = false" 
-            class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all"
-            style="background-color: #E9D5C8;"
-          >
+          <button @click="showDeleteConfirm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
             取消
           </button>
         </div>
@@ -492,6 +478,7 @@
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
         const activeTab = ref('itinerary');
+        const selectedDateIndex = ref(0);
         
         const formData = ref({
           title: '',
@@ -505,6 +492,21 @@
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const weekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+        // 模擬天氣數據
+        const mockWeatherData = {
+          sunny: { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' },
+          cloudy: { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
+          rainy: { icon: '🌧️', temp: 18, feelsLike: 15, description: '有雨預報' },
+          snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' }
+        };
+
+        // 模擬日程數據
+        const mockItineraryData = [
+          { day: 1, activities: [{ time: '09:00', name: '抵達機場', type: 'transport', location: '東京成田機場' }, { time: '12:30', name: '午餐', type: 'food', location: '成田機場餐廳' }, { time: '15:00', name: '入住酒店', type: 'accommodation', location: '新宿 Shinjuku Hotel' }], accommodation: { name: '新宿 Shinjuku Hotel' } },
+          { day: 2, activities: [{ time: '08:00', name: '早餐', type: 'food', location: '酒店餐廳' }, { time: '10:00', name: '遊覽淺草寺', type: 'sightseeing', location: '淺草寺, 東京' }, { time: '14:00', name: '購物', type: 'shopping', location: '築地市場' }, { time: '18:00', name: '晚餐', type: 'food', location: '居酒屋 Izakaya' }], accommodation: { name: '新宿 Shinjuku Hotel' } },
+          { day: 3, activities: [{ time: '08:00', name: '早餐', type: 'food', location: '酒店餐廳' }, { time: '10:00', name: '富士山遊覽', type: 'sightseeing', location: '富士山五合目' }, { time: '17:00', name: '溫泉浸浴', type: 'relaxation', location: '富士山溫泉旅館' }], accommodation: { name: '富士山溫泉旅館 Onsen Resort' } }
+        ];
 
         const formatDateRangeEnglish = (dates) => {
           if (Array.isArray(dates) && dates.length >= 2) {
@@ -591,6 +593,7 @@
 
         const viewTripDetail = (index) => {
           selectedTripIndex.value = index;
+          selectedDateIndex.value = 0;
           currentPage.value = 'detail';
           activeTab.value = 'itinerary';
         };
@@ -717,17 +720,52 @@
           });
         });
 
-        const selectedDateIndex = ref(0);
-
-        watch(currentTripData, () => {
-          selectedDateIndex.value = 0;
-        });
-
         const currentSelectedDateLabel = computed(() => {
           if (!dateOptions.value.length) return '';
           const d = dateOptions.value[selectedDateIndex.value] || dateOptions.value[0];
-          return `${d.weekday} ${d.day}`;
+          return `${d.weekday} ${d.day} Jan`;
         });
+
+        const getCurrentDayNumber = () => {
+          return selectedDateIndex.value + 1;
+        };
+
+        const getDayActivityTitle = () => {
+          const dayNum = getCurrentDayNumber();
+          const mockData = mockItineraryData.find(d => d.day === dayNum);
+          return mockData ? (dayNum === 1 ? '抵達東京' : dayNum === 2 ? '探索東京' : dayNum === 3 ? '富士山露營' : '') : '';
+        };
+
+        const getCurrentDayWeather = () => {
+          const dayNum = getCurrentDayNumber();
+          const weatherTypes = Object.keys(mockWeatherData);
+          const weather = mockWeatherData[weatherTypes[dayNum % weatherTypes.length]];
+          return weather;
+        };
+
+        const getCurrentDayAccommodation = () => {
+          const dayNum = getCurrentDayNumber();
+          const mockData = mockItineraryData.find(d => d.day === dayNum);
+          return mockData ? mockData.accommodation : null;
+        };
+
+        const getCurrentDayActivities = () => {
+          const dayNum = getCurrentDayNumber();
+          const mockData = mockItineraryData.find(d => d.day === dayNum);
+          return mockData ? mockData.activities : [];
+        };
+
+        const getActivityIcon = (type) => {
+          const icons = {
+            'transport': '✈️',
+            'food': '🍽️',
+            'accommodation': '🏨',
+            'sightseeing': '🏯',
+            'shopping': '🛍️',
+            'relaxation': '🧖'
+          };
+          return icons[type] || '📍';
+        };
 
         return {
           trips,
@@ -739,6 +777,7 @@
           deletingIndex,
           activeTab,
           formData,
+          selectedDateIndex,
           formatDateRangeEnglish,
           formatDateDisplay,
           calculateDays,
@@ -756,8 +795,13 @@
           countdownDaysText,
           countdownProgress,
           dateOptions,
-          selectedDateIndex,
-          currentSelectedDateLabel
+          currentSelectedDateLabel,
+          getCurrentDayNumber,
+          getDayActivityTitle,
+          getCurrentDayWeather,
+          getCurrentDayAccommodation,
+          getCurrentDayActivities,
+          getActivityIcon
         };
       }
     }).mount('#app');
