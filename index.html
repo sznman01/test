@@ -88,6 +88,9 @@
     .sticky-button {
       background-color: #FFF7EB;
       border-top: 1px solid #F5E6D3;
+      position: sticky;
+      bottom: 0;
+      z-index: 20;
     }
 
     .date-pill {
@@ -144,7 +147,6 @@
       margin-top: 8px;
     }
 
-    /* 頁面容器樣式 */
     .page-container {
       display: flex;
       flex-direction: column;
@@ -163,19 +165,47 @@
 
     .bottom-nav {
       flex-shrink: 0;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      max-width: 448px;
+      margin-left: auto;
+      margin-right: auto;
+      background-color: #FFF7EB;
+      border-color: #E9D5C8;
+      border-top: 1px solid #E9D5C8;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
     }
 
-    /* 頁面轉換動畫 */
-    .page-enter-active, .page-leave-active {
-      transition: opacity 0.2s ease;
+    .home-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
-    .page-enter-from {
-      opacity: 0;
+    .home-header {
+      flex-shrink: 0;
     }
 
-    .page-leave-to {
-      opacity: 0;
+    .home-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: 20px;
+    }
+
+    .home-footer {
+      flex-shrink: 0;
+      padding: 16px;
+      background-color: #FFF7EB;
+      border-top: 1px solid #F5E6D3;
+    }
+
+    .detail-with-nav {
+      padding-bottom: 70px;
     }
   </style>
 </head>
@@ -183,97 +213,87 @@
 
   <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
     
-    <!-- 主頁 -->
+    <!-- 主頁（無 Bottom Nav）-->
     <template v-if="currentScreen === 'home'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
+      <div class="home-container">
+        <header class="home-header header-bg p-6 text-center text-white shadow-lg">
           <h1 class="text-2xl font-bold">✨ 我的旅行計劃 ✨</h1>
           <p class="text-sm opacity-90 mt-1">輕鬆管理你的行程！</p>
         </header>
 
-        <div class="page-content">
-          <div class="p-4 space-y-4">
-            <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
-              <div class="text-4xl mb-4">🌍</div>
-              <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
-              <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
-            </div>
-            <div v-else class="space-y-4 pb-20">
-              <div 
-                v-for="(trip, index) in trips" 
-                :key="index"
-                class="cute-card rounded-2xl overflow-hidden transform transition-all hover:scale-105 border"
-                :style="{ borderColor: '#E9D5C8', cursor: 'pointer' }"
-                @click="viewTripDetail(index)"
-              >
-                <div v-if="trip.coverImage" class="relative overflow-hidden">
-                  <img :src="trip.coverImage" :alt="trip.title" class="card-cover">
-                  <div class="absolute top-3 right-3 flex gap-2">
-                    <button 
-                      @click.stop="editTrip(index)" 
-                      class="rounded-full p-2 shadow-lg transition-all"
-                      :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
-                      @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
-                      @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
-                    >
-                      ✏️
-                    </button>
-                    <button 
-                      @click.stop="confirmDeleteTrip(index)" 
-                      class="rounded-full p-2 shadow-lg transition-all"
-                      :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
-                      @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
-                      @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
-                    >
-                      🗑️
-                    </button>
-                  </div>
+        <div class="home-content">
+          <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
+            <div class="text-4xl mb-4">🌍</div>
+            <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
+            <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
+          </div>
+          <div v-else class="space-y-4">
+            <div 
+              v-for="(trip, index) in trips" 
+              :key="index"
+              class="cute-card rounded-2xl overflow-hidden transform transition-all hover:scale-105 border cursor-pointer"
+              :style="{ borderColor: '#E9D5C8' }"
+              @click="enterTrip(index)"
+            >
+              <div v-if="trip.coverImage" class="relative overflow-hidden">
+                <img :src="trip.coverImage" :alt="trip.title" class="card-cover">
+                <div class="absolute top-3 right-3 flex gap-2">
+                  <button 
+                    @click.stop="editTrip(index)" 
+                    class="rounded-full p-2 shadow-lg transition-all"
+                    :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    @click.stop="confirmDeleteTrip(index)" 
+                    class="rounded-full p-2 shadow-lg transition-all"
+                    :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
+                  >
+                    🗑️
+                  </button>
                 </div>
-                <div v-else class="relative">
-                  <div class="card-cover-placeholder">🌍</div>
-                  <div class="absolute top-3 right-3 flex gap-2">
-                    <button 
-                      @click.stop="editTrip(index)" 
-                      class="rounded-full p-2 shadow-lg transition-all"
-                      :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
-                      @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
-                      @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
-                    >
-                      ✏️
-                    </button>
-                    <button 
-                      @click.stop="confirmDeleteTrip(index)" 
-                      class="rounded-full p-2 shadow-lg transition-all"
-                      :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
-                      @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
-                      @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
-                    >
-                      🗑️
-                    </button>
-                  </div>
+              </div>
+              <div v-else class="relative">
+                <div class="card-cover-placeholder">🌍</div>
+                <div class="absolute top-3 right-3 flex gap-2">
+                  <button 
+                    @click.stop="editTrip(index)" 
+                    class="rounded-full p-2 shadow-lg transition-all"
+                    :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
+                  >
+                    ✏️
+                  </button>
+                  <button 
+                    @click.stop="confirmDeleteTrip(index)" 
+                    class="rounded-full p-2 shadow-lg transition-all"
+                    :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
+                  >
+                    🗑️
+                  </button>
                 </div>
+              </div>
 
-                <div class="p-5">
-                  <h3 class="font-bold text-lg text-gray-800 mb-2">{{ trip.title }}</h3>
-                  <div class="space-y-2 mb-4">
-                    <p class="text-gray-600 text-sm flex items-center gap-2">
-                      📍 {{ trip.location }}
-                    </p>
-                    <p class="text-gray-500 text-sm flex items-center gap-2">
-                      📅 {{ formatDateRangeEnglish(trip.dates) }}
-                    </p>
-                    <p class="text-gray-500 text-sm flex items-center gap-2">
-                      ⏱️ {{ calculateDays(trip.dates) }} 天
-                    </p>
-                  </div>
-                  <p v-if="trip.description" class="text-gray-600 text-sm line-clamp-2">{{ trip.description }}</p>
+              <div class="p-5">
+                <h3 class="font-bold text-lg text-gray-800 mb-2">{{ trip.title }}</h3>
+                <div class="space-y-2 mb-4">
+                  <p class="text-gray-600 text-sm flex items-center gap-2">
+                    📍 {{ trip.location }}
+                  </p>
+                  <p class="text-gray-500 text-sm flex items-center gap-2">
+                    📅 {{ formatDateRangeEnglish(trip.dates) }}
+                  </p>
+                  <p class="text-gray-500 text-sm flex items-center gap-2">
+                    ⏱️ {{ calculateDays(trip.dates) }} 天
+                  </p>
                 </div>
+                <p v-if="trip.description" class="text-gray-600 text-sm line-clamp-2">{{ trip.description }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="sticky-button p-4">
+        <div class="home-footer">
           <button 
             @click="openAddForm" 
             class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
@@ -284,10 +304,11 @@
       </div>
     </template>
 
-    <!-- 行程詳情頁 -->
-    <template v-if="currentScreen === 'detail'">
+    <!-- 行程詳情頁及其他頁面（有 Bottom Nav）-->
+    <template v-if="currentScreen !== 'home'">
       <div class="page-container">
-        <div class="relative">
+        <!-- 詳情頁頂部 -->
+        <div v-if="currentScreen === 'detail'" class="page-header relative">
           <div v-if="currentTripData.coverImage">
             <img :src="currentTripData.coverImage" :alt="currentTripData.title" class="w-full h-56 object-cover">
           </div>
@@ -295,423 +316,387 @@
             <span class="text-5xl text-white">🌍</span>
           </div>
           <button 
-            @click="currentScreen = 'home'"
+            @click="backToHome"
             class="absolute top-4 left-4 bg-white/90 rounded-full p-2 shadow-md text-gray-700"
           >
             ←
           </button>
         </div>
 
+        <!-- 其他頁面頂部 -->
+        <template v-if="currentScreen !== 'detail'">
+          <header class="page-header header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">
+              <span v-if="currentScreen === 'reservation'">🎫 預約管理</span>
+              <span v-if="currentScreen === 'expense'">💰 記賬</span>
+              <span v-if="currentScreen === 'shopping'">🛍️ 購物清單</span>
+              <span v-if="currentScreen === 'checklist'">✓ 準備清單</span>
+              <span v-if="currentScreen === 'members'">👥 成員</span>
+              <span v-if="currentScreen === 'settings'">⚙️ 設定</span>
+            </h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </template>
+
+        <!-- 內容區域 -->
         <div class="page-content">
-          <div class="itinerary-content px-4">
-            <div class="pt-4">
-              <div class="cute-card rounded-2xl p-4 border" style="border-color:#E9D5C8;">
-                <h1 class="text-xl font-bold text-gray-800 mb-1">{{ currentTripData.title }}</h1>
-                <p class="text-gray-600 mb-1">📍 {{ currentTripData.location }}</p>
-                <p class="text-gray-500 text-sm">
-                  📅 {{ formatDateRangeEnglish(currentTripData.dates) }} · ⏱️ {{ calculateDays(currentTripData.dates) }} 天
-                </p>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
-                <p class="text-sm text-gray-600">距離出發</p>
-                <div class="flex items-baseline gap-2">
-                  <span class="text-4xl font-extrabold text-gray-900">{{ countdownDaysText }}</span>
-                  <span class="text-sm text-gray-600" v-if="countdownDays >= 0">天</span>
+          <!-- 詳情頁 -->
+          <template v-if="currentScreen === 'detail'">
+            <div class="detail-with-nav px-4">
+              <div class="pt-4">
+                <div class="cute-card rounded-2xl p-4 border" style="border-color:#E9D5C8;">
+                  <h1 class="text-xl font-bold text-gray-800 mb-1">{{ currentTripData.title }}</h1>
+                  <p class="text-gray-600 mb-1">📍 {{ currentTripData.location }}</p>
+                  <p class="text-gray-500 text-sm">
+                    📅 {{ formatDateRangeEnglish(currentTripData.dates) }} · ⏱️ {{ calculateDays(currentTripData.dates) }} 天
+                  </p>
                 </div>
-                <div class="mt-2">
-                  <div class="w-full h-3 rounded-full bg-[#FFE3DD] overflow-hidden relative">
-                    <div 
-                      class="h-3 rounded-full"
-                      :style="{
-                        width: countdownProgress + '%',
-                        background: 'linear-gradient(90deg,#E99D99,#D88888)'
-                      }"
-                    ></div>
-                    <div 
-                      class="absolute -top-3 text-lg"
-                      :style="{ left: `calc(${countdownProgress}% - 10px)` }"
-                    >
-                      ✈️
-                    </div>
+              </div>
+
+              <div class="pt-4">
+                <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
+                  <p class="text-sm text-gray-600">距離出發</p>
+                  <div class="flex items-baseline gap-2">
+                    <span class="text-4xl font-extrabold text-gray-900">{{ countdownDaysText }}</span>
+                    <span class="text-sm text-gray-600" v-if="countdownDays >= 0">天</span>
                   </div>
-                </div>
-                <p class="text-xs text-gray-500 mt-1">出發日期：{{ formatDateDisplay(currentTripData.startDate) }}</p>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <p class="text-sm text-gray-700 mb-2 px-4">選擇日期</p>
-              <div class="flex gap-2 overflow-x-auto pb-3 px-4">
-                <button
-                  v-for="(day, idx) in dateOptions"
-                  :key="day.date"
-                  class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
-                  :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
-                  :style="selectedDateIndex === idx 
-                    ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
-                    : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
-                  @click="selectedDateIndex = idx"
-                >
-                  <div>{{ day.weekday }}</div>
-                  <div class="mt-1">{{ day.day }}</div>
-                </button>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <div class="cute-card rounded-2xl p-4 border space-y-1" style="border-color:#E9D5C8;">
-                <p class="text-xs text-gray-500">{{ currentSelectedDateLabel }}</p>
-                <h2 class="text-lg font-bold text-gray-800">Day {{ getCurrentDayNumber() }}</h2>
-                <p class="text-sm text-gray-600">{{ getDayActivityTitle() }}</p>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <div class="cute-card rounded-2xl p-4 border space-y-2" style="border-color:#E9D5C8;">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="text-3xl">{{ getCurrentDayWeather().icon }}</span>
-                    <div>
-                      <p class="text-2xl font-bold text-gray-800">{{ getCurrentDayWeather().temp }}°C</p>
-                      <p class="text-xs text-gray-500">體感 {{ getCurrentDayWeather().feelsLike }}°C</p>
-                    </div>
-                  </div>
-                </div>
-                <p class="text-sm text-gray-600 mt-2">{{ getCurrentDayWeather().description }}</p>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8] flex-1">
-                    <span class="text-2xl">🏨</span>
-                    <div class="flex-1">
-                      <p class="text-sm text-gray-500">住宿</p>
-                      <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation()?.name || '待添加' }}</p>
-                    </div>
-                  </div>
-                  <button 
-                    @click="openEditAccommodationForm"
-                    class="text-gray-400 hover:text-gray-600 p-1 ml-2"
-                  >
-                    ⋯
-                  </button>
-                </div>
-                <a 
-                  v-if="getCurrentDayAccommodation()?.name"
-                  :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
-                  target="_blank"
-                  class="text-xs text-[#E99D99] hover:underline flex items-center gap-1"
-                >
-                  📍 在 Google Maps 查看
-                </a>
-              </div>
-            </div>
-
-            <div class="pt-4">
-              <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
-                <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
-                
-                <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
-                  <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
-                  
-                  <div class="flex gap-3">
-                    <div class="relative mt-1">
-                      <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
-                        {{ activity.time || '—' }}
+                  <div class="mt-2">
+                    <div class="w-full h-3 rounded-full bg-[#FFE3DD] overflow-hidden relative">
+                      <div 
+                        class="h-3 rounded-full"
+                        :style="{
+                          width: countdownProgress + '%',
+                          background: 'linear-gradient(90deg,#E99D99,#D88888)'
+                        }"
+                      ></div>
+                      <div 
+                        class="absolute -top-3 text-lg"
+                        :style="{ left: `calc(${countdownProgress}% - 10px)` }"
+                      >
+                        ✈️
                       </div>
                     </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">出發日期：{{ formatDateDisplay(currentTripData.startDate) }}</p>
+                </div>
+              </div>
 
-                    <div class="flex-1">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <p class="text-sm font-semibold text-gray-800">{{ activity.name }}</p>
-                          <p class="text-xs text-gray-600 mt-1">{{ getActivityIcon(activity.type) }} {{ activity.location }}</p>
-                          <a 
-                            :href="`https://www.google.com/maps/search/${encodeURIComponent(activity.location)}`"
-                            target="_blank"
-                            class="text-xs text-[#E99D99] hover:underline mt-1 inline-block"
-                          >
-                            📍 導航
-                          </a>
+              <div class="pt-4">
+                <p class="text-sm text-gray-700 mb-2 px-4">選擇日期</p>
+                <div class="flex gap-2 overflow-x-auto pb-3 px-4">
+                  <button
+                    v-for="(day, idx) in dateOptions"
+                    :key="day.date"
+                    class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
+                    :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
+                    :style="selectedDateIndex === idx 
+                      ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
+                      : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
+                    @click="selectedDateIndex = idx"
+                  >
+                    <div>{{ day.weekday }}</div>
+                    <div class="mt-1">{{ day.day }}</div>
+                  </button>
+                </div>
+              </div>
+
+              <div class="pt-4">
+                <div class="cute-card rounded-2xl p-4 border space-y-1" style="border-color:#E9D5C8;">
+                  <p class="text-xs text-gray-500">{{ currentSelectedDateLabel }}</p>
+                  <h2 class="text-lg font-bold text-gray-800">Day {{ getCurrentDayNumber() }}</h2>
+                </div>
+              </div>
+
+              <div class="pt-4">
+                <div class="cute-card rounded-2xl p-4 border space-y-2" style="border-color:#E9D5C8;">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-3xl">{{ getCurrentDayWeather().icon }}</span>
+                      <div>
+                        <p class="text-2xl font-bold text-gray-800">{{ getCurrentDayWeather().temp }}°C</p>
+                        <p class="text-xs text-gray-500">體感 {{ getCurrentDayWeather().feelsLike }}°C</p>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-2">{{ getCurrentDayWeather().description }}</p>
+                </div>
+              </div>
+
+              <div class="pt-4">
+                <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8] flex-1">
+                      <span class="text-2xl">🏨</span>
+                      <div class="flex-1">
+                        <p class="text-sm text-gray-500">住宿</p>
+                        <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation()?.name || '待添加' }}</p>
+                      </div>
+                    </div>
+                    <button 
+                      @click="openEditAccommodationForm"
+                      class="text-gray-400 hover:text-gray-600 p-1 ml-2"
+                    >
+                      ⋯
+                    </button>
+                  </div>
+                  <a 
+                    v-if="getCurrentDayAccommodation()?.name"
+                    :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
+                    target="_blank"
+                    class="text-xs text-[#E99D99] hover:underline flex items-center gap-1"
+                  >
+                    📍 在 Google Maps 查看
+                  </a>
+                </div>
+              </div>
+
+              <div class="pt-4">
+                <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
+                  <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
+                  
+                  <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
+                    <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
+                    
+                    <div class="flex gap-3">
+                      <div class="relative mt-1">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
+                          {{ activity.time || '—' }}
                         </div>
-                        <div class="relative">
-                          <button 
-                            @click="openActivityMenu(idx)"
-                            class="text-gray-400 hover:text-gray-600 p-1"
-                          >
-                            ⋯
-                          </button>
+                      </div>
 
-                          <div v-if="activeActivityMenu === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
-                            <button 
-                              @click="openEditActivityForm(idx)"
-                              class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]"
+                      <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                          <div class="flex-1">
+                            <p class="text-sm font-semibold text-gray-800">{{ activity.name }}</p>
+                            <p class="text-xs text-gray-600 mt-1">{{ getActivityIcon(activity.type) }} {{ activity.location }}</p>
+                            <a 
+                              :href="`https://www.google.com/maps/search/${encodeURIComponent(activity.location)}`"
+                              target="_blank"
+                              class="text-xs text-[#E99D99] hover:underline mt-1 inline-block"
                             >
-                              ✏️ 編輯
-                            </button>
+                              📍 導航
+                            </a>
+                          </div>
+                          <div class="relative">
                             <button 
-                              @click="confirmDeleteActivity(idx)"
-                              class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]"
+                              @click="openActivityMenu(idx)"
+                              class="text-gray-400 hover:text-gray-600 p-1"
                             >
-                              🗑️ 刪除
+                              ⋯
                             </button>
+
+                            <div v-if="activeActivityMenu === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                              <button 
+                                @click="openEditActivityForm(idx)"
+                                class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]"
+                              >
+                                ✏️ 編輯
+                              </button>
+                              <button 
+                                @click="confirmDeleteActivity(idx)"
+                                class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]"
+                              >
+                                🗑️ 刪除
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div v-else class="cute-card rounded-2xl p-4 border text-center" style="border-color:#E9D5C8;">
-                <p class="text-gray-500 text-sm">暫無行程安排</p>
-              </div>
-            </div>
-
-            <div class="pt-4 pb-4">
-              <button 
-                @click="openAddActivityForm"
-                class="w-full add-activity-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
-              >
-                ➕ 新增活動/提醒
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <!-- 預約頁面 -->
-    <template v-if="currentScreen === 'reservation'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-          <h1 class="text-2xl font-bold">🎫 預約管理</h1>
-          <p class="text-sm opacity-90 mt-1">管理你的機票、住宿和票券</p>
-        </header>
-
-        <div class="page-content">
-          <div class="p-4 pb-24">
-            <div class="flex items-center justify-between mb-6">
-              <h2 class="text-lg font-bold text-gray-800">{{ currentTripData.title || '選擇行程' }}</h2>
-              <button 
-                @click="showReservationTypeMenu = true"
-                class="bg-[#E99D99] text-white rounded-full w-10 h-10 flex items-center justify-center text-lg hover:bg-[#D88888]"
-              >
-                ➕
-              </button>
-            </div>
-
-            <div class="reservation-section">
-              <p class="reservation-section-title">✈️ 機票</p>
-              <div v-if="currentTripData.reservations?.flights?.length > 0" class="space-y-2">
-                <div v-for="(flight, idx) in currentTripData.reservations.flights" :key="'flight-' + idx" class="reservation-item">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                      <p class="font-semibold text-gray-800 text-sm">{{ flight.flightNumber }}</p>
-                      <p class="text-xs text-gray-600 mt-1">出發: {{ flight.departure }} → 到達: {{ flight.arrival }}</p>
-                      <p class="text-xs text-gray-600">{{ flight.departureLocation }} → {{ flight.arrivalLocation }}</p>
-                      <p class="text-xs text-gray-500 mt-2">登機時間: {{ flight.departureTime }}</p>
-                    </div>
-                    <div class="relative">
-                      <button @click="openReservationMenu('flight', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
-                      <div v-if="activeReservationMenu?.type === 'flight' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
-                        <button @click="editReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
-                        <button @click="deleteReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
-                      </div>
-                    </div>
-                  </div>
-                  <img v-if="flight.certificate" :src="flight.certificate" :alt="flight.flightNumber" class="file-preview">
+                <div v-else class="cute-card rounded-2xl p-4 border text-center" style="border-color:#E9D5C8;">
+                  <p class="text-gray-500 text-sm">暫無行程安排</p>
                 </div>
               </div>
-              <div v-else class="text-center py-6 text-gray-400 text-sm">
-                <p>暫無機票預約</p>
+
+              <div class="pt-4 pb-4">
+                <button 
+                  @click="openAddActivityForm"
+                  class="w-full add-activity-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+                >
+                  ➕ 新增活動/提醒
+                </button>
               </div>
             </div>
+          </template>
 
-            <div class="reservation-section">
-              <p class="reservation-section-title">🏨 住宿</p>
-              <div v-if="currentTripData.reservations?.hotels?.length > 0" class="space-y-2">
-                <div v-for="(hotel, idx) in currentTripData.reservations.hotels" :key="'hotel-' + idx" class="reservation-item">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                      <a :href="`https://www.google.com/maps/search/${encodeURIComponent(hotel.name)}`" target="_blank" class="font-semibold text-[#E99D99] hover:underline text-sm">
-                        {{ hotel.name }}
-                      </a>
-                      <p class="text-xs text-gray-600 mt-1">📍 {{ hotel.address }}</p>
-                      <p class="text-xs text-gray-600">入住: {{ hotel.checkInDate }} | 退房: {{ hotel.checkOutDate }} {{ hotel.checkOutTime }}</p>
-                    </div>
-                    <div class="relative">
-                      <button @click="openReservationMenu('hotel', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
-                      <div v-if="activeReservationMenu?.type === 'hotel' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
-                        <button @click="editReservation('hotel', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
-                        <button @click="deleteReservation('hotel', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+          <!-- 預約頁 -->
+          <template v-if="currentScreen === 'reservation'">
+            <div class="p-4 pb-24">
+              <div class="flex items-center justify-between mb-6">
+                <h2 class="text-lg font-bold text-gray-800">預約管理</h2>
+                <button 
+                  @click="showReservationTypeMenu = true"
+                  class="bg-[#E99D99] text-white rounded-full w-10 h-10 flex items-center justify-center text-lg hover:bg-[#D88888]"
+                >
+                  ➕
+                </button>
+              </div>
+
+              <div class="reservation-section">
+                <p class="reservation-section-title">✈️ 機票</p>
+                <div v-if="currentTripData.reservations?.flights?.length > 0" class="space-y-2">
+                  <div v-for="(flight, idx) in currentTripData.reservations.flights" :key="'flight-' + idx" class="reservation-item">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <p class="font-semibold text-gray-800 text-sm">{{ flight.flightNumber }}</p>
+                        <p class="text-xs text-gray-600 mt-1">出發: {{ flight.departure }} → 到達: {{ flight.arrival }}</p>
+                        <p class="text-xs text-gray-600">{{ flight.departureLocation }} → {{ flight.arrivalLocation }}</p>
+                        <p class="text-xs text-gray-500 mt-2">登機時間: {{ flight.departureTime }}</p>
+                      </div>
+                      <div class="relative">
+                        <button @click="openReservationMenu('flight', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
+                        <div v-if="activeReservationMenu?.type === 'flight' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                          <button @click="editReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                          <button @click="deleteReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+                        </div>
                       </div>
                     </div>
+                    <img v-if="flight.certificate" :src="flight.certificate" :alt="flight.flightNumber" class="file-preview">
                   </div>
-                  <img v-if="hotel.certificate" :src="hotel.certificate" :alt="hotel.name" class="file-preview">
+                </div>
+                <div v-else class="text-center py-6 text-gray-400 text-sm">
+                  <p>暫無機票預約</p>
                 </div>
               </div>
-              <div v-else class="text-center py-6 text-gray-400 text-sm">
-                <p>暫無住宿預約</p>
-              </div>
-            </div>
 
-            <div class="reservation-section">
-              <p class="reservation-section-title">🎫 其他票券</p>
-              <div v-if="currentTripData.reservations?.tickets?.length > 0" class="space-y-2">
-                <div v-for="(ticket, idx) in currentTripData.reservations.tickets" :key="'ticket-' + idx" class="reservation-item">
-                  <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                      <p class="font-semibold text-gray-800 text-sm">{{ ticket.name }}</p>
-                      <p class="text-xs text-gray-600 mt-1">📅 {{ ticket.date }} {{ ticket.time }}</p>
-                    </div>
-                    <div class="relative">
-                      <button @click="openReservationMenu('ticket', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
-                      <div v-if="activeReservationMenu?.type === 'ticket' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
-                        <button @click="editReservation('ticket', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
-                        <button @click="deleteReservation('ticket', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+              <div class="reservation-section">
+                <p class="reservation-section-title">🏨 住宿</p>
+                <div v-if="currentTripData.reservations?.hotels?.length > 0" class="space-y-2">
+                  <div v-for="(hotel, idx) in currentTripData.reservations.hotels" :key="'hotel-' + idx" class="reservation-item">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <a :href="`https://www.google.com/maps/search/${encodeURIComponent(hotel.name)}`" target="_blank" class="font-semibold text-[#E99D99] hover:underline text-sm">
+                          {{ hotel.name }}
+                        </a>
+                        <p class="text-xs text-gray-600 mt-1">📍 {{ hotel.address }}</p>
+                        <p class="text-xs text-gray-600">入住: {{ hotel.checkInDate }} | 退房: {{ hotel.checkOutDate }} {{ hotel.checkOutTime }}</p>
+                      </div>
+                      <div class="relative">
+                        <button @click="openReservationMenu('hotel', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
+                        <div v-if="activeReservationMenu?.type === 'hotel' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                          <button @click="editReservation('hotel', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                          <button @click="deleteReservation('hotel', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+                        </div>
                       </div>
                     </div>
+                    <img v-if="hotel.certificate" :src="hotel.certificate" :alt="hotel.name" class="file-preview">
                   </div>
-                  <img v-if="ticket.certificate" :src="ticket.certificate" :alt="ticket.name" class="file-preview">
+                </div>
+                <div v-else class="text-center py-6 text-gray-400 text-sm">
+                  <p>暫無住宿預約</p>
                 </div>
               </div>
-              <div v-else class="text-center py-6 text-gray-400 text-sm">
-                <p>暫無其他票券</p>
+
+              <div class="reservation-section">
+                <p class="reservation-section-title">🎫 其他票券</p>
+                <div v-if="currentTripData.reservations?.tickets?.length > 0" class="space-y-2">
+                  <div v-for="(ticket, idx) in currentTripData.reservations.tickets" :key="'ticket-' + idx" class="reservation-item">
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <p class="font-semibold text-gray-800 text-sm">{{ ticket.name }}</p>
+                        <p class="text-xs text-gray-600 mt-1">📅 {{ ticket.date }} {{ ticket.time }}</p>
+                      </div>
+                      <div class="relative">
+                        <button @click="openReservationMenu('ticket', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
+                        <div v-if="activeReservationMenu?.type === 'ticket' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                          <button @click="editReservation('ticket', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                          <button @click="deleteReservation('ticket', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+                        </div>
+                      </div>
+                    </div>
+                    <img v-if="ticket.certificate" :src="ticket.certificate" :alt="ticket.name" class="file-preview">
+                  </div>
+                </div>
+                <div v-else class="text-center py-6 text-gray-400 text-sm">
+                  <p>暫無其他票券</p>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
+
+          <!-- 記賬頁 -->
+          <template v-if="currentScreen === 'expense'">
+            <div class="p-4 pb-24 text-center text-gray-400">
+              <div class="text-4xl mb-4">💭</div>
+              <p class="text-lg font-medium">此功能開發中...</p>
+              <p class="text-sm mt-1">記賬功能即將推出！</p>
+            </div>
+          </template>
+
+          <!-- 購物頁 -->
+          <template v-if="currentScreen === 'shopping'">
+            <div class="p-4 pb-24 text-center text-gray-400">
+              <div class="text-4xl mb-4">💭</div>
+              <p class="text-lg font-medium">此功能開發中...</p>
+              <p class="text-sm mt-1">購物清單功能即將推出！</p>
+            </div>
+          </template>
+
+          <!-- 準備清單頁 -->
+          <template v-if="currentScreen === 'checklist'">
+            <div class="p-4 pb-24 text-center text-gray-400">
+              <div class="text-4xl mb-4">💭</div>
+              <p class="text-lg font-medium">此功能開發中...</p>
+              <p class="text-sm mt-1">準備清單功能即將推出！</p>
+            </div>
+          </template>
+
+          <!-- 成員頁 -->
+          <template v-if="currentScreen === 'members'">
+            <div class="p-4 pb-24 text-center text-gray-400">
+              <div class="text-4xl mb-4">💭</div>
+              <p class="text-lg font-medium">此功能開發中...</p>
+              <p class="text-sm mt-1">成員管理功能即將推出！</p>
+            </div>
+          </template>
+
+          <!-- 設定頁 -->
+          <template v-if="currentScreen === 'settings'">
+            <div class="p-4 pb-24 text-center text-gray-400">
+              <div class="text-4xl mb-4">💭</div>
+              <p class="text-lg font-medium">此功能開發中...</p>
+              <p class="text-sm mt-1">應用設定功能即將推出！</p>
+            </div>
+          </template>
         </div>
       </div>
-    </template>
 
-    <!-- 記賬頁面 -->
-    <template v-if="currentScreen === 'expense'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-          <h1 class="text-2xl font-bold">💰 記賬</h1>
-          <p class="text-sm opacity-90 mt-1">追蹤你的旅行開支</p>
-        </header>
-
-        <div class="page-content">
-          <div class="p-4 pb-24 text-center text-gray-400">
-            <div class="text-4xl mb-4">💭</div>
-            <p class="text-lg font-medium">此功能開發中...</p>
-            <p class="text-sm mt-1">記賬功能即將推出！</p>
-          </div>
+      <!-- 底部導航欄（只在詳情及其他頁顯示）-->
+      <nav class="bottom-nav">
+        <div class="flex justify-around items-center overflow-x-auto">
+          <button @click="currentScreen = 'detail'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">✈️</span>
+            <span>行程</span>
+          </button>
+          <button @click="currentScreen = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">🎫</span>
+            <span>預約</span>
+          </button>
+          <button @click="currentScreen = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">💰</span>
+            <span>記賬</span>
+          </button>
+          <button @click="currentScreen = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">🛍️</span>
+            <span>購物</span>
+          </button>
+          <button @click="currentScreen = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">✓</span>
+            <span>準備</span>
+          </button>
+          <button @click="currentScreen = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">👥</span>
+            <span>成員</span>
+          </button>
+          <button @click="currentScreen = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">⚙️</span>
+            <span>設定</span>
+          </button>
         </div>
-      </div>
+      </nav>
     </template>
-
-    <!-- 購物頁面 -->
-    <template v-if="currentScreen === 'shopping'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-          <h1 class="text-2xl font-bold">🛍️ 購物清單</h1>
-          <p class="text-sm opacity-90 mt-1">計劃你的購物行程</p>
-        </header>
-
-        <div class="page-content">
-          <div class="p-4 pb-24 text-center text-gray-400">
-            <div class="text-4xl mb-4">💭</div>
-            <p class="text-lg font-medium">此功能開發中...</p>
-            <p class="text-sm mt-1">購物清單功能即將推出！</p>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <!-- 準備清單頁面 -->
-    <template v-if="currentScreen === 'checklist'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-          <h1 class="text-2xl font-bold">✓ 準備清單</h1>
-          <p class="text-sm opacity-90 mt-1">確保你沒有遺漏任何東西</p>
-        </header>
-
-        <div class="page-content">
-          <div class="p-4 pb-24 text-center text-gray-400">
-            <div class="text-4xl mb-4">💭</div>
-            <p class="text-lg font-medium">此功能開發中...</p>
-            <p class="text-sm mt-1">準備清單功能即將推出！</p>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <!-- 成員頁面 -->
-    <template v-if="currentScreen === 'members'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-          <h1 class="text-2xl font-bold">👥 成員</h1>
-          <p class="text-sm opacity-90 mt-1">邀請朋友一起旅行</p>
-        </header>
-
-        <div class="page-content">
-          <div class="p-4 pb-24 text-center text-gray-400">
-            <div class="text-4xl mb-4">💭</div>
-            <p class="text-lg font-medium">此功能開發中...</p>
-            <p class="text-sm mt-1">成員管理功能即將推出！</p>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <!-- 設定頁面 -->
-    <template v-if="currentScreen === 'settings'">
-      <div class="page-container">
-        <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-          <h1 class="text-2xl font-bold">⚙️ 設定</h1>
-          <p class="text-sm opacity-90 mt-1">自訂你的應用設定</p>
-        </header>
-
-        <div class="page-content">
-          <div class="p-4 pb-24 text-center text-gray-400">
-            <div class="text-4xl mb-4">💭</div>
-            <p class="text-lg font-medium">此功能開發中...</p>
-            <p class="text-sm mt-1">應用設定功能即將推出！</p>
-          </div>
-        </div>
-      </div>
-    </template>
-
-    <!-- 底部導航欄（固定） -->
-    <nav class="bottom-nav fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t shadow-2xl" style="background-color: #FFF7EB; border-color: #E9D5C8;">
-      <div class="flex justify-around items-center overflow-x-auto">
-        <button @click="currentScreen = 'home'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'home' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">✈️</span>
-          <span>行程</span>
-        </button>
-        <button @click="currentScreen = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">🎫</span>
-          <span>預約</span>
-        </button>
-        <button @click="currentScreen = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">💰</span>
-          <span>記賬</span>
-        </button>
-        <button @click="currentScreen = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">🛍️</span>
-          <span>購物</span>
-        </button>
-        <button @click="currentScreen = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">✓</span>
-          <span>準備</span>
-        </button>
-        <button @click="currentScreen = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">👥</span>
-          <span>成員</span>
-        </button>
-        <button @click="currentScreen = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']">
-          <span class="text-xl mb-1">⚙️</span>
-          <span>設定</span>
-        </button>
-      </div>
-    </nav>
 
     <!-- 新增/編輯行程表單 -->
     <div v-if="showAddForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -1497,10 +1482,15 @@
           closeEditAccommodationForm();
         };
 
-        const viewTripDetail = (index) => {
+        const enterTrip = (index) => {
           selectedTripIndex.value = index;
           selectedDateIndex.value = 0;
           currentScreen.value = 'detail';
+        };
+
+        const backToHome = () => {
+          currentScreen.value = 'home';
+          selectedDateIndex.value = 0;
         };
 
         const editTrip = (index) => {
@@ -1751,7 +1741,8 @@
           handleSaveFlight,
           handleSaveHotel,
           handleSaveTicket,
-          viewTripDetail,
+          enterTrip,
+          backToHome,
           editTrip,
           handleSaveTrip,
           handleConfirmDelete,
