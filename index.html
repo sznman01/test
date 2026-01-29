@@ -11,6 +11,35 @@
     .cute-card { background: linear-gradient(145deg, #ffffff 0%, #f0f8ff 100%); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
     .cute-btn { background: linear-gradient(45deg, #ff6b6b, #ffd93d); }
     .nav-active { border-bottom: 3px solid #ff6b9d; color: #ff6b9d; }
+    
+    /* 卡片封面圖片樣式 */
+    .card-cover {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px 12px 0 0;
+    }
+    
+    .card-cover-placeholder {
+      width: 100%;
+      height: 160px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+    }
+
+    /* 圖片預覽 */
+    .image-preview {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin: 12px 0;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-blue-50 min-h-screen font-sans antialiased">
@@ -20,67 +49,85 @@
     <!-- 首頁 -->
     <template v-if="currentPage === 'home'">
       <!-- 標題 -->
-      <header class="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-center text-white shadow-lg">
+      <header class="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-center text-white shadow-lg sticky top-0 z-10">
         <h1 class="text-2xl font-bold">✨ 我的旅行計劃 ✨</h1>
         <p class="text-sm opacity-90 mt-1">輕鬆管理你的行程！</p>
       </header>
 
-      <!-- 卡片列表 -->
-      <div class="flex-1 overflow-y-auto p-4 space-y-4 pb-6">
-        <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
-          <div class="text-4xl mb-4">🌍</div>
-          <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
-          <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
-        </div>
-        <div v-else>
-          <div 
-            v-for="(trip, index) in trips" 
-            :key="index"
-            class="cute-card rounded-2xl p-6 transform transition-all hover:scale-105 border border-pink-100"
-            @click="viewTripDetail(index)"
-          >
-            <!-- 標題和選項按鈕 -->
-            <div class="flex items-start justify-between mb-3">
-              <div class="flex-1">
-                <h3 class="font-bold text-xl text-gray-800">{{ trip.title }}</h3>
+      <!-- 卡片列表容器 -->
+      <div class="flex-1 overflow-y-auto relative">
+        <!-- 卡片列表 -->
+        <div class="p-4 space-y-4">
+          <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
+            <div class="text-4xl mb-4">🌍</div>
+            <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
+            <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
+          </div>
+          <div v-else class="space-y-4">
+            <div 
+              v-for="(trip, index) in trips" 
+              :key="index"
+              class="cute-card rounded-2xl overflow-hidden transform transition-all hover:scale-105 border border-pink-100 cursor-pointer"
+              @click="viewTripDetail(index)"
+            >
+              <!-- 卡片封面圖片 -->
+              <div v-if="trip.coverImage" class="relative overflow-hidden">
+                <img :src="trip.coverImage" :alt="trip.title" class="card-cover">
+                <div class="absolute top-3 right-3">
+                  <button 
+                    @click.stop="editTrip(index)" 
+                    class="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all"
+                  >
+                    ⋯
+                  </button>
+                </div>
               </div>
-              <button 
-                @click.stop="editTrip(index)" 
-                class="text-gray-400 hover:text-gray-600 text-lg ml-2 p-2"
-              >
-                ⋯
-              </button>
+              <div v-else class="relative">
+                <div class="card-cover-placeholder">🌍</div>
+                <div class="absolute top-3 right-3">
+                  <button 
+                    @click.stop="editTrip(index)" 
+                    class="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all"
+                  >
+                    ⋯
+                  </button>
+                </div>
+              </div>
+
+              <!-- 卡片內容 -->
+              <div class="p-5">
+                <!-- 標題 -->
+                <h3 class="font-bold text-lg text-gray-800 mb-2">{{ trip.title }}</h3>
+
+                <!-- 地點和日期 -->
+                <div class="space-y-2 mb-4">
+                  <p class="text-gray-600 text-sm flex items-center gap-2">
+                    📍 {{ trip.location }}
+                  </p>
+                  <p class="text-gray-500 text-sm flex items-center gap-2">
+                    📅 {{ formatDateRange(trip.dates) }}
+                  </p>
+                  <p class="text-gray-500 text-sm flex items-center gap-2">
+                    ⏱️ {{ calculateDays(trip.dates) }} 天
+                  </p>
+                </div>
+
+                <!-- 描述 -->
+                <p v-if="trip.description" class="text-gray-600 text-sm line-clamp-2">{{ trip.description }}</p>
+              </div>
             </div>
+          </div>
 
-            <!-- 地點 -->
-            <p class="text-gray-600 mb-3 flex items-center gap-1">
-              📍 {{ trip.location }}
-            </p>
-
-            <!-- 日期和天數 -->
-            <div class="flex flex-wrap gap-2 mb-4">
-              <div class="px-3 py-2 bg-blue-100 text-blue-700 text-sm rounded-full font-medium">
-                📅 {{ formatDateRange(trip.dates) }}
-              </div>
-              <div class="px-3 py-2 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">
-                ⏱️ {{ calculateDays(trip.dates) }} 天
-              </div>
-            </div>
-
-            <!-- 描述 -->
-            <p v-if="trip.description" class="text-gray-600 text-sm line-clamp-2">{{ trip.description }}</p>
+          <!-- 新增按鈕 (sticky) -->
+          <div class="sticky bottom-0 left-0 right-0 p-4 bg-white">
+            <button 
+              @click="showAddForm = true" 
+              class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              ➕ 新增旅行計劃
+            </button>
           </div>
         </div>
-      </div>
-
-      <!-- 新增按鈕 (固定底部) -->
-      <div class="p-6 bg-white border-t border-gray-100 shadow-2xl">
-        <button 
-          @click="showAddForm = true" 
-          class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
-        >
-          ➕ 新增旅行計劃
-        </button>
       </div>
     </template>
 
@@ -198,6 +245,30 @@
           {{ editingIndex >= 0 ? '編輯行程' : '新增旅行計劃' }} ✨
         </h2>
         <form @submit.prevent="saveTrip" class="space-y-4">
+          
+          <!-- 上傳圖片部份 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">旅行封面圖片</label>
+            <div class="relative">
+              <input 
+                type="file"
+                accept="image/*"
+                @change="handleImageUpload"
+                class="hidden"
+                ref="fileInput"
+              >
+              <button
+                type="button"
+                @click="$refs.fileInput.click()"
+                class="w-full p-4 border-2 border-dashed border-pink-300 rounded-xl hover:border-pink-400 hover:bg-pink-50 transition-all flex items-center justify-center gap-2 text-gray-600 font-medium"
+              >
+                📷 點擊選擇圖片
+              </button>
+            </div>
+            <img v-if="currentTrip.coverImage" :src="currentTrip.coverImage" :alt="currentTrip.title" class="image-preview">
+          </div>
+
+          <!-- 行程名稱 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">行程名稱</label>
             <input 
@@ -207,6 +278,8 @@
               placeholder="例如：香港自由行"
             >
           </div>
+
+          <!-- 目的地 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
             <input 
@@ -216,6 +289,8 @@
               placeholder="例如：香港"
             >
           </div>
+
+          <!-- 開始日期 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
             <input 
@@ -225,6 +300,8 @@
               class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
             >
           </div>
+
+          <!-- 結束日期 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
             <input 
@@ -234,6 +311,8 @@
               class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
             >
           </div>
+
+          <!-- 描述 -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
             <textarea 
@@ -243,6 +322,8 @@
               placeholder="計劃中的亮點、注意事項..."
             ></textarea>
           </div>
+
+          <!-- 按鈕 -->
           <div class="flex gap-3 pt-4">
             <button 
               type="submit" 
@@ -298,6 +379,7 @@
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
         const activeTab = ref('itinerary');
+        const fileInput = ref(null);
         
         const currentTrip = reactive({
           title: '',
@@ -305,6 +387,7 @@
           startDate: '',
           endDate: '',
           description: '',
+          coverImage: '',
           itinerary: []
         });
 
@@ -324,6 +407,17 @@
           return 0;
         };
 
+        const handleImageUpload = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              currentTrip.coverImage = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+
         const viewTripDetail = (index) => {
           selectedTripIndex.value = index;
           currentPage.value = 'detail';
@@ -341,6 +435,7 @@
           currentTrip.startDate = trip.startDate;
           currentTrip.endDate = trip.endDate;
           currentTrip.description = trip.description;
+          currentTrip.coverImage = trip.coverImage || '';
           currentTrip.itinerary = JSON.parse(JSON.stringify(trip.itinerary || []));
           editingIndex.value = index;
           showAddForm.value = true;
@@ -362,6 +457,7 @@
             endDate: currentTrip.endDate,
             dates: dates,
             description: currentTrip.description,
+            coverImage: currentTrip.coverImage,
             itinerary: currentTrip.itinerary
           };
 
@@ -395,6 +491,7 @@
             startDate: '', 
             endDate: '', 
             description: '',
+            coverImage: '',
             itinerary: []
           });
           editingIndex.value = -1;
@@ -426,8 +523,10 @@
           deletingIndex,
           activeTab,
           currentTrip,
+          fileInput,
           formatDateRange,
           calculateDays,
+          handleImageUpload,
           viewTripDetail,
           backToHome,
           editTrip,
