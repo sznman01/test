@@ -338,11 +338,196 @@
       font-size: 20px;
       cursor: pointer;
       transition: all 0.3s;
+      border: none;
     }
 
     .back-button:hover {
       background: #f0f0f0;
       transform: scale(1.1);
+    }
+
+    /* 預算卡片樣式 */
+    .budget-main-card {
+      background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
+      border-radius: 24px;
+      padding: 24px;
+      margin-bottom: 16px;
+      color: white;
+      box-shadow: 0 8px 25px rgba(233, 157, 153, 0.25);
+    }
+
+    .budget-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+
+    .budget-header-item {
+      flex: 1;
+    }
+
+    .budget-header-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .budget-header-value {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .budget-progress {
+      margin: 20px 0;
+    }
+
+    .budget-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .budget-progress-fill {
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    .budget-remaining {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .expense-record-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 8px;
+    }
+
+    .expense-category-select {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #E9D5C8;
+      border-radius: 12px;
+      background-color: #FFFBF7;
+      color: #8B6B6B;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .expense-category-select:hover {
+      border-color: #E99D99;
+      background-color: #fff;
+    }
+
+    .expense-add-btn {
+      background-color: #E99D99;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      white-space: nowrap;
+      transition: all 0.3s;
+    }
+
+    .expense-add-btn:hover {
+      background-color: #D88888;
+    }
+
+    .expense-item {
+      background: white;
+      border: 1px solid #E9D5C8;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .expense-item-left {
+      flex: 1;
+    }
+
+    .expense-item-title {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .expense-item-category {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .expense-item-amount {
+      font-size: 16px;
+      font-weight: bold;
+      color: #E99D99;
+      text-align: right;
+    }
+
+    .expense-item-menu {
+      margin-left: 8px;
+      cursor: pointer;
+      color: #999;
+      font-size: 18px;
+    }
+
+    /* 貨幣轉換器 */
+    .currency-converter {
+      background: white;
+      border: 1px solid #E9D5C8;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .converter-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+
+    .converter-input {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #E9D5C8;
+      border-radius: 8px;
+      font-size: 13px;
+      background-color: #FFFBF7;
+    }
+
+    .converter-label {
+      font-size: 12px;
+      color: #8B6B6B;
+      white-space: nowrap;
+      min-width: 40px;
+    }
+
+    .converter-rate {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #E9D5C8;
     }
   </style>
 </head>
@@ -461,12 +646,19 @@
           </header>
         </div>
 
+        <!-- 預算頁頂部 -->
+        <div v-if="currentScreen === 'expense'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">💰 旅行預算</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </div>
+
         <!-- 其他頁面頂部 -->
-        <template v-if="currentScreen !== 'detail'">
+        <template v-if="currentScreen !== 'detail' && currentScreen !== 'expense'">
           <header class="page-header header-bg p-6 text-center text-white shadow-lg">
             <h1 class="text-2xl font-bold">
               <span v-if="currentScreen === 'reservation'">🎫 預約管理</span>
-              <span v-if="currentScreen === 'expense'">💰 記賬</span>
               <span v-if="currentScreen === 'shopping'">🛍️ 購物清單</span>
               <span v-if="currentScreen === 'checklist'">✓ 準備清單</span>
               <span v-if="currentScreen === 'members'">👥 成員</span>
@@ -772,12 +964,119 @@
             </div>
           </template>
 
-          <!-- 記賬頁 -->
+          <!-- 預算頁 -->
           <template v-if="currentScreen === 'expense'">
-            <div class="p-4 pb-24 text-center text-gray-400">
-              <div class="text-4xl mb-4">💭</div>
-              <p class="text-lg font-medium">此功能開發中...</p>
-              <p class="text-sm mt-1">記賬功能即將推出！</p>
+            <div class="p-4 pb-24">
+              <!-- 設定預算按鈕 -->
+              <div class="flex justify-end mb-4">
+                <button 
+                  @click="showSetBudgetForm = true"
+                  class="bg-white border-2 border-[#E99D99] text-[#E99D99] rounded-2xl px-4 py-2 text-sm font-bold hover:bg-[#FFF7EB] transition-all"
+                >
+                  ⚙️ 設定預算
+                </button>
+              </div>
+
+              <!-- 即時匯率計算機 -->
+              <div class="currency-converter">
+                <p class="text-sm font-bold text-gray-700 mb-12px">💱 即時匯率轉換</p>
+                <div class="converter-row">
+                  <input 
+                    v-model.number="currencyAmount" 
+                    type="number" 
+                    placeholder="輸入金額" 
+                    class="converter-input"
+                  >
+                  <span class="converter-label">{{ currentTripData.currency || 'CNY' }}</span>
+                </div>
+                <div class="converter-row">
+                  <input 
+                    :value="convertedAmount" 
+                    type="text" 
+                    disabled 
+                    class="converter-input opacity-70 bg-gray-100"
+                  >
+                  <span class="converter-label">HKD</span>
+                </div>
+                <div class="converter-rate">
+                  💱 匯率：1 {{ currentTripData.currency || 'CNY' }} = {{ exchangeRate }} HKD
+                </div>
+              </div>
+
+              <!-- 預算主卡片 -->
+              <div class="budget-main-card">
+                <div class="budget-header">
+                  <div class="budget-header-item">
+                    <div class="budget-header-label">總預算</div>
+                    <div class="budget-header-value">{{ formatCurrency(currentTripData.totalBudget) }}</div>
+                  </div>
+                  <div class="budget-header-item">
+                    <div class="budget-header-label">已花費 (HKD)</div>
+                    <div class="budget-header-value">{{ formatCurrency(getTotalExpense()) }}</div>
+                  </div>
+                </div>
+
+                <div class="budget-progress">
+                  <div class="budget-progress-bar">
+                    <div 
+                      class="budget-progress-fill"
+                      :style="{ width: getBudgetPercentage() + '%' }"
+                    ></div>
+                  </div>
+                  <div class="budget-remaining">
+                    <span>進度</span>
+                    <span>{{ getBudgetPercentage().toFixed(1) }}%</span>
+                  </div>
+                </div>
+
+                <div class="border-t border-white border-opacity-30 pt-3">
+                  <p class="text-sm">剩餘額度</p>
+                  <p class="text-2xl font-bold">{{ formatCurrency(getRemainingBudget()) }}</p>
+                </div>
+              </div>
+
+              <!-- 支出記錄區 -->
+              <div class="pt-4">
+                <div class="expense-record-header">
+                  <select 
+                    v-model="selectedExpenseCategory"
+                    class="expense-category-select"
+                  >
+                    <option value="">全部支出</option>
+                    <option value="food">🍽️ 餐飲</option>
+                    <option value="attraction">🎫 景點</option>
+                    <option value="shopping">🛍️ 紀念品</option>
+                    <option value="transport">🚕 交通</option>
+                    <option value="other">📌 其他</option>
+                  </select>
+                  <button 
+                    @click="showAddExpenseForm = true"
+                    class="expense-add-btn"
+                  >
+                    ➕ 新增支出
+                  </button>
+                </div>
+
+                <!-- 支出列表 -->
+                <div v-if="getFilteredExpenses().length > 0" class="space-y-2">
+                  <div v-for="(expense, idx) in getFilteredExpenses()" :key="idx" class="expense-item">
+                    <div class="expense-item-left">
+                      <div class="expense-item-title">{{ expense.title }}</div>
+                      <div class="expense-item-category">{{ getCategoryLabel(expense.category) }} · {{ expense.date }}</div>
+                    </div>
+                    <div class="expense-item-amount">{{ formatCurrency(expense.amountHKD) }}</div>
+                    <button 
+                      @click="deleteExpense(idx)"
+                      class="expense-item-menu"
+                    >
+                      ⋯
+                    </button>
+                  </div>
+                </div>
+                <div v-else class="text-center py-8 text-gray-400">
+                  <p class="text-sm">暫無支出記錄</p>
+                </div>
+              </div>
             </div>
           </template>
 
@@ -832,7 +1131,7 @@
           </button>
           <button @click="currentScreen = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">💰</span>
-            <span>記賬</span>
+            <span>預算</span>
           </button>
           <button @click="currentScreen = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">🛍️</span>
@@ -877,7 +1176,20 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
-            <input v-model="formData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：香港">
+            <select v-model="formData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+              <option value="">選擇目的地</option>
+              <option value="日本">日本 (JPY)</option>
+              <option value="香港">香港 (HKD)</option>
+              <option value="台灣">台灣 (TWD)</option>
+              <option value="韓國">韓國 (KRW)</option>
+              <option value="泰國">泰國 (THB)</option>
+              <option value="新加坡">新加坡 (SGD)</option>
+              <option value="美國">美國 (USD)</option>
+              <option value="英國">英國 (GBP)</option>
+              <option value="法國">法國 (EUR)</option>
+              <option value="荷蘭">荷蘭 (EUR)</option>
+              <option value="瑞士">瑞士 (CHF)</option>
+            </select>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
@@ -1126,6 +1438,122 @@
       </div>
     </div>
 
+    <!-- 設定預算表單 -->
+    <div v-if="showSetBudgetForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">設定預算 ✨</h2>
+        <form @submit.prevent="handleSetBudget" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">總預算 ({{ currentTripData.currency || 'CNY' }})</label>
+            <input 
+              v-model.number="budgetFormData.totalBudget" 
+              type="number" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @blur="$event.target.style.borderColor = '#E9D5C8'" 
+              placeholder="例如：5000"
+            >
+          </div>
+          <div class="text-sm text-gray-500">
+            約等於：{{ (budgetFormData.totalBudget * exchangeRate).toFixed(2) }} HKD
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 確定
+            </button>
+            <button type="button" @click="showSetBudgetForm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 新增支出表單 -->
+    <div v-if="showAddExpenseForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">新增支出 ✨</h2>
+        <form @submit.prevent="handleAddExpense" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">支出項目</label>
+            <input 
+              v-model="expenseFormData.title" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @blur="$event.target.style.borderColor = '#E9D5C8'" 
+              placeholder="例如：午餐"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
+            <select 
+              v-model="expenseFormData.category" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+              <option value="">選擇分類</option>
+              <option value="food">🍽️ 餐飲</option>
+              <option value="attraction">🎫 景點</option>
+              <option value="shopping">🛍️ 紀念品</option>
+              <option value="transport">🚕 交通</option>
+              <option value="other">📌 其他</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">金額 (HKD)</label>
+            <input 
+              v-model.number="expenseFormData.amountHKD" 
+              type="number" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @blur="$event.target.style.borderColor = '#E9D5C8'" 
+              placeholder="例如：150"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+            <input 
+              v-model="expenseFormData.date" 
+              type="date" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
+            <textarea 
+              v-model="expenseFormData.notes" 
+              rows="2" 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            ></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 新增
+            </button>
+            <button type="button" @click="showAddExpenseForm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- 刪除確認對話 -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-sm" style="border-color:#E9D5C8;">
@@ -1148,6 +1576,20 @@
   <script>
     const { createApp, ref, watch, onMounted, computed } = Vue;
 
+    const currencyRates = {
+      '日本': { code: 'JPY', rate: 0.052 },
+      '香港': { code: 'HKD', rate: 1 },
+      '台灣': { code: 'TWD', rate: 0.25 },
+      '韓國': { code: 'KRW', rate: 0.0055 },
+      '泰國': { code: 'THB', rate: 0.2 },
+      '新加坡': { code: 'SGD', rate: 5.5 },
+      '美國': { code: 'USD', rate: 7.8 },
+      '英國': { code: 'GBP', rate: 9.8 },
+      '法國': { code: 'EUR', rate: 8.5 },
+      '荷蘭': { code: 'EUR', rate: 8.5 },
+      '瑞士': { code: 'CHF', rate: 8.8 }
+    };
+
     createApp({
       setup() {
         const trips = ref([]);
@@ -1160,6 +1602,8 @@
         const showFlightForm = ref(false);
         const showHotelForm = ref(false);
         const showTicketForm = ref(false);
+        const showSetBudgetForm = ref(false);
+        const showAddExpenseForm = ref(false);
         const editingIndex = ref(-1);
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
@@ -1169,6 +1613,8 @@
         const editingActivityIndex = ref(-1);
         const editingReservationIndex = ref(-1);
         const activeReservationMenu = ref(null);
+        const currencyAmount = ref(0);
+        const selectedExpenseCategory = ref('');
         
         const formData = ref({
           title: '',
@@ -1179,7 +1625,22 @@
           coverImage: '',
           itinerary: [],
           accommodations: {},
-          reservations: { flights: [], hotels: [], tickets: [] }
+          reservations: { flights: [], hotels: [], tickets: [] },
+          currency: '',
+          totalBudget: 0,
+          expenses: []
+        });
+
+        const budgetFormData = ref({
+          totalBudget: 0
+        });
+
+        const expenseFormData = ref({
+          title: '',
+          category: '',
+          amountHKD: 0,
+          date: new Date().toISOString().split('T')[0],
+          notes: ''
         });
 
         const accommodationFormData = ref({
@@ -1241,6 +1702,15 @@
           '瑞士': { sunny: { icon: '☀️', temp: 15, feelsLike: 13, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 10, feelsLike: 8, description: '多雲寒冷' }, rainy: { icon: '🌧️', temp: 7, feelsLike: 5, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '山區降雪' } }
         };
 
+        const exchangeRate = computed(() => {
+          const location = currentTripData.value.location;
+          return currencyRates[location]?.rate || 1;
+        });
+
+        const convertedAmount = computed(() => {
+          return (currencyAmount.value * exchangeRate.value).toFixed(2);
+        });
+
         const formatDateRangeEnglish = (dates) => {
           if (Array.isArray(dates) && dates.length >= 2) {
             const startDate = new Date(dates[0]);
@@ -1276,6 +1746,13 @@
           return `${d.getFullYear()}-${month}-${date}`;
         };
 
+        const formatCurrency = (amount) => {
+          return amount.toLocaleString('zh-HK', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        };
+
         const calculateDays = (dates) => {
           if (Array.isArray(dates) && dates.length >= 2) {
             const start = new Date(dates[0]);
@@ -1283,6 +1760,36 @@
             return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
           }
           return 0;
+        };
+
+        const getTotalExpense = () => {
+          return (currentTripData.value.expenses || []).reduce((sum, exp) => sum + exp.amountHKD, 0);
+        };
+
+        const getRemainingBudget = () => {
+          return currentTripData.value.totalBudget - getTotalExpense();
+        };
+
+        const getBudgetPercentage = () => {
+          if (currentTripData.value.totalBudget === 0) return 0;
+          return Math.min((getTotalExpense() / currentTripData.value.totalBudget) * 100, 100);
+        };
+
+        const getCategoryLabel = (category) => {
+          const labels = {
+            'food': '🍽️ 餐飲',
+            'attraction': '🎫 景點',
+            'shopping': '🛍️ 紀念品',
+            'transport': '🚕 交通',
+            'other': '📌 其他'
+          };
+          return labels[category] || category;
+        };
+
+        const getFilteredExpenses = () => {
+          const expenses = currentTripData.value.expenses || [];
+          if (!selectedExpenseCategory.value) return expenses;
+          return expenses.filter(exp => exp.category === selectedExpenseCategory.value);
         };
 
         const openFilePicker = () => {
@@ -1350,7 +1857,10 @@
             coverImage: '',
             itinerary: [],
             accommodations: {},
-            reservations: { flights: [], hotels: [], tickets: [] }
+            reservations: { flights: [], hotels: [], tickets: [] },
+            currency: '',
+            totalBudget: 0,
+            expenses: []
           };
           showAddForm.value = true;
         };
@@ -1366,7 +1876,10 @@
             coverImage: '',
             itinerary: [],
             accommodations: {},
-            reservations: { flights: [], hotels: [], tickets: [] }
+            reservations: { flights: [], hotels: [], tickets: [] },
+            currency: '',
+            totalBudget: 0,
+            expenses: []
           };
           editingIndex.value = -1;
           const fileInput = document.getElementById('imageFileInput');
@@ -1538,6 +2051,11 @@
           activeReservationMenu.value = null;
         };
 
+        const deleteExpense = (idx) => {
+          const expenses = currentTripData.value.expenses || [];
+          expenses.splice(idx, 1);
+        };
+
         const handleSaveFlight = () => {
           if (!flightForm.value.flightNumber || !flightForm.value.departureLocation || !flightForm.value.arrivalLocation || !flightForm.value.departureTime || !flightForm.value.arrivalTime) {
             alert('請填寫所有必填欄位');
@@ -1652,6 +2170,44 @@
           closeEditAccommodationForm();
         };
 
+        const handleSetBudget = () => {
+          if (budgetFormData.value.totalBudget <= 0) {
+            alert('請輸入有效金額');
+            return;
+          }
+
+          currentTripData.value.totalBudget = budgetFormData.value.totalBudget * exchangeRate.value;
+          showSetBudgetForm.value = false;
+        };
+
+        const handleAddExpense = () => {
+          if (!expenseFormData.value.title || !expenseFormData.value.category || expenseFormData.value.amountHKD <= 0) {
+            alert('請填寫所有必填欄位');
+            return;
+          }
+
+          if (!currentTripData.value.expenses) {
+            currentTripData.value.expenses = [];
+          }
+
+          currentTripData.value.expenses.push({
+            title: expenseFormData.value.title,
+            category: expenseFormData.value.category,
+            amountHKD: expenseFormData.value.amountHKD,
+            date: expenseFormData.value.date,
+            notes: expenseFormData.value.notes
+          });
+
+          expenseFormData.value = {
+            title: '',
+            category: '',
+            amountHKD: 0,
+            date: new Date().toISOString().split('T')[0],
+            notes: ''
+          };
+          showAddExpenseForm.value = false;
+        };
+
         const enterTrip = (index) => {
           selectedTripIndex.value = index;
           selectedDateIndex.value = 0;
@@ -1674,7 +2230,10 @@
             coverImage: trip.coverImage || '',
             itinerary: JSON.parse(JSON.stringify(trip.itinerary || [])),
             accommodations: JSON.parse(JSON.stringify(trip.accommodations || {})),
-            reservations: JSON.parse(JSON.stringify(trip.reservations || { flights: [], hotels: [], tickets: [] }))
+            reservations: JSON.parse(JSON.stringify(trip.reservations || { flights: [], hotels: [], tickets: [] })),
+            currency: trip.currency || '',
+            totalBudget: trip.totalBudget || 0,
+            expenses: JSON.parse(JSON.stringify(trip.expenses || []))
           };
           editingIndex.value = index;
           showAddForm.value = true;
@@ -1703,7 +2262,10 @@
             coverImage: formData.value.coverImage,
             itinerary: formData.value.itinerary,
             accommodations: formData.value.accommodations,
-            reservations: formData.value.reservations
+            reservations: formData.value.reservations,
+            currency: currencyRates[formData.value.location]?.code || 'CNY',
+            totalBudget: formData.value.totalBudget,
+            expenses: formData.value.expenses
           };
 
           if (editingIndex.value >= 0) {
@@ -1756,7 +2318,10 @@
             coverImage: '',
             itinerary: [],
             accommodations: {},
-            reservations: { flights: [], hotels: [], tickets: [] }
+            reservations: { flights: [], hotels: [], tickets: [] },
+            currency: '',
+            totalBudget: 0,
+            expenses: []
           };
         });
 
@@ -1806,10 +2371,6 @@
 
         const getCurrentDayNumber = () => {
           return selectedDateIndex.value + 1;
-        };
-
-        const getDayActivityTitle = () => {
-          return '';
         };
 
         const getCurrentDayWeather = () => {
@@ -1864,11 +2425,15 @@
           showFlightForm,
           showHotelForm,
           showTicketForm,
+          showSetBudgetForm,
+          showAddExpenseForm,
           editingIndex,
           selectedTripIndex,
           deletingIndex,
           deleteType,
           formData,
+          budgetFormData,
+          expenseFormData,
           activityFormData,
           accommodationFormData,
           flightForm,
@@ -1879,11 +2444,21 @@
           editingActivityIndex,
           editingReservationIndex,
           activeReservationMenu,
+          currencyAmount,
+          selectedExpenseCategory,
           formatDateRangeEnglish,
           formatDateDisplay,
           formatTimeOnly,
           formatDateOnly,
+          formatCurrency,
           calculateDays,
+          getTotalExpense,
+          getRemainingBudget,
+          getBudgetPercentage,
+          getCategoryLabel,
+          getFilteredExpenses,
+          exchangeRate,
+          convertedAmount,
           openFilePicker,
           handleImageChange,
           handleFlightCertificate,
@@ -1908,11 +2483,14 @@
           closeTicketForm,
           editReservation,
           deleteReservation,
+          deleteExpense,
           handleSaveActivity,
           handleSaveAccommodation,
           handleSaveFlight,
           handleSaveHotel,
           handleSaveTicket,
+          handleSetBudget,
+          handleAddExpense,
           enterTrip,
           backToHome,
           editTrip,
@@ -1925,7 +2503,6 @@
           dateOptions,
           currentSelectedDateLabel,
           getCurrentDayNumber,
-          getDayActivityTitle,
           getCurrentDayWeather,
           getCurrentDayAccommodation,
           getCurrentDayActivities,
