@@ -85,14 +85,6 @@
       margin: 12px 0;
     }
 
-    .sticky-button {
-      background-color: #FFF7EB;
-      border-top: 1px solid #F5E6D3;
-      position: sticky;
-      bottom: 0;
-      z-index: 20;
-    }
-
     .date-pill {
       min-width: 76px;
     }
@@ -103,10 +95,6 @@
 
     .timeline-item:active {
       cursor: grabbing;
-    }
-
-    .itinerary-content {
-      padding-bottom: 100px;
     }
 
     .add-activity-btn {
@@ -208,7 +196,6 @@
       padding-bottom: 100px;
     }
 
-    /* 機票卡片樣式 */
     .boarding-pass {
       background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
       border-radius: 20px;
@@ -312,16 +299,6 @@
       opacity: 0.9;
     }
 
-    .boarding-pass-footer-seat {
-      text-align: right;
-      font-size: 12px;
-    }
-
-    /* 返回按鈕定位 */
-    .detail-header-wrapper {
-      position: relative;
-    }
-
     .back-button {
       position: absolute;
       top: 16px;
@@ -346,7 +323,6 @@
       transform: scale(1.1);
     }
 
-    /* 預算卡片樣式 */
     .budget-main-card {
       background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
       border-radius: 24px;
@@ -475,6 +451,12 @@
       color: #999;
     }
 
+    .expense-item-currencies {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #666;
+    }
+
     .expense-item-amount {
       font-size: 16px;
       font-weight: bold;
@@ -489,7 +471,6 @@
       font-size: 18px;
     }
 
-    /* 貨幣轉換器 */
     .currency-converter {
       background: white;
       border: 1px solid #E9D5C8;
@@ -529,12 +510,24 @@
       padding-top: 8px;
       border-top: 1px solid #E9D5C8;
     }
+
+    .expense-form-currency {
+      font-weight: bold;
+      color: #E99D99;
+      font-size: 14px;
+    }
+
+    .expense-form-conversion {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
 
   <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
-
+    
     <!-- 主頁（無 Bottom Nav）-->
     <template v-if="currentScreen === 'home'">
       <div class="home-container">
@@ -639,7 +632,6 @@
           >
             ←
           </button>
-          <!-- 標題 -->
           <header class="header-bg p-6 text-center text-white shadow-lg pt-16">
             <h1 class="text-2xl font-bold">{{ currentTripData.title }}</h1>
             <p class="text-sm opacity-90 mt-1">{{ currentTripData.location }}</p>
@@ -809,10 +801,10 @@
               <div class="pt-4">
                 <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
                   <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
-
+                  
                   <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
                     <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
-
+                    
                     <div class="flex gap-3">
                       <div class="relative mt-1">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
@@ -1013,7 +1005,7 @@
                     placeholder="輸入金額" 
                     class="converter-input"
                   >
-                  <span class="converter-label">{{ currentTripData.currency || 'CNY' }}</span>
+                  <span class="converter-label">{{ currentTripCurrency }}</span>
                 </div>
                 <div class="converter-row">
                   <input 
@@ -1025,7 +1017,7 @@
                   <span class="converter-label">HKD</span>
                 </div>
                 <div class="converter-rate">
-                  💱 匯率：1 {{ currentTripData.currency || 'CNY' }} = {{ exchangeRate }} HKD
+                  💱 匯率：1 {{ currentTripCurrency }} = {{ exchangeRate }} HKD
                 </div>
               </div>
 
@@ -1089,8 +1081,12 @@
                     <div class="expense-item-left">
                       <div class="expense-item-title">{{ expense.title }}</div>
                       <div class="expense-item-category">{{ getCategoryLabel(expense.category) }} · {{ expense.date }}</div>
+                      <div class="expense-item-currencies">
+                        {{ expense.originalCurrency }} {{ formatCurrency(expense.originalAmount) }} 
+                        <span class="text-gray-400">≈ HKD {{ formatCurrency(expense.amountHKD) }}</span>
+                      </div>
                     </div>
-                    <div class="expense-item-amount">{{ formatCurrency(expense.amountHKD) }}</div>
+                    <div class="expense-item-amount">HKD {{ formatCurrency(expense.amountHKD) }}</div>
                     <button 
                       @click="deleteExpense(idx)"
                       class="expense-item-menu"
@@ -1204,17 +1200,17 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
             <select v-model="formData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
               <option value="">選擇目的地</option>
-              <option value="日本">日本 (JPY)</option>
-              <option value="香港">香港 (HKD)</option>
-              <option value="台灣">台灣 (TWD)</option>
-              <option value="韓國">韓國 (KRW)</option>
-              <option value="泰國">泰國 (THB)</option>
-              <option value="新加坡">新加坡 (SGD)</option>
-              <option value="美國">美國 (USD)</option>
-              <option value="英國">英國 (GBP)</option>
-              <option value="法國">法國 (EUR)</option>
-              <option value="荷蘭">荷蘭 (EUR)</option>
-              <option value="瑞士">瑞士 (CHF)</option>
+              <option value="日本">日本 (¥ JPY)</option>
+              <option value="香港">香港 ($ HKD)</option>
+              <option value="台灣">台灣 (NT$ TWD)</option>
+              <option value="韓國">韓國 (₩ KRW)</option>
+              <option value="泰國">泰國 (฿ THB)</option>
+              <option value="新加坡">新加坡 ($ SGD)</option>
+              <option value="美國">美國 ($ USD)</option>
+              <option value="英國">英國 (£ GBP)</option>
+              <option value="法國">法國 (€ EUR)</option>
+              <option value="荷蘭">荷蘭 (€ EUR)</option>
+              <option value="瑞士">瑞士 (CHF CHF)</option>
             </select>
           </div>
           <div>
@@ -1494,7 +1490,7 @@
       </div>
     </div>
 
-    <!-- 新增支出表單 -->
+    <!-- 新增支出表單 - 自動貨幣轉換版 -->
     <div v-if="showAddExpenseForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">新增支出 ✨</h2>
@@ -1530,17 +1526,23 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">金額 (HKD)</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              金額 <span class="expense-form-currency">{{ currentTripCurrency }}</span>
+            </label>
             <input 
-              v-model.number="expenseFormData.amountHKD" 
+              v-model.number="expenseFormData.originalAmount" 
               type="number" 
               required 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
               @focus="$event.target.style.borderColor = '#E99D99'" 
               @blur="$event.target.style.borderColor = '#E9D5C8'" 
-              placeholder="例如：150"
+              @input="updateExpenseConversion"
+              placeholder="輸入本地貨幣金額"
             >
+            <div class="expense-form-conversion" v-if="expenseConversionHKD > 0">
+              ≈ HKD {{ expenseConversionHKD.toFixed(2) }}
+            </div>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
@@ -1567,7 +1569,7 @@
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 新增
+              ✓ 新增支出
             </button>
             <button type="button" @click="showAddExpenseForm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
               ❌ 取消
@@ -1599,18 +1601,19 @@
   <script>
     const { createApp, ref, watch, onMounted, computed } = Vue;
 
+    // 完整匯率數據 - 包含瑞士郎和歐羅
     const currencyRates = {
-      '日本': { code: 'JPY', rate: 0.052 },
-      '香港': { code: 'HKD', rate: 1 },
-      '台灣': { code: 'TWD', rate: 0.25 },
-      '韓國': { code: 'KRW', rate: 0.0055 },
-      '泰國': { code: 'THB', rate: 0.2 },
-      '新加坡': { code: 'SGD', rate: 5.5 },
-      '美國': { code: 'USD', rate: 7.8 },
-      '英國': { code: 'GBP', rate: 9.8 },
-      '法國': { code: 'EUR', rate: 8.5 },
-      '荷蘭': { code: 'EUR', rate: 8.5 },
-      '瑞士': { code: 'CHF', rate: 8.8 }
+      '日本': { code: 'JPY', symbol: '¥', rate: 0.052 },
+      '香港': { code: 'HKD', symbol: '$', rate: 1 },
+      '台灣': { code: 'TWD', symbol: 'NT$', rate: 0.25 },
+      '韓國': { code: 'KRW', symbol: '₩', rate: 0.0055 },
+      '泰國': { code: 'THB', symbol: '฿', rate: 0.2 },
+      '新加坡': { code: 'SGD', symbol: '$', rate: 5.5 },
+      '美國': { code: 'USD', symbol: '$', rate: 7.8 },
+      '英國': { code: 'GBP', symbol: '£', rate: 9.8 },
+      '法國': { code: 'EUR', symbol: '€', rate: 8.5 },
+      '荷蘭': { code: 'EUR', symbol: '€', rate: 8.5 },
+      '瑞士': { code: 'CHF', symbol: 'CHF', rate: 8.8 }
     };
 
     createApp({
@@ -1638,6 +1641,7 @@
         const activeReservationMenu = ref(null);
         const currencyAmount = ref(0);
         const selectedExpenseCategory = ref('');
+        const expenseConversionHKD = ref(0);
 
         const formData = ref({
           title: '',
@@ -1661,7 +1665,9 @@
         const expenseFormData = ref({
           title: '',
           category: '',
+          originalAmount: 0,
           amountHKD: 0,
+          originalCurrency: '',
           date: new Date().toISOString().split('T')[0],
           notes: ''
         });
@@ -1684,8 +1690,6 @@
           arrivalLocation: '',
           departureTime: '',
           arrivalTime: '',
-          departure: '',
-          arrival: '',
           certificate: '',
           notes: ''
         });
@@ -1732,6 +1736,11 @@
 
         const convertedAmount = computed(() => {
           return (currencyAmount.value * exchangeRate.value).toFixed(2);
+        });
+
+        const currentTripCurrency = computed(() => {
+          const location = currentTripData.value.location;
+          return currencyRates[location]?.code || 'HKD';
         });
 
         const formatDateRangeEnglish = (dates) => {
@@ -1813,6 +1822,11 @@
           const expenses = currentTripData.value.expenses || [];
           if (!selectedExpenseCategory.value) return expenses;
           return expenses.filter(exp => exp.category === selectedExpenseCategory.value);
+        };
+
+        const updateExpenseConversion = () => {
+          const rate = exchangeRate.value;
+          expenseConversionHKD.value = expenseFormData.value.originalAmount * rate;
         };
 
         const openFilePicker = () => {
@@ -1993,8 +2007,6 @@
             arrivalLocation: '',
             departureTime: '',
             arrivalTime: '',
-            departure: '',
-            arrival: '',
             certificate: '',
             notes: ''
           };
@@ -2084,12 +2096,6 @@
             alert('請填寫所有必填欄位');
             return;
           }
-
-          const startTime = new Date(flightForm.value.departureTime);
-          const endTime = new Date(flightForm.value.arrivalTime);
-
-          flightForm.value.departure = startTime.toLocaleString('zh-HK');
-          flightForm.value.arrival = endTime.toLocaleString('zh-HK');
 
           if (!currentTripData.value.reservations) {
             currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
@@ -2204,7 +2210,7 @@
         };
 
         const handleAddExpense = () => {
-          if (!expenseFormData.value.title || !expenseFormData.value.category || expenseFormData.value.amountHKD <= 0) {
+          if (!expenseFormData.value.title || !expenseFormData.value.category || expenseFormData.value.originalAmount <= 0) {
             alert('請填寫所有必填欄位');
             return;
           }
@@ -2216,7 +2222,9 @@
           currentTripData.value.expenses.push({
             title: expenseFormData.value.title,
             category: expenseFormData.value.category,
-            amountHKD: expenseFormData.value.amountHKD,
+            originalAmount: expenseFormData.value.originalAmount,
+            amountHKD: expenseConversionHKD.value,
+            originalCurrency: currentTripCurrency.value,
             date: expenseFormData.value.date,
             notes: expenseFormData.value.notes
           });
@@ -2224,10 +2232,13 @@
           expenseFormData.value = {
             title: '',
             category: '',
+            originalAmount: 0,
             amountHKD: 0,
+            originalCurrency: '',
             date: new Date().toISOString().split('T')[0],
             notes: ''
           };
+          expenseConversionHKD.value = 0;
           showAddExpenseForm.value = false;
         };
 
@@ -2286,7 +2297,7 @@
             itinerary: formData.value.itinerary,
             accommodations: formData.value.accommodations,
             reservations: formData.value.reservations,
-            currency: currencyRates[formData.value.location]?.code || 'CNY',
+            currency: currencyRates[formData.value.location]?.code || 'HKD',
             totalBudget: formData.value.totalBudget,
             expenses: formData.value.expenses
           };
@@ -2400,7 +2411,7 @@
           const dayNum = getCurrentDayNumber();
           const location = currentTripData.value.location;
           const weatherData = countryWeatherData[location];
-
+          
           if (!weatherData) {
             return { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' };
           }
@@ -2469,6 +2480,7 @@
           activeReservationMenu,
           currencyAmount,
           selectedExpenseCategory,
+          expenseConversionHKD,
           formatDateRangeEnglish,
           formatDateDisplay,
           formatTimeOnly,
@@ -2482,6 +2494,8 @@
           getFilteredExpenses,
           exchangeRate,
           convertedAmount,
+          currentTripCurrency,
+          updateExpenseConversion,
           openFilePicker,
           handleImageChange,
           handleFlightCertificate,
