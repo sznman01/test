@@ -85,6 +85,14 @@
       margin: 12px 0;
     }
 
+    .sticky-button {
+      background-color: #FFF7EB;
+      border-top: 1px solid #F5E6D3;
+      position: sticky;
+      bottom: 0;
+      z-index: 20;
+    }
+
     .date-pill {
       min-width: 76px;
     }
@@ -526,8 +534,8 @@
 <body class="min-h-screen font-sans antialiased">
 
   <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
-    
-    <!-- 主頁 -->
+
+    <!-- 主頁（無 Bottom Nav）-->
     <template v-if="currentScreen === 'home'">
       <div class="home-container">
         <header class="home-header header-bg p-6 text-center text-white shadow-lg">
@@ -620,26 +628,69 @@
       </div>
     </template>
 
-    <!-- 詳情頁面（有 Bottom Nav）-->
+    <!-- 行程詳情頁及其他頁面（有 Bottom Nav）-->
     <template v-if="currentScreen !== 'home'">
       <div class="page-container">
-        <!-- 頁面頂部 -->
-        <div class="page-header">
+        <!-- 詳情頁頂部 -->
+        <div v-if="currentScreen === 'detail'" class="page-header relative">
           <button 
             @click="backToHome"
             class="back-button"
           >
             ←
           </button>
+          <!-- 標題 -->
           <header class="header-bg p-6 text-center text-white shadow-lg pt-16">
-            <h1 v-if="currentScreen === 'detail'" class="text-2xl font-bold">{{ currentTripData.title }}</h1>
-            <h1 v-else-if="currentScreen === 'expense'" class="text-2xl font-bold">💰 旅行預算</h1>
-            <h1 v-else-if="currentScreen === 'reservation'" class="text-2xl font-bold">🎫 預約管理</h1>
-            <h1 v-else-if="currentScreen === 'shopping'" class="text-2xl font-bold">🛍️ 購物清單</h1>
-            <h1 v-else-if="currentScreen === 'checklist'" class="text-2xl font-bold">✓ 準備清單</h1>
-            <h1 v-else-if="currentScreen === 'members'" class="text-2xl font-bold">👥 成員</h1>
-            <h1 v-else-if="currentScreen === 'settings'" class="text-2xl font-bold">⚙️ 設定</h1>
+            <h1 class="text-2xl font-bold">{{ currentTripData.title }}</h1>
             <p class="text-sm opacity-90 mt-1">{{ currentTripData.location }}</p>
+          </header>
+        </div>
+
+        <!-- 預約頁頂部 -->
+        <div v-if="currentScreen === 'reservation'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">🎫 預約管理</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </div>
+
+        <!-- 預算頁頂部 -->
+        <div v-if="currentScreen === 'expense'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">💰 旅行預算</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </div>
+
+        <!-- 購物頁頂部 -->
+        <div v-if="currentScreen === 'shopping'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">🛍️ 購物清單</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </div>
+
+        <!-- 準備清單頁頂部 -->
+        <div v-if="currentScreen === 'checklist'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">✓ 準備清單</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </div>
+
+        <!-- 成員頁頂部 -->
+        <div v-if="currentScreen === 'members'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">👥 成員</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+          </header>
+        </div>
+
+        <!-- 設定頁頂部 -->
+        <div v-if="currentScreen === 'settings'" class="page-header">
+          <header class="header-bg p-6 text-center text-white shadow-lg">
+            <h1 class="text-2xl font-bold">⚙️ 設定</h1>
+            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
           </header>
         </div>
 
@@ -758,10 +809,10 @@
               <div class="pt-4">
                 <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
                   <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
-                  
+
                   <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
                     <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
-                    
+
                     <div class="flex gap-3">
                       <div class="relative mt-1">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
@@ -1093,55 +1144,34 @@
         </div>
       </div>
 
-      <!-- 底部導航欄 -->
+      <!-- 底部導航欄（只在詳情及其他頁顯示）-->
       <nav class="bottom-nav">
         <div class="flex justify-around items-center overflow-x-auto">
-          <button 
-            @click="currentScreen = 'detail'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'detail'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">✈️</span>
             <span>行程</span>
           </button>
-          <button 
-            @click="currentScreen = 'reservation'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">🎫</span>
             <span>預約</span>
           </button>
-          <button 
-            @click="goToExpense" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">💰</span>
             <span>預算</span>
           </button>
-          <button 
-            @click="currentScreen = 'shopping'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">🛍️</span>
             <span>購物</span>
           </button>
-          <button 
-            @click="currentScreen = 'checklist'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">✓</span>
             <span>準備</span>
           </button>
-          <button 
-            @click="currentScreen = 'members'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">👥</span>
             <span>成員</span>
           </button>
-          <button 
-            @click="currentScreen = 'settings'" 
-            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']"
-          >
+          <button @click="currentScreen = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">⚙️</span>
             <span>設定</span>
           </button>
@@ -1440,7 +1470,7 @@
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">設定預算 ✨</h2>
         <form @submit.prevent="handleSetBudget" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">總預算 ({{ currentTripData.currency || 'CNY' }})</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">總預算 (HKD)</label>
             <input 
               v-model.number="budgetFormData.totalBudget" 
               type="number" 
@@ -1449,11 +1479,8 @@
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
               @focus="$event.target.style.borderColor = '#E99D99'" 
               @blur="$event.target.style.borderColor = '#E9D5C8'" 
-              placeholder="例如：5000"
+              placeholder="例如：10000"
             >
-          </div>
-          <div class="text-sm text-gray-500">
-            約等於：{{ (budgetFormData.totalBudget * exchangeRate).toFixed(2) }} HKD
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
@@ -1611,7 +1638,7 @@
         const activeReservationMenu = ref(null);
         const currencyAmount = ref(0);
         const selectedExpenseCategory = ref('');
-        
+
         const formData = ref({
           title: '',
           location: '',
@@ -2060,7 +2087,7 @@
 
           const startTime = new Date(flightForm.value.departureTime);
           const endTime = new Date(flightForm.value.arrivalTime);
-          
+
           flightForm.value.departure = startTime.toLocaleString('zh-HK');
           flightForm.value.arrival = endTime.toLocaleString('zh-HK');
 
@@ -2172,7 +2199,7 @@
             return;
           }
 
-          currentTripData.value.totalBudget = budgetFormData.value.totalBudget * exchangeRate.value;
+          currentTripData.value.totalBudget = budgetFormData.value.totalBudget;
           showSetBudgetForm.value = false;
         };
 
@@ -2213,10 +2240,6 @@
         const backToHome = () => {
           currentScreen.value = 'home';
           selectedDateIndex.value = 0;
-        };
-
-        const goToExpense = () => {
-          currentScreen.value = 'expense';
         };
 
         const editTrip = (index) => {
@@ -2377,7 +2400,7 @@
           const dayNum = getCurrentDayNumber();
           const location = currentTripData.value.location;
           const weatherData = countryWeatherData[location];
-          
+
           if (!weatherData) {
             return { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' };
           }
@@ -2493,7 +2516,6 @@
           handleAddExpense,
           enterTrip,
           backToHome,
-          goToExpense,
           editTrip,
           handleSaveTrip,
           handleConfirmDelete,
