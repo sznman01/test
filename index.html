@@ -85,14 +85,6 @@
       margin: 12px 0;
     }
 
-    .sticky-button {
-      background-color: #FFF7EB;
-      border-top: 1px solid #F5E6D3;
-      position: sticky;
-      bottom: 0;
-      z-index: 20;
-    }
-
     .date-pill {
       min-width: 76px;
     }
@@ -535,7 +527,7 @@
 
   <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
     
-    <!-- 主頁（無 Bottom Nav）-->
+    <!-- 主頁 -->
     <template v-if="currentScreen === 'home'">
       <div class="home-container">
         <header class="home-header header-bg p-6 text-center text-white shadow-lg">
@@ -628,45 +620,28 @@
       </div>
     </template>
 
-    <!-- 行程詳情頁及其他頁面（有 Bottom Nav）-->
+    <!-- 詳情頁面（有 Bottom Nav）-->
     <template v-if="currentScreen !== 'home'">
       <div class="page-container">
-        <!-- 詳情頁頂部 -->
-        <div v-if="currentScreen === 'detail'" class="page-header relative">
+        <!-- 頁面頂部 -->
+        <div class="page-header">
           <button 
             @click="backToHome"
             class="back-button"
           >
             ←
           </button>
-          <!-- 標題 -->
           <header class="header-bg p-6 text-center text-white shadow-lg pt-16">
-            <h1 class="text-2xl font-bold">{{ currentTripData.title }}</h1>
+            <h1 v-if="currentScreen === 'detail'" class="text-2xl font-bold">{{ currentTripData.title }}</h1>
+            <h1 v-else-if="currentScreen === 'expense'" class="text-2xl font-bold">💰 旅行預算</h1>
+            <h1 v-else-if="currentScreen === 'reservation'" class="text-2xl font-bold">🎫 預約管理</h1>
+            <h1 v-else-if="currentScreen === 'shopping'" class="text-2xl font-bold">🛍️ 購物清單</h1>
+            <h1 v-else-if="currentScreen === 'checklist'" class="text-2xl font-bold">✓ 準備清單</h1>
+            <h1 v-else-if="currentScreen === 'members'" class="text-2xl font-bold">👥 成員</h1>
+            <h1 v-else-if="currentScreen === 'settings'" class="text-2xl font-bold">⚙️ 設定</h1>
             <p class="text-sm opacity-90 mt-1">{{ currentTripData.location }}</p>
           </header>
         </div>
-
-        <!-- 預算頁頂部 -->
-        <div v-if="currentScreen === 'expense'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">💰 旅行預算</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
-        </div>
-
-        <!-- 其他頁面頂部 -->
-        <template v-if="currentScreen !== 'detail' && currentScreen !== 'expense'">
-          <header class="page-header header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">
-              <span v-if="currentScreen === 'reservation'">🎫 預約管理</span>
-              <span v-if="currentScreen === 'shopping'">🛍️ 購物清單</span>
-              <span v-if="currentScreen === 'checklist'">✓ 準備清單</span>
-              <span v-if="currentScreen === 'members'">👥 成員</span>
-              <span v-if="currentScreen === 'settings'">⚙️ 設定</span>
-            </h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
-        </template>
 
         <!-- 內容區域 -->
         <div class="page-content">
@@ -979,7 +954,7 @@
 
               <!-- 即時匯率計算機 -->
               <div class="currency-converter">
-                <p class="text-sm font-bold text-gray-700 mb-12px">💱 即時匯率轉換</p>
+                <p class="text-sm font-bold text-gray-700 mb-3">💱 即時匯率轉換</p>
                 <div class="converter-row">
                   <input 
                     v-model.number="currencyAmount" 
@@ -1118,34 +1093,55 @@
         </div>
       </div>
 
-      <!-- 底部導航欄（只在詳情及其他頁顯示）-->
+      <!-- 底部導航欄 -->
       <nav class="bottom-nav">
         <div class="flex justify-around items-center overflow-x-auto">
-          <button @click="currentScreen = 'detail'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="currentScreen = 'detail'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">✈️</span>
             <span>行程</span>
           </button>
-          <button @click="currentScreen = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="currentScreen = 'reservation'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">🎫</span>
             <span>預約</span>
           </button>
-          <button @click="currentScreen = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="goToExpense" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">💰</span>
             <span>預算</span>
           </button>
-          <button @click="currentScreen = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="currentScreen = 'shopping'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">🛍️</span>
             <span>購物</span>
           </button>
-          <button @click="currentScreen = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="currentScreen = 'checklist'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">✓</span>
             <span>準備</span>
           </button>
-          <button @click="currentScreen = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="currentScreen = 'members'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">👥</span>
             <span>成員</span>
           </button>
-          <button @click="currentScreen = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']">
+          <button 
+            @click="currentScreen = 'settings'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']"
+          >
             <span class="text-xl mb-1">⚙️</span>
             <span>設定</span>
           </button>
@@ -2219,6 +2215,10 @@
           selectedDateIndex.value = 0;
         };
 
+        const goToExpense = () => {
+          currentScreen.value = 'expense';
+        };
+
         const editTrip = (index) => {
           const trip = trips.value[index];
           formData.value = {
@@ -2493,6 +2493,7 @@
           handleAddExpense,
           enterTrip,
           backToHome,
+          goToExpense,
           editTrip,
           handleSaveTrip,
           handleConfirmDelete,
