@@ -1,1151 +1,238 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>✈️ 旅遊小幫手 - Trip Planner</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        :root {
-            --primary-pink: #FF6B9D;
-            --primary-red: #E84C3D;
-            --secondary-pink: #FFB7C5;
-            --japan-blue: #2E5090;
-            --light-bg: #FFF7FB;
-            --white: #FFFFFF;
-            --gray-light: #F5F5F5;
-            --gray-medium: #CCCCCC;
-            --gray-dark: #666666;
-            --text-dark: #333333;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
-            --shadow-md: 0 8px 16px rgba(0,0,0,0.12);
-            --shadow-lg: 0 16px 32px rgba(0,0,0,0.15);
-            --radius-sm: 8px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
-            background: var(--light-bg);
-            color: var(--text-dark);
-            overflow: hidden;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-        }
-
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: relative;
-        }
-
-        /* 主內容區域 */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding-bottom: 80px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* ============ 主畫面 ============ */
-        .page {
-            display: none;
-            min-height: 100%;
-        }
-
-        .page.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* 主畫面頭部 */
-        .home-header {
-            padding: 24px 20px 16px;
-            background: linear-gradient(135deg, var(--primary-pink) 0%, #FF8CB9 100%);
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-            color: white;
-            text-align: center;
-            box-shadow: var(--shadow-md);
-        }
-
-        .home-header h1 {
-            font-size: 28px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .home-header p {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-
-        /* 行程卡片輪播 */
-        .trips-carousel {
-            padding: 20px 0;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
-            display: flex;
-            gap: 16px;
-            padding-left: 20px;
-            padding-right: 20px;
-        }
-
-        .trips-carousel::-webkit-scrollbar {
-            display: none;
-        }
-
-        .trip-card {
-            flex: 0 0 calc(100% - 40px);
-            height: 320px;
-            border-radius: var(--radius-lg);
-            background: white;
-            overflow: hidden;
-            box-shadow: var(--shadow-md);
-            scroll-snap-align: start;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .trip-card:active {
-            transform: scale(0.98);
-        }
-
-        .trip-card-image {
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-
-        .trip-card-decoration {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 32px;
-            opacity: 0.8;
-        }
-
-        .trip-card-content {
-            padding: 20px;
-            height: 140px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .trip-card-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .trip-card-location {
-            font-size: 13px;
-            color: var(--gray-dark);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .trip-card-meta {
-            display: flex;
-            gap: 12px;
-            font-size: 12px;
-            color: var(--gray-dark);
-            margin-bottom: 8px;
-        }
-
-        .trip-card-countdown {
-            background: linear-gradient(135deg, var(--primary-pink) 0%, #FF8CB9 100%);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            text-align: center;
-            width: 100%;
-        }
-
-        /* 新增行程按鈕 */
-        .add-trip-btn {
-            flex: 0 0 calc(100% - 40px);
-            height: 320px;
-            border-radius: var(--radius-lg);
-            background: white;
-            border: 3px dashed var(--secondary-pink);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .add-trip-btn:active {
-            background: var(--light-bg);
-            border-color: var(--primary-pink);
-        }
-
-        .add-trip-btn-icon {
-            font-size: 48px;
-        }
-
-        .add-trip-btn-text {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--primary-pink);
-        }
-
-        /* ============ 行程詳情頁面 ============ */
-        .itinerary-header {
-            background: linear-gradient(135deg, var(--primary-pink) 0%, #FF8CB9 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-            margin-bottom: 16px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: var(--shadow-md);
-        }
-
-        .itinerary-header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .itinerary-date {
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .itinerary-decoration {
-            font-size: 32px;
-        }
-
-        .itinerary-info {
-            font-size: 13px;
-            opacity: 0.95;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        /* 日期選擇器 */
-        .date-picker {
-            display: flex;
-            gap: 8px;
-            padding: 16px 20px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            background: white;
-            border-bottom: 1px solid #F0F0F0;
-        }
-
-        .date-picker::-webkit-scrollbar {
-            display: none;
-        }
-
-        .date-item {
-            flex: 0 0 auto;
-            padding: 12px 16px;
-            border-radius: var(--radius-md);
-            background: var(--gray-light);
-            border: 2px solid transparent;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 70px;
-        }
-
-        .date-item.active {
-            background: var(--primary-pink);
-            color: white;
-            border-color: var(--primary-red);
-            font-weight: 600;
-        }
-
-        .date-day {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .date-num {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .date-weather {
-            font-size: 16px;
-            margin-top: 4px;
-        }
-
-        .date-add-btn {
-            flex: 0 0 auto;
-            width: 70px;
-            padding: 12px;
-            border-radius: var(--radius-md);
-            border: 2px dashed var(--primary-pink);
-            background: white;
-            color: var(--primary-pink);
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        /* 天氣卡片 */
-        .weather-card {
-            background: white;
-            margin: 0 20px 16px;
-            padding: 16px;
-            border-radius: var(--radius-md);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .weather-icon {
-            font-size: 40px;
-            flex: 0 0 auto;
-        }
-
-        .weather-info {
-            flex: 1;
-        }
-
-        .weather-condition {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .weather-details {
-            font-size: 12px;
-            color: var(--gray-dark);
-        }
-
-        /* 時間軸 */
-        .timeline {
-            padding: 16px 20px;
-        }
-
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-            padding-left: 40px;
-            animation: slideIn 0.4s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .timeline-dot {
-            position: absolute;
-            left: 0;
-            top: 8px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: var(--primary-pink);
-            border: 3px solid white;
-            box-shadow: 0 0 0 2px var(--primary-pink);
-            z-index: 2;
-        }
-
-        .timeline-item.completed .timeline-dot {
-            background: var(--japan-blue);
-            box-shadow: 0 0 0 2px var(--japan-blue);
-        }
-
-        .timeline-line {
-            position: absolute;
-            left: 11px;
-            top: 24px;
-            width: 2px;
-            height: calc(100% + 20px);
-            background: linear-gradient(to bottom, var(--primary-pink), var(--secondary-pink));
-            z-index: 1;
-        }
-
-        .timeline-item:last-child .timeline-line {
-            display: none;
-        }
-
-        .timeline-card {
-            background: white;
-            padding: 16px;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
-        }
-
-        .timeline-card:active {
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .timeline-card.completed {
-            opacity: 0.7;
-            background: #F0F0F0;
-        }
-
-        .timeline-time {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--primary-pink);
-            margin-bottom: 8px;
-        }
-
-        .timeline-location {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 4px;
-        }
-
-        .timeline-description {
-            font-size: 13px;
-            color: var(--gray-dark);
-            line-height: 1.4;
-            margin-bottom: 8px;
-        }
-
-        .timeline-actions {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
-        .timeline-checkbox {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: var(--japan-blue);
-        }
-
-        .timeline-menu {
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px 8px;
-            color: var(--gray-dark);
-        }
-
-        .add-itinerary-btn {
-            background: var(--primary-pink);
-            color: white;
-            border: none;
-            padding: 14px 24px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin: 16px 0 32px;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .add-itinerary-btn:active {
-            transform: scale(0.98);
-            box-shadow: var(--shadow-md);
-        }
-
-        /* ============ 底部導航 ============ */
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-top: 1px solid #F0F0F0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 70px;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
-            z-index: 500;
-            padding-bottom: max(0px, env(safe-area-inset-bottom));
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            flex: 1;
-            height: 100%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--gray-dark);
-            text-decoration: none;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .nav-item:active {
-            transform: scale(0.95);
-        }
-
-        .nav-item.active {
-            color: var(--primary-pink);
-            font-weight: 700;
-        }
-
-        .nav-icon {
-            font-size: 24px;
-        }
-
-        .nav-label {
-            font-size: 11px;
-        }
-
-        /* ============ 模態框 ============ */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            z-index: 900;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: block;
-        }
-
-        .modal-content {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            max-height: 85vh;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 24px 20px 40px;
-            animation: slideUp 0.4s ease;
-            z-index: 901;
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(100%);
-            }
-            to {
-                transform: translateY(0);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-dark);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            padding: 0;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gray-dark);
-        }
-
-        /* 表單 */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 8px;
-        }
-
-        .form-label .required {
-            color: var(--primary-red);
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #E8E8E8;
-            border-radius: var(--radius-md);
-            font-size: 16px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--primary-pink);
-            box-shadow: 0 0 0 4px rgba(255, 107, 157, 0.1);
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-helper {
-            font-size: 12px;
-            color: var(--gray-dark);
-            margin-top: 6px;
-        }
-
-        /* 按鈕組 */
-        .form-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 28px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 20px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-pink) 0%, #FF8CB9 100%);
-            color: white;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
-            box-shadow: var(--shadow-md);
-        }
-
-        .btn-secondary {
-            background: var(--gray-light);
-            color: var(--text-dark);
-            border: 2px solid #E8E8E8;
-        }
-
-        .btn-secondary:active {
-            background: #E8E8E8;
-        }
-
-        /* 其他頁面 */
-        .other-page {
-            padding: 20px;
-            text-align: center;
-            color: var(--gray-dark);
-        }
-
-        .other-page h2 {
-            font-size: 24px;
-            color: var(--text-dark);
-            margin-bottom: 16px;
-        }
-
-        /* 響應式 */
-        @media (max-width: 360px) {
-            .home-header h1 {
-                font-size: 24px;
-            }
-
-            .trip-card-title {
-                font-size: 16px;
-            }
-
-            .btn {
-                padding: 14px 12px;
-            }
-        }
-
-        /* iOS notch 支持 */
-        @supports (padding: max(0px)) {
-            .main-content {
-                padding-bottom: calc(80px + max(0px, env(safe-area-inset-bottom)));
-            }
-
-            .bottom-nav {
-                height: calc(70px + max(0px, env(safe-area-inset-bottom)));
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>旅行計劃 App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    /* 自訂可愛顏色 */
+    .cute-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); }
+    .cute-card { background: linear-gradient(145deg, #ffffff 0%, #f0f8ff 100%); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+    .cute-btn { background: linear-gradient(45deg, #ff6b6b, #ffd93d); }
+  </style>
 </head>
-<body>
-    <div class="app-container">
-        <!-- 主內容 -->
-        <div class="main-content">
-            <!-- 主畫面 -->
-            <div id="homePage" class="page active">
-                <div class="home-header">
-                    <h1>✈️ 我的旅遊</h1>
-                    <p>一起去冒險吧！</p>
-                </div>
+<body class="bg-gradient-to-br from-pink-50 to-blue-50 min-h-screen font-sans antialiased">
 
-                <div class="trips-carousel">
-                    <div class="trip-card" onclick="goToItinerary(0)">
-                        <div class="trip-card-image" style="background-image: url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=180&fit=crop')">
-                            <div class="trip-card-decoration">🗾</div>
-                        </div>
-                        <div class="trip-card-content">
-                            <div>
-                                <div class="trip-card-title">日本 2026 之旅</div>
-                                <div class="trip-card-location">📍 大阪・東京・京都</div>
-                                <div class="trip-card-meta">
-                                    <span>📅 1月14-20日</span>
-                                    <span>7天6夜</span>
-                                </div>
-                            </div>
-                            <div class="trip-card-countdown">⏰ 6天後出發</div>
-                        </div>
-                    </div>
+  <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
+    <!-- 標題 -->
+    <header class="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-center text-white shadow-lg">
+      <h1 class="text-2xl font-bold">✨ 我的旅行計劃 ✨</h1>
+      <p class="text-sm opacity-90 mt-1">輕鬆管理你的行程！</p>
+    </header>
 
-                    <div class="trip-card" onclick="goToItinerary(1)">
-                        <div class="trip-card-image" style="background-image: url('https://images.unsplash.com/photo-1572491796066-01b2b3deedb8?w=400&h=180&fit=crop')">
-                            <div class="trip-card-decoration">🏝️</div>
-                        </div>
-                        <div class="trip-card-content">
-                            <div>
-                                <div class="trip-card-title">泰國 海島天堂</div>
-                                <div class="trip-card-location">📍 曼谷・普吉島</div>
-                                <div class="trip-card-meta">
-                                    <span>📅 3月1-8日</span>
-                                    <span>8天7夜</span>
-                                </div>
-                            </div>
-                            <div class="trip-card-countdown">⏰ 30天後出發</div>
-                        </div>
-                    </div>
-
-                    <div class="add-trip-btn" onclick="showAddTripModal()">
-                        <div class="add-trip-btn-icon">✨</div>
-                        <div class="add-trip-btn-text">新增旅程</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 行程頁面 -->
-            <div id="itineraryPage" class="page">
-                <div class="itinerary-header">
-                    <div class="itinerary-header-top">
-                        <div class="itinerary-date">Day 1</div>
-                        <div class="itinerary-decoration">😊</div>
-                    </div>
-                    <div class="itinerary-info">
-                        <span>2026年1月14日 (星期三)</span>
-                        <span>大阪</span>
-                        <span>Hotel IL Cuore</span>
-                    </div>
-                </div>
-
-                <div class="date-picker">
-                    <div class="date-item active">
-                        <div class="date-day">Wed</div>
-                        <div class="date-num">14</div>
-                        <div class="date-weather">☀️</div>
-                    </div>
-                    <div class="date-item">
-                        <div class="date-day">Thu</div>
-                        <div class="date-num">15</div>
-                        <div class="date-weather">☁️</div>
-                    </div>
-                    <div class="date-item">
-                        <div class="date-day">Fri</div>
-                        <div class="date-num">16</div>
-                        <div class="date-weather">🌧️</div>
-                    </div>
-                    <div class="date-item">
-                        <div class="date-day">Sat</div>
-                        <div class="date-num">17</div>
-                        <div class="date-weather">☀️</div>
-                    </div>
-                    <div class="date-item">
-                        <div class="date-day">Sun</div>
-                        <div class="date-num">18</div>
-                        <div class="date-weather">☀️</div>
-                    </div>
-                    <div class="date-add-btn" onclick="addNewDay()">+</div>
-                </div>
-
-                <div class="weather-card">
-                    <div class="weather-icon">☀️</div>
-                    <div class="weather-info">
-                        <div class="weather-condition">晴天 Sunny</div>
-                        <div class="weather-details">12°C ~ 20°C | 隱雲時晴</div>
-                    </div>
-                </div>
-
-                <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-line"></div>
-                        <div class="timeline-card">
-                            <div class="timeline-time">⏰ 12:45</div>
-                            <div class="timeline-location">✈️ 關西機場</div>
-                            <div class="timeline-description">降落 Arrival | 航班號 JL123</div>
-                            <div class="timeline-actions">
-                                <input type="checkbox" class="timeline-checkbox">
-                                <button class="timeline-menu">⋯</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-line"></div>
-                        <div class="timeline-card">
-                            <div class="timeline-time">⏰ 14:00</div>
-                            <div class="timeline-location">🍽️ 碳火烤肉 道樂堀みつる</div>
-                            <div class="timeline-description">經典大阪燒午餐 | 著名排隊餐廳</div>
-                            <div class="timeline-actions">
-                                <input type="checkbox" class="timeline-checkbox">
-                                <button class="timeline-menu">⋯</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-line"></div>
-                        <div class="timeline-card">
-                            <div class="timeline-time">⏰ 16:00</div>
-                            <div class="timeline-location">🏨 Hotel IL Cuore Check-in</div>
-                            <div class="timeline-description">Namba 難波區 | 2晚住宿</div>
-                            <div class="timeline-actions">
-                                <input type="checkbox" class="timeline-checkbox">
-                                <button class="timeline-menu">⋯</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item completed">
-                        <div class="timeline-dot"></div>
-                        <div class="timeline-card" style="text-decoration: line-through;">
-                            <div class="timeline-time">⏰ 18:00</div>
-                            <div class="timeline-location">🛍️ 心齋橋逛街</div>
-                            <div class="timeline-description">購物天堂 | 晚間活動已完成</div>
-                            <div class="timeline-actions">
-                                <input type="checkbox" class="timeline-checkbox" checked>
-                                <button class="timeline-menu">⋯</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="add-itinerary-btn" onclick="showAddItineraryModal()">+ 新增行程</button>
-            </div>
-
-            <!-- 預約頁面 -->
-            <div id="reservationPage" class="page">
-                <div class="other-page">
-                    <h2>🎫 預約管理</h2>
-                    <p>機票、住宿、租車等預約資訊</p>
-                </div>
-            </div>
-
-            <!-- 記賬頁面 -->
-            <div id="budgetPage" class="page">
-                <div class="other-page">
-                    <h2>💰 記賬本</h2>
-                    <p>追蹤旅行開支</p>
-                </div>
-            </div>
-
-            <!-- 購物清單 -->
-            <div id="shoppingPage" class="page">
-                <div class="other-page">
-                    <h2>🛍️ 購物清單</h2>
-                    <p>整理想買的東西</p>
-                </div>
-            </div>
-
-            <!-- 準備清單 -->
-            <div id="checklist Page" class="page">
-                <div class="other-page">
-                    <h2>✓ 準備清單</h2>
-                    <p>行前檢查清單</p>
-                </div>
-            </div>
-
-            <!-- 設置頁面 -->
-            <div id="settingsPage" class="page">
-                <div class="other-page">
-                    <h2>⚙️ 設置</h2>
-                    <p>應用設置與偏好</p>
-                </div>
-            </div>
+    <!-- 卡片列表 -->
+    <div class="flex-1 overflow-y-auto p-4 space-y-4 py-6">
+      <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
+        <div class="text-4xl mb-4">🌍</div>
+        <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
+        <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
+      </div>
+      <div v-else>
+        <div 
+          v-for="(trip, index) in trips" 
+          :key="index"
+          class="cute-card rounded-2xl p-6 transform transition-all hover:scale-105 cursor-pointer border border-pink-100"
+          @click="editTrip(index)"
+        >
+          <div class="flex items-start justify-between mb-3">
+            <h3 class="font-bold text-xl text-gray-800 flex-1 pr-4 truncate">{{ trip.title }}</h3>
+            <span class="text-2xl">{{ getEmojiForTrip(trip) }}</span>
+          </div>
+          <p class="text-gray-600 mb-4 line-clamp-2">{{ trip.description }}</p>
+          <div class="flex flex-wrap gap-1 mb-4">
+            <span v-for="(date, i) in trip.dates.slice(0,3)" :key="i" class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+              {{ date }}
+            </span>
+            <span v-if="trip.dates.length > 3" class="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+              +{{ trip.dates.length - 3 }}更多
+            </span>
+          </div>
+          <div class="flex items-center justify-between text-sm text-gray-500">
+            <span>{{ trip.location }}</span>
+            <button @click.stop="deleteTrip(index)" class="text-red-400 hover:text-red-500 p-1">
+              🗑️
+            </button>
+          </div>
         </div>
-
-        <!-- 底部導航 -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="switchPage('homePage', this)">
-                <div class="nav-icon">🏠</div>
-                <div class="nav-label">首頁</div>
-            </div>
-            <div class="nav-item" onclick="switchPage('itineraryPage', this)">
-                <div class="nav-icon">📅</div>
-                <div class="nav-label">行程</div>
-            </div>
-            <div class="nav-item" onclick="switchPage('reservationPage', this)">
-                <div class="nav-icon">🎫</div>
-                <div class="nav-label">預約</div>
-            </div>
-            <div class="nav-item" onclick="switchPage('budgetPage', this)">
-                <div class="nav-icon">💰</div>
-                <div class="nav-label">記賬</div>
-            </div>
-            <div class="nav-item" onclick="switchPage('shoppingPage', this)">
-                <div class="nav-icon">🛍️</div>
-                <div class="nav-label">購物</div>
-            </div>
-            <div class="nav-item" onclick="switchPage('settingsPage', this)">
-                <div class="nav-icon">⚙️</div>
-                <div class="nav-label">設置</div>
-            </div>
-        </div>
+      </div>
     </div>
 
-    <!-- 添加行程 Modal -->
-    <div class="modal-overlay" id="addItineraryModal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <span>✈️ 新增行程</span>
-                <button class="modal-close" onclick="closeAddItineraryModal()">✕</button>
-            </div>
-
-            <form onsubmit="submitItinerary(event)">
-                <div class="form-group">
-                    <label class="form-label">
-                        分類 <span class="required">*</span>
-                    </label>
-                    <select class="form-select" required>
-                        <option>選擇分類</option>
-                        <option>景點</option>
-                        <option>美食</option>
-                        <option>購物</option>
-                        <option>住宿</option>
-                        <option>交通</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        名稱 <span class="required">*</span>
-                    </label>
-                    <input type="text" class="form-input" placeholder="例如：淺草寺" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">時間</label>
-                    <input type="time" class="form-input">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">簡介</label>
-                    <textarea class="form-textarea" placeholder="簡短描述..."></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        <input type="checkbox" style="margin-right: 8px;">
-                        設置提醒事項
-                    </label>
-                </div>
-
-                <div class="form-buttons">
-                    <button type="submit" class="btn btn-primary">✅ 保存</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeAddItineraryModal()">取消</button>
-                </div>
-            </form>
-        </div>
+    <!-- 新增按鈕 (固定底部) -->
+    <div class="p-6 bg-white border-t border-gray-100 shadow-2xl">
+      <button 
+        @click="showAddForm = true" 
+        class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+      >
+        ➕ 新增旅行計劃
+      </button>
     </div>
 
-    <!-- 新增旅程 Modal -->
-    <div class="modal-overlay" id="addTripModal" onclick="closeModal(event)">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <span>✨ 新增旅程</span>
-                <button class="modal-close" onclick="closeAddTripModal()">✕</button>
-            </div>
-
-            <form onsubmit="submitTrip(event)">
-                <div class="form-group">
-                    <label class="form-label">
-                        國家/地區 <span class="required">*</span>
-                    </label>
-                    <select class="form-select" required>
-                        <option>選擇國家</option>
-                        <option>日本</option>
-                        <option>泰國</option>
-                        <option>韓國</option>
-                        <option>台灣</option>
-                        <option>歐洲</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">
-                        旅程名稱 <span class="required">*</span>
-                    </label>
-                    <input type="text" class="form-input" placeholder="例如：日本2026之旅" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">開始日期</label>
-                    <input type="date" class="form-input">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">天數</label>
-                    <input type="number" class="form-input" placeholder="7" min="1" max="30">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">簡介</label>
-                    <textarea class="form-textarea" placeholder="描述您的旅行計劃..."></textarea>
-                </div>
-
-                <div class="form-buttons">
-                    <button type="submit" class="btn btn-primary">✅ 建立</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeAddTripModal()">取消</button>
-                </div>
-            </form>
-        </div>
+    <!-- 新增/編輯表單 (彈出) -->
+    <div v-if="showAddForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          {{ editingIndex >= 0 ? '編輯行程' : '新增旅行計劃' }} ✨
+        </h2>
+        <form @submit.prevent="saveTrip" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">行程名稱</label>
+            <input 
+              v-model="currentTrip.title" 
+              required 
+              class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
+              placeholder="例如：巴黎浪漫之旅"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
+            <input 
+              v-model="currentTrip.location" 
+              required 
+              class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
+              placeholder="例如：巴黎、日本"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+            <input 
+              v-model="currentTrip.dates" 
+              required 
+              class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
+              placeholder="例如：2026/03/01, 2026/03/05, 2026/03/10"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+            <textarea 
+              v-model="currentTrip.description" 
+              rows="3"
+              class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none resize-none"
+              placeholder="計劃中的亮點、注意事項..."
+            ></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button 
+              type="submit" 
+              class="flex-1 bg-gradient-to-r from-green-400 to-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:scale-105 transition-all shadow-lg"
+            >
+              💾 保存
+            </button>
+            <button 
+              @click="cancelEdit" 
+              type="button"
+              class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-300 transition-all"
+            >
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // 頁面切換
-        function switchPage(pageId, navItem) {
-            // 隱藏所有頁面
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  <script>
+    const { createApp, ref, reactive, onMounted } = Vue;
 
-            // 顯示選中頁面
-            document.getElementById(pageId).classList.add('active');
-            navItem.classList.add('active');
+    createApp({
+      setup() {
+        const trips = ref([]);
+        const showAddForm = ref(false);
+        const editingIndex = ref(-1);
+        const currentTrip = reactive({
+          title: '',
+          location: '',
+          dates: '',
+          description: ''
+        });
 
-            // 滾動到頂部
-            document.querySelector('.main-content').scrollTop = 0;
-        }
+        const getEmojiForTrip = (trip) => {
+          const emojis = ['✈️', '🌟', '🏖️', '🗺️', '🎒', '🌺', '🏰', '🗽'];
+          return emojis[Math.floor(Math.random() * emojis.length)];
+        };
 
-        // 進入行程詳情
-        function goToItinerary(index) {
-            document.querySelectorAll('.nav-item')[1].click();
-        }
+        const addTrip = () => {
+          const dates = currentTrip.dates.split(',').map(d => d.trim()).filter(Boolean);
+          trips.value.push({
+            title: currentTrip.title,
+            location: currentTrip.location,
+            dates: dates,
+            description: currentTrip.description
+          });
+          resetForm();
+        };
 
-        // 模態框控制
-        function showAddItineraryModal() {
-            document.getElementById('addItineraryModal').classList.add('active');
-        }
+        const editTrip = (index) => {
+          const trip = trips.value[index];
+          currentTrip.title = trip.title;
+          currentTrip.location = trip.location;
+          currentTrip.dates = trip.dates.join(', ');
+          currentTrip.description = trip.description;
+          editingIndex.value = index;
+          showAddForm.value = true;
+        };
 
-        function closeAddItineraryModal() {
-            document.getElementById('addItineraryModal').classList.remove('active');
-        }
+        const saveTrip = () => {
+          if (editingIndex.value >= 0) {
+            const dates = currentTrip.dates.split(',').map(d => d.trim()).filter(Boolean);
+            trips.value[editingIndex.value] = {
+              title: currentTrip.title,
+              location: currentTrip.location,
+              dates: dates,
+              description: currentTrip.description
+            };
+          } else {
+            addTrip();
+          }
+          resetForm();
+        };
 
-        function showAddTripModal() {
-            document.getElementById('addTripModal').classList.add('active');
-        }
+        const deleteTrip = (index) => {
+          if (confirm('確定刪除這個旅行計劃嗎？')) {
+            trips.value.splice(index, 1);
+          }
+        };
 
-        function closeAddTripModal() {
-            document.getElementById('addTripModal').classList.remove('active');
-        }
+        const cancelEdit = () => {
+          resetForm();
+        };
 
-        function closeModal(event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                event.target.classList.remove('active');
-            }
-        }
+        const resetForm = () => {
+          Object.assign(currentTrip, { title: '', location: '', dates: '', description: '' });
+          editingIndex.value = -1;
+          showAddForm.value = false;
+        };
 
-        // 表單提交
-        function submitItinerary(event) {
-            event.preventDefault();
-            closeAddItineraryModal();
-            alert('✅ 行程已保存！');
-        }
+        // 本地儲存
+        onMounted(() => {
+          const saved = localStorage.getItem('travelTrips');
+          if (saved) {
+            trips.value = JSON.parse(saved);
+          }
+        });
 
-        function submitTrip(event) {
-            event.preventDefault();
-            closeAddTripModal();
-            alert('✅ 旅程已建立！');
-        }
+        const saveToLocal = () => {
+          localStorage.setItem('travelTrips', JSON.stringify(trips.value));
+        };
 
-        // 其他功能
-        function addNewDay() {
-            alert('+ 功能：新增旅行日期');
-        }
-    </script>
+        // 監聽變化自動儲存
+        watch(trips, saveToLocal, { deep: true });
+
+        return {
+          trips,
+          showAddForm,
+          editingIndex,
+          currentTrip,
+          getEmojiForTrip,
+          editTrip,
+          saveTrip,
+          deleteTrip,
+          cancelEdit
+        };
+      }
+    }).mount('#app');
+  </script>
+
 </body>
 </html>
