@@ -114,6 +114,35 @@
     .add-activity-btn:hover {
       background: linear-gradient(135deg, #D88888 0%, #C77777 100%);
     }
+
+    .reservation-section {
+      margin-bottom: 20px;
+    }
+
+    .reservation-section-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #8B6B6B;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+
+    .reservation-item {
+      background: white;
+      border: 1px solid #E9D5C8;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .file-preview {
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -437,37 +466,138 @@
 
       <!-- 底部導航欄（固定） -->
       <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t shadow-2xl" style="background-color: #FFF7EB; border-color: #E9D5C8;">
-        <div class="flex justify-around items-center">
-          <button @click="activeTab = 'itinerary'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'itinerary' ? 'nav-active' : 'text-gray-500']">
+        <div class="flex justify-around items-center overflow-x-auto">
+          <button @click="activeTab = 'itinerary'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'itinerary' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">✈️</span>
             <span>行程</span>
           </button>
-          <button @click="activeTab = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'reservation' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">🏨</span>
+          <button @click="activeTab = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'reservation' ? 'nav-active' : 'text-gray-500']">
+            <span class="text-xl mb-1">🎫</span>
             <span>預約</span>
           </button>
-          <button @click="activeTab = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'expense' ? 'nav-active' : 'text-gray-500']">
+          <button @click="activeTab = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'expense' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">💰</span>
             <span>記賬</span>
           </button>
-          <button @click="activeTab = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'shopping' ? 'nav-active' : 'text-gray-500']">
+          <button @click="activeTab = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'shopping' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">🛍️</span>
             <span>購物</span>
           </button>
-          <button @click="activeTab = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'checklist' ? 'nav-active' : 'text-gray-500']">
+          <button @click="activeTab = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'checklist' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">✓</span>
             <span>準備</span>
           </button>
-          <button @click="activeTab = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'members' ? 'nav-active' : 'text-gray-500']">
+          <button @click="activeTab = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'members' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">👥</span>
             <span>成員</span>
           </button>
-          <button @click="activeTab = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'settings' ? 'nav-active' : 'text-gray-500']">
+          <button @click="activeTab = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', activeTab === 'settings' ? 'nav-active' : 'text-gray-500']">
             <span class="text-xl mb-1">⚙️</span>
             <span>設定</span>
           </button>
         </div>
       </nav>
+
+      <!-- 預約標籤頁 -->
+      <template v-if="activeTab === 'reservation'">
+        <div class="flex-1 overflow-y-auto" style="background-color:#FFF7EB;">
+          <div class="p-4 pb-24">
+            <!-- 標題和新增按鈕 -->
+            <div class="flex items-center justify-between mb-6">
+              <h2 class="text-xl font-bold text-gray-800">預約管理</h2>
+              <button 
+                @click="showReservationTypeMenu = true"
+                class="bg-[#E99D99] text-white rounded-full w-10 h-10 flex items-center justify-center text-lg hover:bg-[#D88888]"
+              >
+                ➕
+              </button>
+            </div>
+
+            <!-- 機票部分 -->
+            <div class="reservation-section">
+              <p class="reservation-section-title">✈️ 機票</p>
+              <div v-if="currentTripData.reservations?.flights?.length > 0" class="space-y-2">
+                <div v-for="(flight, idx) in currentTripData.reservations.flights" :key="'flight-' + idx" class="reservation-item">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <p class="font-semibold text-gray-800 text-sm">{{ flight.flightNumber }}</p>
+                      <p class="text-xs text-gray-600 mt-1">出發: {{ flight.departure }} → 到達: {{ flight.arrival }}</p>
+                      <p class="text-xs text-gray-600">{{ flight.departureLocation }} → {{ flight.arrivalLocation }}</p>
+                      <p class="text-xs text-gray-500 mt-2">登機時間: {{ flight.departureTime }}</p>
+                    </div>
+                    <div class="relative">
+                      <button @click="openReservationMenu('flight', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
+                      <div v-if="activeReservationMenu?.type === 'flight' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                        <button @click="editReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                        <button @click="deleteReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+                      </div>
+                    </div>
+                  </div>
+                  <img v-if="flight.certificate" :src="flight.certificate" :alt="flight.flightNumber" class="file-preview">
+                </div>
+              </div>
+              <div v-else class="text-center py-6 text-gray-400 text-sm">
+                <p>暫無機票預約</p>
+              </div>
+            </div>
+
+            <!-- 住宿部分 -->
+            <div class="reservation-section">
+              <p class="reservation-section-title">🏨 住宿</p>
+              <div v-if="currentTripData.reservations?.hotels?.length > 0" class="space-y-2">
+                <div v-for="(hotel, idx) in currentTripData.reservations.hotels" :key="'hotel-' + idx" class="reservation-item">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <a :href="`https://www.google.com/maps/search/${encodeURIComponent(hotel.name)}`" target="_blank" class="font-semibold text-[#E99D99] hover:underline text-sm">
+                        {{ hotel.name }}
+                      </a>
+                      <p class="text-xs text-gray-600 mt-1">📍 {{ hotel.address }}</p>
+                      <p class="text-xs text-gray-600">入住: {{ hotel.checkInDate }} | 退房: {{ hotel.checkOutDate }} {{ hotel.checkOutTime }}</p>
+                    </div>
+                    <div class="relative">
+                      <button @click="openReservationMenu('hotel', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
+                      <div v-if="activeReservationMenu?.type === 'hotel' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                        <button @click="editReservation('hotel', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                        <button @click="deleteReservation('hotel', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+                      </div>
+                    </div>
+                  </div>
+                  <img v-if="hotel.certificate" :src="hotel.certificate" :alt="hotel.name" class="file-preview">
+                </div>
+              </div>
+              <div v-else class="text-center py-6 text-gray-400 text-sm">
+                <p>暫無住宿預約</p>
+              </div>
+            </div>
+
+            <!-- 其他票券部分 -->
+            <div class="reservation-section">
+              <p class="reservation-section-title">🎫 其他票券</p>
+              <div v-if="currentTripData.reservations?.tickets?.length > 0" class="space-y-2">
+                <div v-for="(ticket, idx) in currentTripData.reservations.tickets" :key="'ticket-' + idx" class="reservation-item">
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <p class="font-semibold text-gray-800 text-sm">{{ ticket.name }}</p>
+                      <p class="text-xs text-gray-600 mt-1">📅 {{ ticket.date }} {{ ticket.time }}</p>
+                    </div>
+                    <div class="relative">
+                      <button @click="openReservationMenu('ticket', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
+                      <div v-if="activeReservationMenu?.type === 'ticket' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                        <button @click="editReservation('ticket', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                        <button @click="deleteReservation('ticket', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
+                      </div>
+                    </div>
+                  </div>
+                  <img v-if="ticket.certificate" :src="ticket.certificate" :alt="ticket.name" class="file-preview">
+                </div>
+              </div>
+              <div v-else class="text-center py-6 text-gray-400 text-sm">
+                <p>暫無其他票券</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
     </template>
 
     <!-- 新增/編輯行程表單 -->
@@ -588,12 +718,166 @@
       </div>
     </div>
 
+    <!-- 預約類型選擇菜單 -->
+    <div v-if="showReservationTypeMenu" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">選擇預約類型 ✨</h2>
+        <div class="space-y-3">
+          <button @click="openFlightForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
+            <p class="font-semibold text-gray-800">✈️ 機票</p>
+            <p class="text-xs text-gray-600 mt-1">航班預訂資訊</p>
+          </button>
+          <button @click="openHotelForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
+            <p class="font-semibold text-gray-800">🏨 住宿</p>
+            <p class="text-xs text-gray-600 mt-1">酒店預訂資訊</p>
+          </button>
+          <button @click="openTicketForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
+            <p class="font-semibold text-gray-800">🎫 其他票券</p>
+            <p class="text-xs text-gray-600 mt-1">門票、演唱會等</p>
+          </button>
+          <button @click="showReservationTypeMenu = false" class="w-full p-4 border rounded-xl text-gray-700 font-bold" style="border-color: #E9D5C8; background-color: #E9D5C8;">
+            ❌ 取消
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 新增機票表單 -->
+    <div v-if="showFlightForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯機票' : '新增機票' }} ✈️</h2>
+        <form @submit.prevent="handleSaveFlight" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">航班編號</label>
+            <input v-model="flightForm.flightNumber" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：CX880">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">出發地點</label>
+            <input v-model="flightForm.departureLocation" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：香港">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
+            <input v-model="flightForm.arrivalLocation" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">登機時間</label>
+            <input v-model="flightForm.departureTime" type="datetime-local" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">到達時間</label>
+            <input v-model="flightForm.arrivalTime" type="datetime-local" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
+            <input type="file" accept="image/*" @change="handleFlightCertificate" class="w-full p-2 border rounded-xl" :style="{ borderColor: '#E9D5C8' }">
+            <img v-if="flightForm.certificate" :src="flightForm.certificate" :alt="flightForm.flightNumber" class="image-preview">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
+            <textarea v-model="flightForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closeFlightForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 新增住宿表單 -->
+    <div v-if="showHotelForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯住宿' : '新增住宿' }} 🏨</h2>
+        <form @submit.prevent="handleSaveHotel" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">酒店名稱</label>
+            <input v-model="hotelForm.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：Shinjuku Hotel">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">酒店地址</label>
+            <input v-model="hotelForm.address" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京都新宿区...">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">入住日期</label>
+            <input v-model="hotelForm.checkInDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">退房日期</label>
+            <input v-model="hotelForm.checkOutDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">退房時間</label>
+            <input v-model="hotelForm.checkOutTime" type="time" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
+            <input type="file" accept="image/*" @change="handleHotelCertificate" class="w-full p-2 border rounded-xl" :style="{ borderColor: '#E9D5C8' }">
+            <img v-if="hotelForm.certificate" :src="hotelForm.certificate" :alt="hotelForm.name" class="image-preview">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
+            <textarea v-model="hotelForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closeHotelForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 新增其他票券表單 -->
+    <div v-if="showTicketForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯票券' : '新增票券' }} 🎫</h2>
+        <form @submit.prevent="handleSaveTicket" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">票券名稱</label>
+            <input v-model="ticketForm.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京迪士尼樂園">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+            <input v-model="ticketForm.date" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">時間</label>
+            <input v-model="ticketForm.time" type="time" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
+            <input type="file" accept="image/*" @change="handleTicketCertificate" class="w-full p-2 border rounded-xl" :style="{ borderColor: '#E9D5C8' }">
+            <img v-if="ticketForm.certificate" :src="ticketForm.certificate" :alt="ticketForm.name" class="image-preview">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
+            <textarea v-model="ticketForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closeTicketForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- 刪除確認對話 -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-sm" style="border-color:#E9D5C8;">
         <h2 class="text-xl font-bold text-center mb-4 text-gray-800">確定刪除嗎？</h2>
         <p class="text-center text-gray-600 mb-6">
-          {{ deleteType === 'trip' ? (trips[deletingIndex] ? trips[deletingIndex].title : '') : '此行程' }} 將被永久刪除
+          {{ deleteType === 'trip' ? (trips[deletingIndex] ? trips[deletingIndex].title : '') : '此項目' }} 將被永久刪除
         </p>
         <div class="flex gap-3">
           <button @click="handleConfirmDelete" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all" style="background-color: #E99D99;">
@@ -618,6 +902,10 @@
         const showAddActivityForm = ref(false);
         const showEditAccommodationForm = ref(false);
         const showDeleteConfirm = ref(false);
+        const showReservationTypeMenu = ref(false);
+        const showFlightForm = ref(false);
+        const showHotelForm = ref(false);
+        const showTicketForm = ref(false);
         const editingIndex = ref(-1);
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
@@ -626,6 +914,8 @@
         const selectedDateIndex = ref(0);
         const activeActivityMenu = ref(-1);
         const editingActivityIndex = ref(-1);
+        const editingReservationIndex = ref(-1);
+        const activeReservationMenu = ref(null);
         
         const formData = ref({
           title: '',
@@ -635,7 +925,8 @@
           description: '',
           coverImage: '',
           itinerary: [],
-          accommodations: {}
+          accommodations: {},
+          reservations: { flights: [], hotels: [], tickets: [] }
         });
 
         const accommodationFormData = ref({
@@ -647,6 +938,36 @@
           name: '',
           location: '',
           type: 'sightseeing',
+          notes: ''
+        });
+
+        const flightForm = ref({
+          flightNumber: '',
+          departureLocation: '',
+          arrivalLocation: '',
+          departureTime: '',
+          arrivalTime: '',
+          departure: '',
+          arrival: '',
+          certificate: '',
+          notes: ''
+        });
+
+        const hotelForm = ref({
+          name: '',
+          address: '',
+          checkInDate: '',
+          checkOutDate: '',
+          checkOutTime: '',
+          certificate: '',
+          notes: ''
+        });
+
+        const ticketForm = ref({
+          name: '',
+          date: '',
+          time: '',
+          certificate: '',
           notes: ''
         });
 
@@ -719,6 +1040,39 @@
           }
         };
 
+        const handleFlightCertificate = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              flightForm.value.certificate = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+
+        const handleHotelCertificate = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              hotelForm.value.certificate = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+
+        const handleTicketCertificate = (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              ticketForm.value.certificate = e.target.result;
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+
         const openAddForm = () => {
           editingIndex.value = -1;
           formData.value = {
@@ -729,7 +1083,8 @@
             description: '',
             coverImage: '',
             itinerary: [],
-            accommodations: {}
+            accommodations: {},
+            reservations: { flights: [], hotels: [], tickets: [] }
           };
           showAddForm.value = true;
         };
@@ -744,7 +1099,8 @@
             description: '',
             coverImage: '',
             itinerary: [],
-            accommodations: {}
+            accommodations: {},
+            reservations: { flights: [], hotels: [], tickets: [] }
           };
           editingIndex.value = -1;
           const fileInput = document.getElementById('imageFileInput');
@@ -820,6 +1176,166 @@
           accommodationFormData.value.name = '';
         };
 
+        const openReservationMenu = (type, idx) => {
+          if (activeReservationMenu.value?.type === type && activeReservationMenu.value?.idx === idx) {
+            activeReservationMenu.value = null;
+          } else {
+            activeReservationMenu.value = { type, idx };
+          }
+        };
+
+        const openFlightForm = () => {
+          editingReservationIndex.value = -1;
+          flightForm.value = {
+            flightNumber: '',
+            departureLocation: '',
+            arrivalLocation: '',
+            departureTime: '',
+            arrivalTime: '',
+            departure: '',
+            arrival: '',
+            certificate: '',
+            notes: ''
+          };
+          showFlightForm.value = true;
+          showReservationTypeMenu.value = false;
+        };
+
+        const closeFlightForm = () => {
+          showFlightForm.value = false;
+          editingReservationIndex.value = -1;
+        };
+
+        const openHotelForm = () => {
+          editingReservationIndex.value = -1;
+          hotelForm.value = {
+            name: '',
+            address: '',
+            checkInDate: '',
+            checkOutDate: '',
+            checkOutTime: '',
+            certificate: '',
+            notes: ''
+          };
+          showHotelForm.value = true;
+          showReservationTypeMenu.value = false;
+        };
+
+        const closeHotelForm = () => {
+          showHotelForm.value = false;
+          editingReservationIndex.value = -1;
+        };
+
+        const openTicketForm = () => {
+          editingReservationIndex.value = -1;
+          ticketForm.value = {
+            name: '',
+            date: '',
+            time: '',
+            certificate: '',
+            notes: ''
+          };
+          showTicketForm.value = true;
+          showReservationTypeMenu.value = false;
+        };
+
+        const closeTicketForm = () => {
+          showTicketForm.value = false;
+          editingReservationIndex.value = -1;
+        };
+
+        const editReservation = (type, idx) => {
+          editingReservationIndex.value = idx;
+          if (type === 'flight') {
+            const flight = currentTripData.value.reservations.flights[idx];
+            flightForm.value = JSON.parse(JSON.stringify(flight));
+            showFlightForm.value = true;
+          } else if (type === 'hotel') {
+            const hotel = currentTripData.value.reservations.hotels[idx];
+            hotelForm.value = JSON.parse(JSON.stringify(hotel));
+            showHotelForm.value = true;
+          } else if (type === 'ticket') {
+            const ticket = currentTripData.value.reservations.tickets[idx];
+            ticketForm.value = JSON.parse(JSON.stringify(ticket));
+            showTicketForm.value = true;
+          }
+          activeReservationMenu.value = null;
+        };
+
+        const deleteReservation = (type, idx) => {
+          if (type === 'flight') {
+            currentTripData.value.reservations.flights.splice(idx, 1);
+          } else if (type === 'hotel') {
+            currentTripData.value.reservations.hotels.splice(idx, 1);
+          } else if (type === 'ticket') {
+            currentTripData.value.reservations.tickets.splice(idx, 1);
+          }
+          activeReservationMenu.value = null;
+        };
+
+        const handleSaveFlight = () => {
+          if (!flightForm.value.flightNumber || !flightForm.value.departureLocation || !flightForm.value.arrivalLocation || !flightForm.value.departureTime || !flightForm.value.arrivalTime) {
+            alert('請填寫所有必填欄位');
+            return;
+          }
+
+          const startTime = new Date(flightForm.value.departureTime);
+          const endTime = new Date(flightForm.value.arrivalTime);
+          
+          flightForm.value.departure = startTime.toLocaleString('zh-HK');
+          flightForm.value.arrival = endTime.toLocaleString('zh-HK');
+
+          if (!currentTripData.value.reservations) {
+            currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
+          }
+
+          if (editingReservationIndex.value >= 0) {
+            currentTripData.value.reservations.flights[editingReservationIndex.value] = JSON.parse(JSON.stringify(flightForm.value));
+          } else {
+            currentTripData.value.reservations.flights.push(JSON.parse(JSON.stringify(flightForm.value)));
+          }
+
+          closeFlightForm();
+        };
+
+        const handleSaveHotel = () => {
+          if (!hotelForm.value.name || !hotelForm.value.address || !hotelForm.value.checkInDate || !hotelForm.value.checkOutDate) {
+            alert('請填寫所有必填欄位');
+            return;
+          }
+
+          if (!currentTripData.value.reservations) {
+            currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
+          }
+
+          if (editingReservationIndex.value >= 0) {
+            currentTripData.value.reservations.hotels[editingReservationIndex.value] = JSON.parse(JSON.stringify(hotelForm.value));
+          } else {
+            currentTripData.value.reservations.hotels.push(JSON.parse(JSON.stringify(hotelForm.value)));
+          }
+
+          closeHotelForm();
+        };
+
+        const handleSaveTicket = () => {
+          if (!ticketForm.value.name || !ticketForm.value.date || !ticketForm.value.time) {
+            alert('請填寫所有必填欄位');
+            return;
+          }
+
+          if (!currentTripData.value.reservations) {
+            currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
+          }
+
+          if (editingReservationIndex.value >= 0) {
+            currentTripData.value.reservations.tickets[editingReservationIndex.value] = JSON.parse(JSON.stringify(ticketForm.value));
+          } else {
+            currentTripData.value.reservations.tickets.push(JSON.parse(JSON.stringify(ticketForm.value)));
+          }
+
+          closeTicketForm();
+        };
+
         const handleSaveActivity = () => {
           if (!activityFormData.value.time || !activityFormData.value.name || !activityFormData.value.location) {
             alert('請填寫所有必填欄位');
@@ -892,7 +1408,8 @@
             description: trip.description,
             coverImage: trip.coverImage || '',
             itinerary: JSON.parse(JSON.stringify(trip.itinerary || [])),
-            accommodations: JSON.parse(JSON.stringify(trip.accommodations || {}))
+            accommodations: JSON.parse(JSON.stringify(trip.accommodations || {})),
+            reservations: JSON.parse(JSON.stringify(trip.reservations || { flights: [], hotels: [], tickets: [] }))
           };
           editingIndex.value = index;
           showAddForm.value = true;
@@ -920,7 +1437,8 @@
             description: formData.value.description,
             coverImage: formData.value.coverImage,
             itinerary: formData.value.itinerary,
-            accommodations: formData.value.accommodations
+            accommodations: formData.value.accommodations,
+            reservations: formData.value.reservations
           };
 
           if (editingIndex.value >= 0) {
@@ -972,7 +1490,8 @@
             description: '',
             coverImage: '',
             itinerary: [],
-            accommodations: {}
+            accommodations: {},
+            reservations: { flights: [], hotels: [], tickets: [] }
           };
         });
 
@@ -1049,7 +1568,13 @@
 
         const getCurrentDayActivities = () => {
           const dayNum = getCurrentDayNumber();
-          return (currentTripData.value.itinerary || []).filter(item => item.day === dayNum);
+          const activities = (currentTripData.value.itinerary || []).filter(item => item.day === dayNum);
+          // 依時序排列
+          return activities.sort((a, b) => {
+            const timeA = a.time ? parseInt(a.time.replace(':', '')) : 0;
+            const timeB = b.time ? parseInt(b.time.replace(':', '')) : 0;
+            return timeA - timeB;
+          });
         };
 
         const getActivityIcon = (type) => {
@@ -1071,6 +1596,10 @@
           showAddActivityForm,
           showEditAccommodationForm,
           showDeleteConfirm,
+          showReservationTypeMenu,
+          showFlightForm,
+          showHotelForm,
+          showTicketForm,
           editingIndex,
           selectedTripIndex,
           deletingIndex,
@@ -1079,14 +1608,22 @@
           formData,
           activityFormData,
           accommodationFormData,
+          flightForm,
+          hotelForm,
+          ticketForm,
           selectedDateIndex,
           activeActivityMenu,
           editingActivityIndex,
+          editingReservationIndex,
+          activeReservationMenu,
           formatDateRangeEnglish,
           formatDateDisplay,
           calculateDays,
           openFilePicker,
           handleImageChange,
+          handleFlightCertificate,
+          handleHotelCertificate,
+          handleTicketCertificate,
           openAddForm,
           closeForm,
           openAddActivityForm,
@@ -1097,8 +1634,20 @@
           confirmDeleteActivity,
           openEditAccommodationForm,
           closeEditAccommodationForm,
+          openReservationMenu,
+          openFlightForm,
+          closeFlightForm,
+          openHotelForm,
+          closeHotelForm,
+          openTicketForm,
+          closeTicketForm,
+          editReservation,
+          deleteReservation,
           handleSaveActivity,
           handleSaveAccommodation,
+          handleSaveFlight,
+          handleSaveHotel,
+          handleSaveTicket,
           viewTripDetail,
           backToHome,
           editTrip,
