@@ -102,17 +102,17 @@
       cursor: grabbing;
     }
 
-    .sticky-date-header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background-color: #FFF7EB;
-      padding: 12px 16px;
-      border-bottom: 2px solid #E9D5C8;
-    }
-
     .itinerary-content {
       padding-bottom: 100px;
+    }
+
+    .add-activity-btn {
+      background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
+      border: 2px dashed rgba(233, 157, 153, 0.3);
+    }
+
+    .add-activity-btn:hover {
+      background: linear-gradient(135deg, #D88888 0%, #C77777 100%);
     }
   </style>
 </head>
@@ -201,170 +201,191 @@
       </div>
     </template>
 
-    <!-- 單一行程詳情頁（重新設計） -->
+    <!-- 單一行程詳情頁（全部可垂直滾動） -->
     <template v-if="currentPage === 'detail'">
-      <!-- 頂部封面 -->
-      <div class="relative">
-        <div v-if="currentTripData.coverImage">
-          <img :src="currentTripData.coverImage" :alt="currentTripData.title" class="w-full h-56 object-cover">
-        </div>
-        <div v-else class="w-full h-56 flex items-center justify-center" style="background: linear-gradient(135deg,#E99D99,#D88888);">
-          <span class="text-5xl text-white">🌍</span>
-        </div>
-        <button 
-          @click="backToHome"
-          class="absolute top-4 left-4 bg-white/90 rounded-full p-2 shadow-md text-gray-700"
-        >
-          ←
-        </button>
-      </div>
-
-      <!-- 行程名稱卡片 -->
-      <div class="px-4 pt-4">
-        <div class="cute-card rounded-2xl p-4 border" style="border-color:#E9D5C8;">
-          <h1 class="text-xl font-bold text-gray-800 mb-1">{{ currentTripData.title }}</h1>
-          <p class="text-gray-600 mb-1">📍 {{ currentTripData.location }}</p>
-          <p class="text-gray-500 text-sm">
-            📅 {{ formatDateRangeEnglish(currentTripData.dates) }} · ⏱️ {{ calculateDays(currentTripData.dates) }} 天
-          </p>
-        </div>
-      </div>
-
-      <!-- 倒數計時器卡 -->
-      <div class="px-4 pt-4">
-        <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
-          <p class="text-sm text-gray-600">距離出發</p>
-          <div class="flex items-baseline gap-2">
-            <span class="text-4xl font-extrabold text-gray-900">{{ countdownDaysText }}</span>
-            <span class="text-sm text-gray-600" v-if="countdownDays >= 0">天</span>
+      <!-- 主容器：全部内容可滚动 -->
+      <div class="flex-1 overflow-y-auto" style="background-color:#FFF7EB;">
+        
+        <!-- 頂部封面（在可滾動區內） -->
+        <div class="relative">
+          <div v-if="currentTripData.coverImage">
+            <img :src="currentTripData.coverImage" :alt="currentTripData.title" class="w-full h-56 object-cover">
           </div>
-          <div class="mt-2">
-            <div class="w-full h-3 rounded-full bg-[#FFE3DD] overflow-hidden relative">
-              <div 
-                class="h-3 rounded-full"
-                :style="{
-                  width: countdownProgress + '%',
-                  background: 'linear-gradient(90deg,#E99D99,#D88888)'
-                }"
-              ></div>
-              <div 
-                class="absolute -top-3 text-lg"
-                :style="{ left: `calc(${countdownProgress}% - 10px)` }"
-              >
-                ✈️
-              </div>
-            </div>
+          <div v-else class="w-full h-56 flex items-center justify-center" style="background: linear-gradient(135deg,#E99D99,#D88888);">
+            <span class="text-5xl text-white">🌍</span>
           </div>
-          <p class="text-xs text-gray-500 mt-1">出發日期：{{ formatDateDisplay(currentTripData.startDate) }}</p>
-        </div>
-      </div>
-
-      <!-- 日期選擇卡：水平滾動（sticky） -->
-      <div class="sticky-date-header">
-        <p class="text-sm text-gray-700 mb-2">選擇日期</p>
-        <div class="flex gap-2 overflow-x-auto pb-1">
-          <button
-            v-for="(day, idx) in dateOptions"
-            :key="day.date"
-            class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
-            :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
-            :style="selectedDateIndex === idx 
-              ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
-              : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
-            @click="selectedDateIndex = idx"
+          <button 
+            @click="backToHome"
+            class="absolute top-4 left-4 bg-white/90 rounded-full p-2 shadow-md text-gray-700"
           >
-            <div>{{ day.weekday }}</div>
-            <div class="mt-1">{{ day.day }}</div>
+            ←
           </button>
         </div>
-      </div>
 
-      <!-- 詳細行程內容區 -->
-      <div class="flex-1 overflow-y-auto" style="background-color:#FFF7EB;">
+        <!-- 所有內容包裝在可滾動容器內 -->
         <div class="itinerary-content px-4">
+          
+          <!-- 行程名稱卡片 -->
+          <div class="pt-4">
+            <div class="cute-card rounded-2xl p-4 border" style="border-color:#E9D5C8;">
+              <h1 class="text-xl font-bold text-gray-800 mb-1">{{ currentTripData.title }}</h1>
+              <p class="text-gray-600 mb-1">📍 {{ currentTripData.location }}</p>
+              <p class="text-gray-500 text-sm">
+                📅 {{ formatDateRangeEnglish(currentTripData.dates) }} · ⏱️ {{ calculateDays(currentTripData.dates) }} 天
+              </p>
+            </div>
+          </div>
+
+          <!-- 倒數計時器卡 -->
+          <div class="pt-4">
+            <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
+              <p class="text-sm text-gray-600">距離出發</p>
+              <div class="flex items-baseline gap-2">
+                <span class="text-4xl font-extrabold text-gray-900">{{ countdownDaysText }}</span>
+                <span class="text-sm text-gray-600" v-if="countdownDays >= 0">天</span>
+              </div>
+              <div class="mt-2">
+                <div class="w-full h-3 rounded-full bg-[#FFE3DD] overflow-hidden relative">
+                  <div 
+                    class="h-3 rounded-full"
+                    :style="{
+                      width: countdownProgress + '%',
+                      background: 'linear-gradient(90deg,#E99D99,#D88888)'
+                    }"
+                  ></div>
+                  <div 
+                    class="absolute -top-3 text-lg"
+                    :style="{ left: `calc(${countdownProgress}% - 10px)` }"
+                  >
+                    ✈️
+                  </div>
+                </div>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">出發日期：{{ formatDateDisplay(currentTripData.startDate) }}</p>
+            </div>
+          </div>
+
+          <!-- 日期選擇卡：水平滾動（非 sticky） -->
+          <div class="pt-4">
+            <p class="text-sm text-gray-700 mb-2 px-4">選擇日期</p>
+            <div class="flex gap-2 overflow-x-auto pb-3 px-4">
+              <button
+                v-for="(day, idx) in dateOptions"
+                :key="day.date"
+                class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
+                :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
+                :style="selectedDateIndex === idx 
+                  ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
+                  : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
+                @click="selectedDateIndex = idx"
+              >
+                <div>{{ day.weekday }}</div>
+                <div class="mt-1">{{ day.day }}</div>
+              </button>
+            </div>
+          </div>
+
           <!-- 日期標題卡 -->
-          <div class="cute-card rounded-2xl p-4 border mt-4 space-y-1" style="border-color:#E9D5C8;">
-            <p class="text-xs text-gray-500">{{ currentSelectedDateLabel }}</p>
-            <h2 class="text-lg font-bold text-gray-800">Day {{ getCurrentDayNumber() }}</h2>
-            <p class="text-sm text-gray-600">{{ getDayActivityTitle() }}</p>
+          <div class="pt-4">
+            <div class="cute-card rounded-2xl p-4 border space-y-1" style="border-color:#E9D5C8;">
+              <p class="text-xs text-gray-500">{{ currentSelectedDateLabel }}</p>
+              <h2 class="text-lg font-bold text-gray-800">Day {{ getCurrentDayNumber() }}</h2>
+              <p class="text-sm text-gray-600">{{ getDayActivityTitle() }}</p>
+            </div>
           </div>
 
           <!-- 天氣卡 -->
-          <div class="cute-card rounded-2xl p-4 border mt-4 space-y-2" style="border-color:#E9D5C8;">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <span class="text-3xl">{{ getCurrentDayWeather().icon }}</span>
-                <div>
-                  <p class="text-2xl font-bold text-gray-800">{{ getCurrentDayWeather().temp }}°C</p>
-                  <p class="text-xs text-gray-500">體感 {{ getCurrentDayWeather().feelsLike }}°C</p>
+          <div class="pt-4">
+            <div class="cute-card rounded-2xl p-4 border space-y-2" style="border-color:#E9D5C8;">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-3xl">{{ getCurrentDayWeather().icon }}</span>
+                  <div>
+                    <p class="text-2xl font-bold text-gray-800">{{ getCurrentDayWeather().temp }}°C</p>
+                    <p class="text-xs text-gray-500">體感 {{ getCurrentDayWeather().feelsLike }}°C</p>
+                  </div>
                 </div>
               </div>
+              <p class="text-sm text-gray-600 mt-2">{{ getCurrentDayWeather().description }}</p>
             </div>
-            <p class="text-sm text-gray-600 mt-2">{{ getCurrentDayWeather().description }}</p>
           </div>
 
           <!-- 酒店/住宿資訊卡 -->
-          <div v-if="getCurrentDayAccommodation()" class="cute-card rounded-2xl p-4 border mt-4 space-y-3" style="border-color:#E9D5C8;">
-            <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8]">
-              <span class="text-2xl">🏨</span>
-              <div class="flex-1">
-                <p class="text-sm text-gray-500">住宿</p>
-                <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation().name }}</p>
+          <div v-if="getCurrentDayAccommodation()" class="pt-4">
+            <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
+              <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8]">
+                <span class="text-2xl">🏨</span>
+                <div class="flex-1">
+                  <p class="text-sm text-gray-500">住宿</p>
+                  <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation().name }}</p>
+                </div>
               </div>
+              <a 
+                :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
+                target="_blank"
+                class="text-xs text-[#E99D99] hover:underline flex items-center gap-1"
+              >
+                📍 在 Google Maps 查看
+              </a>
             </div>
-            <a 
-              :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
-              target="_blank"
-              class="text-xs text-[#E99D99] hover:underline flex items-center gap-1"
-            >
-              📍 在 Google Maps 查看
-            </a>
           </div>
 
           <!-- 活動時間軸卡 -->
-          <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border mt-4 space-y-3" style="border-color:#E9D5C8;">
-            <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
-            
-            <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
-              <!-- 連線 -->
-              <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
+          <div class="pt-4">
+            <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
+              <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
               
-              <!-- 圓點 + 時間圓圈 + 內容 -->
-              <div class="flex gap-3">
-                <!-- 時間圓圈 -->
-                <div class="relative mt-1">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
-                    {{ activity.time || '—' }}
-                  </div>
-                </div>
-
-                <!-- 活動內容 -->
-                <div class="flex-1">
-                  <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                      <p class="text-sm font-semibold text-gray-800">{{ activity.name }}</p>
-                      <p class="text-xs text-gray-600 mt-1">{{ getActivityIcon(activity.type) }} {{ activity.location }}</p>
-                      <a 
-                        :href="`https://www.google.com/maps/search/${encodeURIComponent(activity.location)}`"
-                        target="_blank"
-                        class="text-xs text-[#E99D99] hover:underline mt-1 inline-block"
-                      >
-                        📍 導航
-                      </a>
+              <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
+                <!-- 連線 -->
+                <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
+                
+                <!-- 圓點 + 時間圓圈 + 內容 -->
+                <div class="flex gap-3">
+                  <!-- 時間圓圈 -->
+                  <div class="relative mt-1">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
+                      {{ activity.time || '—' }}
                     </div>
-                    <button class="text-gray-400 hover:text-gray-600 p-1">⋯</button>
+                  </div>
+
+                  <!-- 活動內容 -->
+                  <div class="flex-1">
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1">
+                        <p class="text-sm font-semibold text-gray-800">{{ activity.name }}</p>
+                        <p class="text-xs text-gray-600 mt-1">{{ getActivityIcon(activity.type) }} {{ activity.location }}</p>
+                        <a 
+                          :href="`https://www.google.com/maps/search/${encodeURIComponent(activity.location)}`"
+                          target="_blank"
+                          class="text-xs text-[#E99D99] hover:underline mt-1 inline-block"
+                        >
+                          📍 導航
+                        </a>
+                      </div>
+                      <button class="text-gray-400 hover:text-gray-600 p-1">⋯</button>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            <div v-else class="cute-card rounded-2xl p-4 border text-center" style="border-color:#E9D5C8;">
+              <p class="text-gray-500 text-sm">暫無行程安排</p>
+            </div>
           </div>
-          <div v-else class="cute-card rounded-2xl p-4 border mt-4 text-center" style="border-color:#E9D5C8;">
-            <p class="text-gray-500 text-sm">暫無行程安排</p>
+
+          <!-- 新增活動/提醒按鈕 -->
+          <div class="pt-4 pb-4">
+            <button 
+              @click="openAddActivityForm"
+              class="w-full add-activity-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
+            >
+              ➕ 新增活動/提醒
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- 底部導航欄 -->
+      <!-- 底部導航欄（固定） -->
       <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t shadow-2xl" style="background-color: #FFF7EB; border-color: #E9D5C8;">
         <div class="flex justify-around items-center">
           <button @click="activeTab = 'itinerary'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'itinerary' ? 'nav-active' : 'text-gray-500']">
@@ -399,7 +420,7 @@
       </nav>
     </template>
 
-    <!-- 新增/編輯表單 -->
+    <!-- 新增/編輯行程表單 -->
     <div v-if="showAddForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
@@ -448,6 +469,52 @@
       </div>
     </div>
 
+    <!-- 新增活動表單 -->
+    <div v-if="showAddActivityForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          新增活動/提醒 ✨
+        </h2>
+        <form @submit.prevent="handleAddActivity" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">時間</label>
+            <input v-model="activityFormData.time" type="time" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">活動名稱</label>
+            <input v-model="activityFormData.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：逛街購物">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">地點</label>
+            <input v-model="activityFormData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：銅鑼灣時代廣場">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">活動類型</label>
+            <select v-model="activityFormData.type" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+              <option value="sightseeing">景點遊覽</option>
+              <option value="food">飲食</option>
+              <option value="shopping">購物</option>
+              <option value="transport">交通</option>
+              <option value="accommodation">住宿</option>
+              <option value="relaxation">休閒</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
+            <textarea v-model="activityFormData.notes" rows="3" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="添加任何備註..."></textarea>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 新增
+            </button>
+            <button type="button" @click="closeAddActivityForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- 刪除確認對話 -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-sm" style="border-color:#E9D5C8;">
@@ -473,6 +540,7 @@
         const trips = ref([]);
         const currentPage = ref('home');
         const showAddForm = ref(false);
+        const showAddActivityForm = ref(false);
         const showDeleteConfirm = ref(false);
         const editingIndex = ref(-1);
         const selectedTripIndex = ref(0);
@@ -488,6 +556,14 @@
           description: '',
           coverImage: '',
           itinerary: []
+        });
+
+        const activityFormData = ref({
+          time: '',
+          name: '',
+          location: '',
+          type: 'sightseeing',
+          notes: ''
         });
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -589,6 +665,49 @@
           if (fileInput) {
             fileInput.value = '';
           }
+        };
+
+        const openAddActivityForm = () => {
+          activityFormData.value = {
+            time: '',
+            name: '',
+            location: '',
+            type: 'sightseeing',
+            notes: ''
+          };
+          showAddActivityForm.value = true;
+        };
+
+        const closeAddActivityForm = () => {
+          showAddActivityForm.value = false;
+          activityFormData.value = {
+            time: '',
+            name: '',
+            location: '',
+            type: 'sightseeing',
+            notes: ''
+          };
+        };
+
+        const handleAddActivity = () => {
+          if (!activityFormData.value.time || !activityFormData.value.name || !activityFormData.value.location) {
+            alert('請填寫所有必填欄位');
+            return;
+          }
+
+          const dayNum = getCurrentDayNumber();
+          const mockData = mockItineraryData.find(d => d.day === dayNum);
+          if (mockData) {
+            mockData.activities.push({
+              time: activityFormData.value.time,
+              name: activityFormData.value.name,
+              type: activityFormData.value.type,
+              location: activityFormData.value.location,
+              notes: activityFormData.value.notes
+            });
+          }
+
+          closeAddActivityForm();
         };
 
         const viewTripDetail = (index) => {
@@ -771,12 +890,14 @@
           trips,
           currentPage,
           showAddForm,
+          showAddActivityForm,
           showDeleteConfirm,
           editingIndex,
           selectedTripIndex,
           deletingIndex,
           activeTab,
           formData,
+          activityFormData,
           selectedDateIndex,
           formatDateRangeEnglish,
           formatDateDisplay,
@@ -785,6 +906,9 @@
           handleImageChange,
           openAddForm,
           closeForm,
+          openAddActivityForm,
+          closeAddActivityForm,
+          handleAddActivity,
           viewTripDetail,
           backToHome,
           editTrip,
