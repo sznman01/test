@@ -569,7 +569,77 @@
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const weekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-        // 模擬天氣數據
+        // 國家天氣數據 - 預設溫度範圍
+        const countryWeatherData = {
+          '日本': [
+            { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' },
+            { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
+            { icon: '🌧️', temp: 18, feelsLike: 15, description: '有雨預報' },
+            { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' }
+          ],
+          '香港': [
+            { icon: '☀️', temp: 32, feelsLike: 35, description: '炎熱潮濕' },
+            { icon: '☁️', temp: 28, feelsLike: 30, description: '多雲天氣' },
+            { icon: '🌧️', temp: 24, feelsLike: 22, description: '有雨預報' },
+            { icon: '⛅', temp: 26, feelsLike: 28, description: '陰晴不定' }
+          ],
+          '台灣': [
+            { icon: '☀️', temp: 30, feelsLike: 32, description: '晴朗炎熱' },
+            { icon: '☁️', temp: 26, feelsLike: 28, description: '多雲天氣' },
+            { icon: '🌧️', temp: 22, feelsLike: 20, description: '有雨預報' },
+            { icon: '💨', temp: 24, feelsLike: 26, description: '有風涼爽' }
+          ],
+          '韓國': [
+            { icon: '☀️', temp: 25, feelsLike: 27, description: '晴朗溫和' },
+            { icon: '☁️', temp: 20, feelsLike: 18, description: '多雲天氣' },
+            { icon: '🌧️', temp: 16, feelsLike: 14, description: '有雨預報' },
+            { icon: '❄️', temp: -5, feelsLike: -8, description: '冰凍寒冷' }
+          ],
+          '泰國': [
+            { icon: '☀️', temp: 34, feelsLike: 37, description: '酷熱潮濕' },
+            { icon: '☁️', temp: 30, feelsLike: 32, description: '多雲天氣' },
+            { icon: '🌧️', temp: 26, feelsLike: 24, description: '有雨預報' },
+            { icon: '💨', temp: 28, feelsLike: 30, description: '有風悶熱' }
+          ],
+          '新加坡': [
+            { icon: '☀️', temp: 32, feelsLike: 35, description: '晴朗炎熱' },
+            { icon: '☁️', temp: 28, feelsLike: 30, description: '多雲天氣' },
+            { icon: '🌧️', temp: 26, feelsLike: 24, description: '有雨預報' },
+            { icon: '⛅', temp: 30, feelsLike: 32, description: '陰晴不定' }
+          ],
+          '美國': [
+            { icon: '☀️', temp: 26, feelsLike: 28, description: '晴朗舒適' },
+            { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
+            { icon: '🌧️', temp: 18, feelsLike: 16, description: '有雨預報' },
+            { icon: '❄️', temp: 0, feelsLike: -3, description: '寒冷下雪' }
+          ],
+          '英國': [
+            { icon: '☁️', temp: 15, feelsLike: 13, description: '多雲陰涼' },
+            { icon: '🌧️', temp: 12, feelsLike: 10, description: '有雨潮濕' },
+            { icon: '⛅', temp: 18, feelsLike: 16, description: '陰晴不定' },
+            { icon: '❄️', temp: 2, feelsLike: -1, description: '寒冷結冰' }
+          ],
+          '法國': [
+            { icon: '☀️', temp: 24, feelsLike: 26, description: '晴朗溫和' },
+            { icon: '☁️', temp: 18, feelsLike: 16, description: '多雲天氣' },
+            { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' },
+            { icon: '❄️', temp: -2, feelsLike: -4, description: '寒冷下雪' }
+          ],
+          '荷蘭': [
+            { icon: '☁️', temp: 16, feelsLike: 14, description: '多雲陰涼' },
+            { icon: '🌧️', temp: 13, feelsLike: 11, description: '有雨潮濕' },
+            { icon: '⛅', temp: 19, feelsLike: 17, description: '陰晴不定' },
+            { icon: '❄️', temp: 1, feelsLike: -2, description: '寒冷結冰' }
+          ],
+          '瑞士': [
+            { icon: '☀️', temp: 18, feelsLike: 16, description: '晴朗涼爽' },
+            { icon: '☁️', temp: 14, feelsLike: 12, description: '多雲天氣' },
+            { icon: '🌧️', temp: 10, feelsLike: 8, description: '有雨預報' },
+            { icon: '❄️', temp: -5, feelsLike: -8, description: '寒冷下雪' }
+          ]
+        };
+
+        // 模擬天氣數據（備用）
         const mockWeatherData = {
           sunny: { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' },
           cloudy: { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
