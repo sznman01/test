@@ -144,7 +144,7 @@
             >
               <div v-if="trip.coverImage" class="relative overflow-hidden">
                 <img :src="trip.coverImage" :alt="trip.title" class="card-cover">
-                <div class="absolute top-3 right-3">
+                <div class="absolute top-3 right-3 flex gap-2">
                   <button 
                     @click.stop="editTrip(index)" 
                     class="rounded-full p-2 shadow-lg transition-all"
@@ -152,13 +152,22 @@
                     @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
                     @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
                   >
-                    ⋯
+                    ✏️
+                  </button>
+                  <button 
+                    @click.stop="confirmDeleteTrip(index)" 
+                    class="rounded-full p-2 shadow-lg transition-all"
+                    :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
+                    @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
+                    @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
+                  >
+                    🗑️
                   </button>
                 </div>
               </div>
               <div v-else class="relative">
                 <div class="card-cover-placeholder">🌍</div>
-                <div class="absolute top-3 right-3">
+                <div class="absolute top-3 right-3 flex gap-2">
                   <button 
                     @click.stop="editTrip(index)" 
                     class="rounded-full p-2 shadow-lg transition-all"
@@ -166,7 +175,16 @@
                     @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
                     @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
                   >
-                    ⋯
+                    ✏️
+                  </button>
+                  <button 
+                    @click.stop="confirmDeleteTrip(index)" 
+                    class="rounded-full p-2 shadow-lg transition-all"
+                    :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
+                    @mouseover="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 1)'"
+                    @mouseout="$event.target.style.backgroundColor = 'rgba(255, 255, 255, 0.9)'"
+                  >
+                    🗑️
                   </button>
                 </div>
               </div>
@@ -371,7 +389,30 @@
                           📍 導航
                         </a>
                       </div>
-                      <button class="text-gray-400 hover:text-gray-600 p-1">⋯</button>
+                      <div class="relative">
+                        <button 
+                          @click="openActivityMenu(idx)"
+                          class="text-gray-400 hover:text-gray-600 p-1"
+                        >
+                          ⋯
+                        </button>
+
+                        <!-- 活動菜單 -->
+                        <div v-if="activeActivityMenu === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                          <button 
+                            @click="openEditActivityForm(idx)"
+                            class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]"
+                          >
+                            ✏️ 編輯
+                          </button>
+                          <button 
+                            @click="confirmDeleteActivity(idx)"
+                            class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]"
+                          >
+                            🗑️ 刪除
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -501,13 +542,13 @@
       </div>
     </div>
 
-    <!-- 新增活動表單 -->
+    <!-- 新增/編輯活動表單 -->
     <div v-if="showAddActivityForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-          新增活動/提醒 ✨
+          {{ editingActivityIndex >= 0 ? '編輯活動' : '新增活動/提醒' }} ✨
         </h2>
-        <form @submit.prevent="handleAddActivity" class="space-y-4">
+        <form @submit.prevent="handleSaveActivity" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">時間</label>
             <input v-model="activityFormData.time" type="time" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
@@ -537,7 +578,7 @@
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 新增
+              {{ editingActivityIndex >= 0 ? '✓ 更新' : '✓ 新增' }}
             </button>
             <button type="button" @click="closeAddActivityForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
               ❌ 取消
@@ -551,7 +592,9 @@
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-sm" style="border-color:#E9D5C8;">
         <h2 class="text-xl font-bold text-center mb-4 text-gray-800">確定刪除嗎？</h2>
-        <p class="text-center text-gray-600 mb-6">{{ trips[deletingIndex] ? trips[deletingIndex].title : '' }} 將被永久刪除</p>
+        <p class="text-center text-gray-600 mb-6">
+          {{ deleteType === 'trip' ? (trips[deletingIndex] ? trips[deletingIndex].title : '') : '此行程' }} 將被永久刪除
+        </p>
         <div class="flex gap-3">
           <button @click="handleConfirmDelete" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all" style="background-color: #E99D99;">
             刪除
@@ -578,8 +621,11 @@
         const editingIndex = ref(-1);
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
+        const deleteType = ref('trip');
         const activeTab = ref('itinerary');
         const selectedDateIndex = ref(0);
+        const activeActivityMenu = ref(-1);
+        const editingActivityIndex = ref(-1);
         
         const formData = ref({
           title: '',
@@ -617,7 +663,9 @@
           '新加坡': { sunny: { icon: '☀️', temp: 33, feelsLike: 36, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 30, feelsLike: 32, description: '多雲炎熱' }, rainy: { icon: '🌧️', temp: 28, feelsLike: 30, description: '多雨潮濕' }, snowy: { icon: '❄️', temp: 22, feelsLike: 20, description: '罕見涼爽' } },
           '美國': { sunny: { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' }, cloudy: { icon: '☁️', temp: 18, feelsLike: 17, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '冰雪寒冷' } },
           '英國': { sunny: { icon: '☀️', temp: 20, feelsLike: 18, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 15, feelsLike: 13, description: '多雲寒冷' }, rainy: { icon: '🌧️', temp: 12, feelsLike: 10, description: '多雨陰濕' }, snowy: { icon: '❄️', temp: 0, feelsLike: -3, description: '偶有降雪' } },
-          '法國': { sunny: { icon: '☀️', temp: 23, feelsLike: 22, description: '晴朗舒適' }, cloudy: { icon: '☁️', temp: 17, feelsLike: 15, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 13, feelsLike: 11, description: '有雨預報' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' } }
+          '法國': { sunny: { icon: '☀️', temp: 23, feelsLike: 22, description: '晴朗舒適' }, cloudy: { icon: '☁️', temp: 17, feelsLike: 15, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 13, feelsLike: 11, description: '有雨預報' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' } },
+          '荷蘭': { sunny: { icon: '☀️', temp: 18, feelsLike: 16, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 13, feelsLike: 11, description: '多雲潮濕' }, rainy: { icon: '🌧️', temp: 10, feelsLike: 8, description: '多雨潮濕' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '偶有降雪' } },
+          '瑞士': { sunny: { icon: '☀️', temp: 15, feelsLike: 13, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 10, feelsLike: 8, description: '多雲寒冷' }, rainy: { icon: '🌧️', temp: 7, feelsLike: 5, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '山區降雪' } }
         };
 
         const formatDateRangeEnglish = (dates) => {
@@ -706,6 +754,7 @@
         };
 
         const openAddActivityForm = () => {
+          editingActivityIndex.value = -1;
           activityFormData.value = {
             time: '',
             name: '',
@@ -714,6 +763,7 @@
             notes: ''
           };
           showAddActivityForm.value = true;
+          activeActivityMenu.value = -1;
         };
 
         const closeAddActivityForm = () => {
@@ -725,6 +775,37 @@
             type: 'sightseeing',
             notes: ''
           };
+          editingActivityIndex.value = -1;
+        };
+
+        const openActivityMenu = (idx) => {
+          activeActivityMenu.value = activeActivityMenu.value === idx ? -1 : idx;
+        };
+
+        const openEditActivityForm = (idx) => {
+          const activity = getCurrentDayActivities()[idx];
+          activityFormData.value = {
+            time: activity.time,
+            name: activity.name,
+            location: activity.location,
+            type: activity.type,
+            notes: activity.notes || ''
+          };
+          editingActivityIndex.value = idx;
+          showAddActivityForm.value = true;
+          activeActivityMenu.value = -1;
+        };
+
+        const confirmDeleteTrip = (index) => {
+          deletingIndex.value = index;
+          deleteType.value = 'trip';
+          showDeleteConfirm.value = true;
+        };
+
+        const confirmDeleteActivity = (idx) => {
+          deletingIndex.value = idx;
+          deleteType.value = 'activity';
+          showDeleteConfirm.value = true;
         };
 
         const openEditAccommodationForm = () => {
@@ -739,7 +820,7 @@
           accommodationFormData.value.name = '';
         };
 
-        const handleAddActivity = () => {
+        const handleSaveActivity = () => {
           if (!activityFormData.value.time || !activityFormData.value.name || !activityFormData.value.location) {
             alert('請填寫所有必填欄位');
             return;
@@ -749,15 +830,25 @@
           if (!trips.value[selectedTripIndex.value].itinerary) {
             trips.value[selectedTripIndex.value].itinerary = [];
           }
-          
-          trips.value[selectedTripIndex.value].itinerary.push({
-            day: dayNum,
-            time: activityFormData.value.time,
-            name: activityFormData.value.name,
-            type: activityFormData.value.type,
-            location: activityFormData.value.location,
-            notes: activityFormData.value.notes
-          });
+
+          if (editingActivityIndex.value >= 0) {
+            const activities = getCurrentDayActivities();
+            const activity = activities[editingActivityIndex.value];
+            activity.time = activityFormData.value.time;
+            activity.name = activityFormData.value.name;
+            activity.type = activityFormData.value.type;
+            activity.location = activityFormData.value.location;
+            activity.notes = activityFormData.value.notes;
+          } else {
+            trips.value[selectedTripIndex.value].itinerary.push({
+              day: dayNum,
+              time: activityFormData.value.time,
+              name: activityFormData.value.name,
+              type: activityFormData.value.type,
+              location: activityFormData.value.location,
+              notes: activityFormData.value.notes
+            });
+          }
 
           closeAddActivityForm();
         };
@@ -841,7 +932,18 @@
         };
 
         const handleConfirmDelete = () => {
-          trips.value.splice(deletingIndex.value, 1);
+          if (deleteType.value === 'trip') {
+            trips.value.splice(deletingIndex.value, 1);
+          } else if (deleteType.value === 'activity') {
+            const dayNum = getCurrentDayNumber();
+            const itinerary = trips.value[selectedTripIndex.value].itinerary;
+            const activities = itinerary.filter(item => item.day === dayNum);
+            const activityToDelete = activities[deletingIndex.value];
+            const indexInFullList = itinerary.indexOf(activityToDelete);
+            if (indexInFullList !== -1) {
+              itinerary.splice(indexInFullList, 1);
+            }
+          }
           showDeleteConfirm.value = false;
         };
 
@@ -972,11 +1074,14 @@
           editingIndex,
           selectedTripIndex,
           deletingIndex,
+          deleteType,
           activeTab,
           formData,
           activityFormData,
           accommodationFormData,
           selectedDateIndex,
+          activeActivityMenu,
+          editingActivityIndex,
           formatDateRangeEnglish,
           formatDateDisplay,
           calculateDays,
@@ -986,9 +1091,13 @@
           closeForm,
           openAddActivityForm,
           closeAddActivityForm,
+          openActivityMenu,
+          openEditActivityForm,
+          confirmDeleteTrip,
+          confirmDeleteActivity,
           openEditAccommodationForm,
           closeEditAccommodationForm,
-          handleAddActivity,
+          handleSaveActivity,
           handleSaveAccommodation,
           viewTripDetail,
           backToHome,
