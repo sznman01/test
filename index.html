@@ -311,16 +311,25 @@
           </div>
 
           <!-- 酒店/住宿資訊卡 -->
-          <div v-if="getCurrentDayAccommodation()" class="pt-4">
+          <div class="pt-4">
             <div class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
-              <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8]">
-                <span class="text-2xl">🏨</span>
-                <div class="flex-1">
-                  <p class="text-sm text-gray-500">住宿</p>
-                  <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation().name }}</p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2 pb-3 border-b border-[#E9D5C8] flex-1">
+                  <span class="text-2xl">🏨</span>
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-500">住宿</p>
+                    <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation()?.name || '待添加' }}</p>
+                  </div>
                 </div>
+                <button 
+                  @click="openEditAccommodationForm"
+                  class="text-gray-400 hover:text-gray-600 p-1 ml-2"
+                >
+                  ⋯
+                </button>
               </div>
               <a 
+                v-if="getCurrentDayAccommodation()?.name"
                 :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
                 target="_blank"
                 class="text-xs text-[#E99D99] hover:underline flex items-center gap-1"
@@ -469,6 +478,29 @@
       </div>
     </div>
 
+    <!-- 編輯住宿表單 -->
+    <div v-if="showEditAccommodationForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          編輯住宿 (Day {{ getCurrentDayNumber() }}) ✨
+        </h2>
+        <form @submit.prevent="handleSaveAccommodation" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">住宿名稱</label>
+            <input v-model="accommodationFormData.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：Shinjuku Hotel">
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closeEditAccommodationForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- 新增活動表單 -->
     <div v-if="showAddActivityForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
@@ -541,6 +573,7 @@
         const currentPage = ref('home');
         const showAddForm = ref(false);
         const showAddActivityForm = ref(false);
+        const showEditAccommodationForm = ref(false);
         const showDeleteConfirm = ref(false);
         const editingIndex = ref(-1);
         const selectedTripIndex = ref(0);
@@ -555,7 +588,12 @@
           endDate: '',
           description: '',
           coverImage: '',
-          itinerary: []
+          itinerary: [],
+          accommodations: {}
+        });
+
+        const accommodationFormData = ref({
+          name: ''
         });
 
         const activityFormData = ref({
@@ -569,90 +607,18 @@
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const weekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-        // 國家天氣數據 - 預設溫度範圍
+        // 國家天氣數據映射
         const countryWeatherData = {
-          '日本': [
-            { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' },
-            { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
-            { icon: '🌧️', temp: 18, feelsLike: 15, description: '有雨預報' },
-            { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' }
-          ],
-          '香港': [
-            { icon: '☀️', temp: 32, feelsLike: 35, description: '炎熱潮濕' },
-            { icon: '☁️', temp: 28, feelsLike: 30, description: '多雲天氣' },
-            { icon: '🌧️', temp: 24, feelsLike: 22, description: '有雨預報' },
-            { icon: '⛅', temp: 26, feelsLike: 28, description: '陰晴不定' }
-          ],
-          '台灣': [
-            { icon: '☀️', temp: 30, feelsLike: 32, description: '晴朗炎熱' },
-            { icon: '☁️', temp: 26, feelsLike: 28, description: '多雲天氣' },
-            { icon: '🌧️', temp: 22, feelsLike: 20, description: '有雨預報' },
-            { icon: '💨', temp: 24, feelsLike: 26, description: '有風涼爽' }
-          ],
-          '韓國': [
-            { icon: '☀️', temp: 25, feelsLike: 27, description: '晴朗溫和' },
-            { icon: '☁️', temp: 20, feelsLike: 18, description: '多雲天氣' },
-            { icon: '🌧️', temp: 16, feelsLike: 14, description: '有雨預報' },
-            { icon: '❄️', temp: -5, feelsLike: -8, description: '冰凍寒冷' }
-          ],
-          '泰國': [
-            { icon: '☀️', temp: 34, feelsLike: 37, description: '酷熱潮濕' },
-            { icon: '☁️', temp: 30, feelsLike: 32, description: '多雲天氣' },
-            { icon: '🌧️', temp: 26, feelsLike: 24, description: '有雨預報' },
-            { icon: '💨', temp: 28, feelsLike: 30, description: '有風悶熱' }
-          ],
-          '新加坡': [
-            { icon: '☀️', temp: 32, feelsLike: 35, description: '晴朗炎熱' },
-            { icon: '☁️', temp: 28, feelsLike: 30, description: '多雲天氣' },
-            { icon: '🌧️', temp: 26, feelsLike: 24, description: '有雨預報' },
-            { icon: '⛅', temp: 30, feelsLike: 32, description: '陰晴不定' }
-          ],
-          '美國': [
-            { icon: '☀️', temp: 26, feelsLike: 28, description: '晴朗舒適' },
-            { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
-            { icon: '🌧️', temp: 18, feelsLike: 16, description: '有雨預報' },
-            { icon: '❄️', temp: 0, feelsLike: -3, description: '寒冷下雪' }
-          ],
-          '英國': [
-            { icon: '☁️', temp: 15, feelsLike: 13, description: '多雲陰涼' },
-            { icon: '🌧️', temp: 12, feelsLike: 10, description: '有雨潮濕' },
-            { icon: '⛅', temp: 18, feelsLike: 16, description: '陰晴不定' },
-            { icon: '❄️', temp: 2, feelsLike: -1, description: '寒冷結冰' }
-          ],
-          '法國': [
-            { icon: '☀️', temp: 24, feelsLike: 26, description: '晴朗溫和' },
-            { icon: '☁️', temp: 18, feelsLike: 16, description: '多雲天氣' },
-            { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' },
-            { icon: '❄️', temp: -2, feelsLike: -4, description: '寒冷下雪' }
-          ],
-          '荷蘭': [
-            { icon: '☁️', temp: 16, feelsLike: 14, description: '多雲陰涼' },
-            { icon: '🌧️', temp: 13, feelsLike: 11, description: '有雨潮濕' },
-            { icon: '⛅', temp: 19, feelsLike: 17, description: '陰晴不定' },
-            { icon: '❄️', temp: 1, feelsLike: -2, description: '寒冷結冰' }
-          ],
-          '瑞士': [
-            { icon: '☀️', temp: 18, feelsLike: 16, description: '晴朗涼爽' },
-            { icon: '☁️', temp: 14, feelsLike: 12, description: '多雲天氣' },
-            { icon: '🌧️', temp: 10, feelsLike: 8, description: '有雨預報' },
-            { icon: '❄️', temp: -5, feelsLike: -8, description: '寒冷下雪' }
-          ]
+          '日本': { sunny: { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' }, cloudy: { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' }, rainy: { icon: '🌧️', temp: 18, feelsLike: 15, description: '有雨預報' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' } },
+          '香港': { sunny: { icon: '☀️', temp: 32, feelsLike: 35, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 28, feelsLike: 30, description: '多雲溫暖' }, rainy: { icon: '🌧️', temp: 24, feelsLike: 22, description: '有雨預報' }, snowy: { icon: '❄️', temp: 15, feelsLike: 12, description: '罕見寒冷' } },
+          '台灣': { sunny: { icon: '☀️', temp: 30, feelsLike: 32, description: '晴朗溫暖' }, cloudy: { icon: '☁️', temp: 26, feelsLike: 25, description: '多雲舒適' }, rainy: { icon: '🌧️', temp: 22, feelsLike: 20, description: '有雨預報' }, snowy: { icon: '❄️', temp: 10, feelsLike: 8, description: '罕見寒冷' } },
+          '韓國': { sunny: { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' }, cloudy: { icon: '☁️', temp: 18, feelsLike: 17, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '冰雪寒冷' } },
+          '泰國': { sunny: { icon: '☀️', temp: 35, feelsLike: 38, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 32, feelsLike: 34, description: '多雲炎熱' }, rainy: { icon: '🌧️', temp: 28, feelsLike: 30, description: '雨季潮濕' }, snowy: { icon: '❄️', temp: 20, feelsLike: 18, description: '少見涼爽' } },
+          '新加坡': { sunny: { icon: '☀️', temp: 33, feelsLike: 36, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 30, feelsLike: 32, description: '多雲炎熱' }, rainy: { icon: '🌧️', temp: 28, feelsLike: 30, description: '多雨潮濕' }, snowy: { icon: '❄️', temp: 22, feelsLike: 20, description: '罕見涼爽' } },
+          '美國': { sunny: { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' }, cloudy: { icon: '☁️', temp: 18, feelsLike: 17, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '冰雪寒冷' } },
+          '英國': { sunny: { icon: '☀️', temp: 20, feelsLike: 18, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 15, feelsLike: 13, description: '多雲寒冷' }, rainy: { icon: '🌧️', temp: 12, feelsLike: 10, description: '多雨陰濕' }, snowy: { icon: '❄️', temp: 0, feelsLike: -3, description: '偶有降雪' } },
+          '法國': { sunny: { icon: '☀️', temp: 23, feelsLike: 22, description: '晴朗舒適' }, cloudy: { icon: '☁️', temp: 17, feelsLike: 15, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 13, feelsLike: 11, description: '有雨預報' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' } }
         };
-
-        // 模擬天氣數據（備用）
-        const mockWeatherData = {
-          sunny: { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' },
-          cloudy: { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' },
-          rainy: { icon: '🌧️', temp: 18, feelsLike: 15, description: '有雨預報' },
-          snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' }
-        };
-
-        // 模擬日程數據
-        const mockItineraryData = [
-          { day: 1, activities: [{ time: '09:00', name: '抵達機場', type: 'transport', location: '東京成田機場' }, { time: '12:30', name: '午餐', type: 'food', location: '成田機場餐廳' }, { time: '15:00', name: '入住酒店', type: 'accommodation', location: '新宿 Shinjuku Hotel' }], accommodation: { name: '新宿 Shinjuku Hotel' } },
-          { day: 2, activities: [{ time: '08:00', name: '早餐', type: 'food', location: '酒店餐廳' }, { time: '10:00', name: '遊覽淺草寺', type: 'sightseeing', location: '淺草寺, 東京' }, { time: '14:00', name: '購物', type: 'shopping', location: '築地市場' }, { time: '18:00', name: '晚餐', type: 'food', location: '居酒屋 Izakaya' }], accommodation: { name: '新宿 Shinjuku Hotel' } },
-          { day: 3, activities: [{ time: '08:00', name: '早餐', type: 'food', location: '酒店餐廳' }, { time: '10:00', name: '富士山遊覽', type: 'sightseeing', location: '富士山五合目' }, { time: '17:00', name: '溫泉浸浴', type: 'relaxation', location: '富士山溫泉旅館' }], accommodation: { name: '富士山溫泉旅館 Onsen Resort' } }
-        ];
 
         const formatDateRangeEnglish = (dates) => {
           if (Array.isArray(dates) && dates.length >= 2) {
@@ -714,7 +680,8 @@
             endDate: '',
             description: '',
             coverImage: '',
-            itinerary: []
+            itinerary: [],
+            accommodations: {}
           };
           showAddForm.value = true;
         };
@@ -728,7 +695,8 @@
             endDate: '',
             description: '',
             coverImage: '',
-            itinerary: []
+            itinerary: [],
+            accommodations: {}
           };
           editingIndex.value = -1;
           const fileInput = document.getElementById('imageFileInput');
@@ -759,6 +727,18 @@
           };
         };
 
+        const openEditAccommodationForm = () => {
+          const dayNum = getCurrentDayNumber();
+          const currentAccom = getCurrentDayAccommodation();
+          accommodationFormData.value.name = currentAccom?.name || '';
+          showEditAccommodationForm.value = true;
+        };
+
+        const closeEditAccommodationForm = () => {
+          showEditAccommodationForm.value = false;
+          accommodationFormData.value.name = '';
+        };
+
         const handleAddActivity = () => {
           if (!activityFormData.value.time || !activityFormData.value.name || !activityFormData.value.location) {
             alert('請填寫所有必填欄位');
@@ -766,18 +746,38 @@
           }
 
           const dayNum = getCurrentDayNumber();
-          const mockData = mockItineraryData.find(d => d.day === dayNum);
-          if (mockData) {
-            mockData.activities.push({
-              time: activityFormData.value.time,
-              name: activityFormData.value.name,
-              type: activityFormData.value.type,
-              location: activityFormData.value.location,
-              notes: activityFormData.value.notes
-            });
+          if (!trips.value[selectedTripIndex.value].itinerary) {
+            trips.value[selectedTripIndex.value].itinerary = [];
           }
+          
+          trips.value[selectedTripIndex.value].itinerary.push({
+            day: dayNum,
+            time: activityFormData.value.time,
+            name: activityFormData.value.name,
+            type: activityFormData.value.type,
+            location: activityFormData.value.location,
+            notes: activityFormData.value.notes
+          });
 
           closeAddActivityForm();
+        };
+
+        const handleSaveAccommodation = () => {
+          if (!accommodationFormData.value.name) {
+            alert('請填寫住宿名稱');
+            return;
+          }
+
+          const dayNum = getCurrentDayNumber();
+          if (!trips.value[selectedTripIndex.value].accommodations) {
+            trips.value[selectedTripIndex.value].accommodations = {};
+          }
+
+          trips.value[selectedTripIndex.value].accommodations[dayNum] = {
+            name: accommodationFormData.value.name
+          };
+
+          closeEditAccommodationForm();
         };
 
         const viewTripDetail = (index) => {
@@ -800,7 +800,8 @@
             endDate: trip.endDate,
             description: trip.description,
             coverImage: trip.coverImage || '',
-            itinerary: JSON.parse(JSON.stringify(trip.itinerary || []))
+            itinerary: JSON.parse(JSON.stringify(trip.itinerary || [])),
+            accommodations: JSON.parse(JSON.stringify(trip.accommodations || {}))
           };
           editingIndex.value = index;
           showAddForm.value = true;
@@ -827,7 +828,8 @@
             dates: dates,
             description: formData.value.description,
             coverImage: formData.value.coverImage,
-            itinerary: formData.value.itinerary
+            itinerary: formData.value.itinerary,
+            accommodations: formData.value.accommodations
           };
 
           if (editingIndex.value >= 0) {
@@ -867,7 +869,8 @@
             dates: [],
             description: '',
             coverImage: '',
-            itinerary: []
+            itinerary: [],
+            accommodations: {}
           };
         });
 
@@ -920,28 +923,31 @@
         };
 
         const getDayActivityTitle = () => {
-          const dayNum = getCurrentDayNumber();
-          const mockData = mockItineraryData.find(d => d.day === dayNum);
-          return mockData ? (dayNum === 1 ? '抵達東京' : dayNum === 2 ? '探索東京' : dayNum === 3 ? '富士山露營' : '') : '';
+          return '';
         };
 
         const getCurrentDayWeather = () => {
           const dayNum = getCurrentDayNumber();
-          const weatherTypes = Object.keys(mockWeatherData);
-          const weather = mockWeatherData[weatherTypes[dayNum % weatherTypes.length]];
-          return weather;
+          const location = currentTripData.value.location;
+          const weatherData = countryWeatherData[location];
+          
+          if (!weatherData) {
+            return { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' };
+          }
+
+          const weatherTypes = Object.keys(weatherData);
+          const weatherType = weatherTypes[dayNum % weatherTypes.length];
+          return weatherData[weatherType];
         };
 
         const getCurrentDayAccommodation = () => {
           const dayNum = getCurrentDayNumber();
-          const mockData = mockItineraryData.find(d => d.day === dayNum);
-          return mockData ? mockData.accommodation : null;
+          return currentTripData.value.accommodations?.[dayNum] || null;
         };
 
         const getCurrentDayActivities = () => {
           const dayNum = getCurrentDayNumber();
-          const mockData = mockItineraryData.find(d => d.day === dayNum);
-          return mockData ? mockData.activities : [];
+          return (currentTripData.value.itinerary || []).filter(item => item.day === dayNum);
         };
 
         const getActivityIcon = (type) => {
@@ -961,6 +967,7 @@
           currentPage,
           showAddForm,
           showAddActivityForm,
+          showEditAccommodationForm,
           showDeleteConfirm,
           editingIndex,
           selectedTripIndex,
@@ -968,6 +975,7 @@
           activeTab,
           formData,
           activityFormData,
+          accommodationFormData,
           selectedDateIndex,
           formatDateRangeEnglish,
           formatDateDisplay,
@@ -978,7 +986,10 @@
           closeForm,
           openAddActivityForm,
           closeAddActivityForm,
+          openEditAccommodationForm,
+          closeEditAccommodationForm,
           handleAddActivity,
+          handleSaveAccommodation,
           viewTripDetail,
           backToHome,
           editTrip,
