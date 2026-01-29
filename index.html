@@ -62,14 +62,12 @@
       width: 100%;
       height: 160px;
       object-fit: cover;
-      border-radius: 12px 12px 0 0;
     }
 
     .card-cover-placeholder {
       width: 100%;
       height: 160px;
       background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
-      border-radius: 12px 12px 0 0;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -205,7 +203,116 @@
     }
 
     .detail-with-nav {
-      padding-bottom: 70px;
+      padding-bottom: 100px;
+    }
+
+    /* 機票卡片樣式 */
+    .boarding-pass {
+      background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+      color: white;
+      box-shadow: 0 8px 25px rgba(233, 157, 153, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .boarding-pass-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .boarding-pass-menu {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .boarding-pass-menu:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .boarding-pass-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .boarding-pass-city {
+      flex: 1;
+      text-align: center;
+    }
+
+    .boarding-pass-city-code {
+      font-size: 32px;
+      font-weight: bold;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .boarding-pass-city-time {
+      font-size: 13px;
+      opacity: 0.95;
+    }
+
+    .boarding-pass-route {
+      flex: 0 0 auto;
+      text-align: center;
+      padding: 0 8px;
+    }
+
+    .boarding-pass-route-plane {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .boarding-pass-route-arrow {
+      font-size: 11px;
+      opacity: 0.85;
+    }
+
+    .boarding-pass-footer {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+    }
+
+    .boarding-pass-footer-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .boarding-pass-footer-code {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .boarding-pass-footer-date {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .boarding-pass-footer-seat {
+      text-align: right;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -307,20 +414,22 @@
     <!-- 行程詳情頁及其他頁面（有 Bottom Nav）-->
     <template v-if="currentScreen !== 'home'">
       <div class="page-container">
-        <!-- 詳情頁頂部 -->
-        <div v-if="currentScreen === 'detail'" class="page-header relative">
+        <!-- 詳情頁頂部 - 可滾動的封面 -->
+        <div v-if="currentScreen === 'detail'" class="page-header">
+          <!-- 返回按鈕 - 絕對位置在頂部 -->
+          <button 
+            @click="backToHome"
+            class="absolute top-4 left-4 bg-white/90 rounded-full p-2 shadow-md text-gray-700 z-10"
+          >
+            ←
+          </button>
+          <!-- 封面圖片跟隨滾動 -->
           <div v-if="currentTripData.coverImage">
             <img :src="currentTripData.coverImage" :alt="currentTripData.title" class="w-full h-56 object-cover">
           </div>
           <div v-else class="w-full h-56 flex items-center justify-center" style="background: linear-gradient(135deg,#E99D99,#D88888);">
             <span class="text-5xl text-white">🌍</span>
           </div>
-          <button 
-            @click="backToHome"
-            class="absolute top-4 left-4 bg-white/90 rounded-full p-2 shadow-md text-gray-700"
-          >
-            ←
-          </button>
         </div>
 
         <!-- 其他頁面頂部 -->
@@ -536,24 +645,42 @@
 
               <div class="reservation-section">
                 <p class="reservation-section-title">✈️ 機票</p>
-                <div v-if="currentTripData.reservations?.flights?.length > 0" class="space-y-2">
-                  <div v-for="(flight, idx) in currentTripData.reservations.flights" :key="'flight-' + idx" class="reservation-item">
-                    <div class="flex justify-between items-start">
-                      <div class="flex-1">
-                        <p class="font-semibold text-gray-800 text-sm">{{ flight.flightNumber }}</p>
-                        <p class="text-xs text-gray-600 mt-1">出發: {{ flight.departure }} → 到達: {{ flight.arrival }}</p>
-                        <p class="text-xs text-gray-600">{{ flight.departureLocation }} → {{ flight.arrivalLocation }}</p>
-                        <p class="text-xs text-gray-500 mt-2">登機時間: {{ flight.departureTime }}</p>
-                      </div>
+                <div v-if="currentTripData.reservations?.flights?.length > 0" class="space-y-3">
+                  <div v-for="(flight, idx) in currentTripData.reservations.flights" :key="'flight-' + idx" class="boarding-pass">
+                    <div class="boarding-pass-header">
+                      <span>BOARDING PASS</span>
                       <div class="relative">
-                        <button @click="openReservationMenu('flight', idx)" class="text-gray-400 hover:text-gray-600">⋯</button>
-                        <div v-if="activeReservationMenu?.type === 'flight' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                        <button @click="openReservationMenu('flight', idx)" class="boarding-pass-menu">⋯</button>
+                        <div v-if="activeReservationMenu?.type === 'flight' && activeReservationMenu?.idx === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-20">
                           <button @click="editReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
                           <button @click="deleteReservation('flight', idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
                         </div>
                       </div>
                     </div>
-                    <img v-if="flight.certificate" :src="flight.certificate" :alt="flight.flightNumber" class="file-preview">
+
+                    <div class="boarding-pass-content">
+                      <div class="boarding-pass-city">
+                        <div class="boarding-pass-city-code">{{ flight.departureLocation.substring(0, 3).toUpperCase() }}</div>
+                        <div class="boarding-pass-city-time">{{ formatTimeOnly(flight.departureTime) }}</div>
+                      </div>
+
+                      <div class="boarding-pass-route">
+                        <div class="boarding-pass-route-plane">✈️</div>
+                        <div class="boarding-pass-route-arrow">{{ flight.departureLocation }} → {{ flight.arrivalLocation }}</div>
+                      </div>
+
+                      <div class="boarding-pass-city">
+                        <div class="boarding-pass-city-code">{{ flight.arrivalLocation.substring(0, 3).toUpperCase() }}</div>
+                        <div class="boarding-pass-city-time">{{ formatTimeOnly(flight.arrivalTime) }}</div>
+                      </div>
+                    </div>
+
+                    <div class="boarding-pass-footer">
+                      <div class="boarding-pass-footer-left">
+                        <div class="boarding-pass-footer-code">{{ flight.flightNumber }}</div>
+                        <div class="boarding-pass-footer-date">{{ formatDateOnly(flight.departureTime) }}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div v-else class="text-center py-6 text-gray-400 text-sm">
@@ -1104,6 +1231,20 @@
           const d = new Date(dateStr);
           if (isNaN(d)) return dateStr;
           return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+        };
+
+        const formatTimeOnly = (dateTimeStr) => {
+          if (!dateTimeStr) return '';
+          const d = new Date(dateTimeStr);
+          return d.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
+        };
+
+        const formatDateOnly = (dateTimeStr) => {
+          if (!dateTimeStr) return '';
+          const d = new Date(dateTimeStr);
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const date = String(d.getDate()).padStart(2, '0');
+          return `${d.getFullYear()}-${month}-${date}`;
         };
 
         const calculateDays = (dates) => {
@@ -1711,6 +1852,8 @@
           activeReservationMenu,
           formatDateRangeEnglish,
           formatDateDisplay,
+          formatTimeOnly,
+          formatDateOnly,
           calculateDays,
           openFilePicker,
           handleImageChange,
