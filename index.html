@@ -190,7 +190,7 @@
           <!-- 新增按鈕 (sticky) -->
           <div class="sticky-button p-4">
             <button 
-              @click="showAddForm = true" 
+              @click="openAddForm" 
               class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
             >
               ➕ 新增旅行計劃
@@ -322,13 +322,13 @@
               <input 
                 type="file"
                 accept="image/*"
-                @change="handleImageUpload"
+                @change="onImageSelected"
                 class="hidden"
-                ref="fileInput"
+                id="imageFileInput"
               >
               <button
                 type="button"
-                @click="$refs.fileInput.click()"
+                @click="triggerFileInput"
                 class="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-50 transition-all flex items-center justify-center gap-2 font-medium"
                 :style="{ borderColor: '#E99D99', backgroundColor: '#FFFBF7', color: '#8B6B6B' }"
               >
@@ -418,7 +418,7 @@
               💾 保存
             </button>
             <button 
-              @click="cancelEdit" 
+              @click.prevent="cancelEdit" 
               type="button"
               class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all"
               style="background-color: #E9D5C8;"
@@ -434,7 +434,7 @@
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-sm" :style="{ borderColor: '#E9D5C8' }">
         <h2 class="text-xl font-bold text-center mb-4 text-gray-800">確定刪除嗎？</h2>
-        <p class="text-center text-gray-600 mb-6">{{ trips[deletingIndex].title }} 將被永久刪除</p>
+        <p class="text-center text-gray-600 mb-6">{{ trips[deletingIndex] ? trips[deletingIndex].title : '' }} 將被永久刪除</p>
         <div class="flex gap-3">
           <button 
             @click="confirmDelete" 
@@ -456,7 +456,7 @@
   </div>
 
   <script>
-    const { createApp, ref, reactive, onMounted, watch, computed } = Vue;
+    const { createApp, ref, reactive, onMounted, watch } = Vue;
 
     createApp({
       setup() {
@@ -468,7 +468,6 @@
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
         const activeTab = ref('itinerary');
-        const fileInput = ref(null);
         
         const currentTrip = reactive({
           title: '',
@@ -508,7 +507,14 @@
           return 0;
         };
 
-        const handleImageUpload = (event) => {
+        const triggerFileInput = () => {
+          const fileInput = document.getElementById('imageFileInput');
+          if (fileInput) {
+            fileInput.click();
+          }
+        };
+
+        const onImageSelected = (event) => {
           const file = event.target.files[0];
           if (file) {
             const reader = new FileReader();
@@ -517,6 +523,11 @@
             };
             reader.readAsDataURL(file);
           }
+        };
+
+        const openAddForm = () => {
+          resetForm();
+          showAddForm.value = true;
         };
 
         const viewTripDetail = (index) => {
@@ -568,7 +579,7 @@
             trips.value.push(tripData);
           }
           
-          resetForm();
+          cancelEdit();
         };
 
         const deleteTrip = (index) => {
@@ -624,10 +635,11 @@
           deletingIndex,
           activeTab,
           currentTrip,
-          fileInput,
           formatDateRangeEnglish,
           calculateDays,
-          handleImageUpload,
+          triggerFileInput,
+          onImageSelected,
+          openAddForm,
           viewTripDetail,
           backToHome,
           editTrip,
