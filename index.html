@@ -522,6 +522,29 @@
       color: #666;
       margin-top: 4px;
     }
+
+    /* 新增：無框標題區樣式 */
+    .floating-section-header {
+      background: linear-gradient(135deg, #E99D99 0%, #D88888 100%);
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 0;
+      box-shadow: none;
+      color: white;
+      position: relative;
+      z-index: 10;
+    }
+
+    .floating-section-header-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .floating-section-header-description {
+      font-size: 13px;
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -642,7 +665,7 @@
         <div v-if="currentScreen === 'reservation'" class="page-header">
           <header class="header-bg p-6 text-center text-white shadow-lg">
             <h1 class="text-2xl font-bold">🎫 預約管理</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
+            <p class="text-sm opacity-90 mt-1">機票、住宿、租車與票券</p>
           </header>
         </div>
 
@@ -872,6 +895,12 @@
           <!-- 預約頁 -->
           <template v-if="currentScreen === 'reservation'">
             <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">📋 預約類型</div>
+                <div class="floating-section-header-description">管理你的機票、住宿與票券</div>
+              </div>
+
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-gray-800">預約管理</h2>
                 <button 
@@ -985,6 +1014,12 @@
           <!-- 預算頁 -->
           <template v-if="currentScreen === 'expense'">
             <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">💸 支出追蹤</div>
+                <div class="floating-section-header-description">管理你的旅遊預算與支出</div>
+              </div>
+
               <!-- 設定預算按鈕 -->
               <div class="flex justify-end mb-4">
                 <button 
@@ -1104,37 +1139,65 @@
 
           <!-- 購物頁 -->
           <template v-if="currentScreen === 'shopping'">
-            <div class="p-4 pb-24 text-center text-gray-400">
-              <div class="text-4xl mb-4">💭</div>
-              <p class="text-lg font-medium">此功能開發中...</p>
-              <p class="text-sm mt-1">購物清單功能即將推出！</p>
+            <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">🛍️ 購物清單</div>
+                <div class="floating-section-header-description">規劃你的購物清單</div>
+              </div>
+              <div class="text-center text-gray-400 py-12">
+                <div class="text-4xl mb-4">💭</div>
+                <p class="text-lg font-medium">此功能開發中...</p>
+                <p class="text-sm mt-1">購物清單功能即將推出！</p>
+              </div>
             </div>
           </template>
 
           <!-- 準備清單頁 -->
           <template v-if="currentScreen === 'checklist'">
-            <div class="p-4 pb-24 text-center text-gray-400">
-              <div class="text-4xl mb-4">💭</div>
-              <p class="text-lg font-medium">此功能開發中...</p>
-              <p class="text-sm mt-1">準備清單功能即將推出！</p>
+            <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">✓ 準備清單</div>
+                <div class="floating-section-header-description">確保你沒有遺漏任何東西</div>
+              </div>
+              <div class="text-center text-gray-400 py-12">
+                <div class="text-4xl mb-4">💭</div>
+                <p class="text-lg font-medium">此功能開發中...</p>
+                <p class="text-sm mt-1">準備清單功能即將推出！</p>
+              </div>
             </div>
           </template>
 
           <!-- 成員頁 -->
           <template v-if="currentScreen === 'members'">
-            <div class="p-4 pb-24 text-center text-gray-400">
-              <div class="text-4xl mb-4">💭</div>
-              <p class="text-lg font-medium">此功能開發中...</p>
-              <p class="text-sm mt-1">成員管理功能即將推出！</p>
+            <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">👥 成員</div>
+                <div class="floating-section-header-description">邀請朋友加入你的旅行</div>
+              </div>
+              <div class="text-center text-gray-400 py-12">
+                <div class="text-4xl mb-4">💭</div>
+                <p class="text-lg font-medium">此功能開發中...</p>
+                <p class="text-sm mt-1">成員管理功能即將推出！</p>
+              </div>
             </div>
           </template>
 
           <!-- 設定頁 -->
           <template v-if="currentScreen === 'settings'">
-            <div class="p-4 pb-24 text-center text-gray-400">
-              <div class="text-4xl mb-4">💭</div>
-              <p class="text-lg font-medium">此功能開發中...</p>
-              <p class="text-sm mt-1">應用設定功能即將推出！</p>
+            <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">⚙️ 設定</div>
+                <div class="floating-section-header-description">自訂你的應用偏好設定</div>
+              </div>
+              <div class="text-center text-gray-400 py-12">
+                <div class="text-4xl mb-4">💭</div>
+                <p class="text-lg font-medium">此功能開發中...</p>
+                <p class="text-sm mt-1">應用設定功能即將推出！</p>
+              </div>
             </div>
           </template>
         </div>
