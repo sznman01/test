@@ -8,66 +8,188 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
     /* 自訂可愛顏色 */
-    .cute-bg { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%); }
     .cute-card { background: linear-gradient(145deg, #ffffff 0%, #f0f8ff 100%); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
     .cute-btn { background: linear-gradient(45deg, #ff6b6b, #ffd93d); }
+    .nav-active { border-bottom: 3px solid #ff6b9d; color: #ff6b9d; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-pink-50 to-blue-50 min-h-screen font-sans antialiased">
 
   <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
-    <!-- 標題 -->
-    <header class="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-center text-white shadow-lg">
-      <h1 class="text-2xl font-bold">✨ 我的旅行計劃 ✨</h1>
-      <p class="text-sm opacity-90 mt-1">輕鬆管理你的行程！</p>
-    </header>
+    
+    <!-- 首頁 -->
+    <template v-if="currentPage === 'home'">
+      <!-- 標題 -->
+      <header class="bg-gradient-to-r from-purple-400 to-pink-400 p-6 text-center text-white shadow-lg">
+        <h1 class="text-2xl font-bold">✨ 我的旅行計劃 ✨</h1>
+        <p class="text-sm opacity-90 mt-1">輕鬆管理你的行程！</p>
+      </header>
 
-    <!-- 卡片列表 -->
-    <div class="flex-1 overflow-y-auto p-4 space-y-4 py-6">
-      <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
-        <div class="text-4xl mb-4">🌍</div>
-        <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
-        <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
-      </div>
-      <div v-else>
-        <div 
-          v-for="(trip, index) in trips" 
-          :key="index"
-          class="cute-card rounded-2xl p-6 transform transition-all hover:scale-105 cursor-pointer border border-pink-100"
-          @click="editTrip(index)"
-        >
-          <div class="flex items-start justify-between mb-3">
-            <h3 class="font-bold text-xl text-gray-800 flex-1 pr-4 truncate">{{ trip.title }}</h3>
-            <span class="text-2xl">{{ getEmojiForTrip(trip) }}</span>
-          </div>
-          <p class="text-gray-600 mb-4 line-clamp-2">{{ trip.description }}</p>
-          <div class="flex flex-wrap gap-1 mb-4">
-            <span v-for="(date, i) in trip.dates.slice(0,3)" :key="i" class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-              {{ date }}
-            </span>
-            <span v-if="trip.dates.length > 3" class="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
-              +{{ trip.dates.length - 3 }}更多
-            </span>
-          </div>
-          <div class="flex items-center justify-between text-sm text-gray-500">
-            <span>{{ trip.location }}</span>
-            <button @click.stop="deleteTrip(index)" class="text-red-400 hover:text-red-500 p-1">
-              🗑️
-            </button>
+      <!-- 卡片列表 -->
+      <div class="flex-1 overflow-y-auto p-4 space-y-4 pb-6">
+        <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
+          <div class="text-4xl mb-4">🌍</div>
+          <p class="text-lg font-medium">還沒有旅行計劃哦～</p>
+          <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
+        </div>
+        <div v-else>
+          <div 
+            v-for="(trip, index) in trips" 
+            :key="index"
+            class="cute-card rounded-2xl p-6 transform transition-all hover:scale-105 border border-pink-100"
+            @click="viewTripDetail(index)"
+          >
+            <!-- 標題和選項按鈕 -->
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <h3 class="font-bold text-xl text-gray-800">{{ trip.title }}</h3>
+              </div>
+              <button 
+                @click.stop="editTrip(index)" 
+                class="text-gray-400 hover:text-gray-600 text-lg ml-2 p-2"
+              >
+                ⋯
+              </button>
+            </div>
+
+            <!-- 地點 -->
+            <p class="text-gray-600 mb-3 flex items-center gap-1">
+              📍 {{ trip.location }}
+            </p>
+
+            <!-- 日期和天數 -->
+            <div class="flex flex-wrap gap-2 mb-4">
+              <div class="px-3 py-2 bg-blue-100 text-blue-700 text-sm rounded-full font-medium">
+                📅 {{ formatDateRange(trip.dates) }}
+              </div>
+              <div class="px-3 py-2 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">
+                ⏱️ {{ calculateDays(trip.dates) }} 天
+              </div>
+            </div>
+
+            <!-- 描述 -->
+            <p v-if="trip.description" class="text-gray-600 text-sm line-clamp-2">{{ trip.description }}</p>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 新增按鈕 (固定底部) -->
-    <div class="p-6 bg-white border-t border-gray-100 shadow-2xl">
-      <button 
-        @click="showAddForm = true" 
-        class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
-      >
-        ➕ 新增旅行計劃
-      </button>
-    </div>
+      <!-- 新增按鈕 (固定底部) -->
+      <div class="p-6 bg-white border-t border-gray-100 shadow-2xl">
+        <button 
+          @click="showAddForm = true" 
+          class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+        >
+          ➕ 新增旅行計劃
+        </button>
+      </div>
+    </template>
+
+    <!-- 詳細頁面 -->
+    <template v-if="currentPage === 'detail'">
+      <!-- 返回按鈕和標題 -->
+      <div class="bg-gradient-to-r from-purple-400 to-pink-400 p-4 text-white shadow-lg flex items-center gap-3">
+        <button @click="backToHome" class="text-2xl hover:scale-110 transition-all">
+          ← 
+        </button>
+        <div class="flex-1">
+          <h1 class="text-xl font-bold">{{ trips[selectedTripIndex].title }}</h1>
+          <p class="text-sm opacity-90">{{ trips[selectedTripIndex].location }}</p>
+        </div>
+      </div>
+
+      <!-- 時間軸內容 -->
+      <div class="flex-1 overflow-y-auto p-6 pb-24">
+        <div v-if="trips[selectedTripIndex].itinerary && trips[selectedTripIndex].itinerary.length > 0">
+          <div 
+            v-for="(item, idx) in trips[selectedTripIndex].itinerary" 
+            :key="idx"
+            class="relative mb-8"
+          >
+            <!-- 時間軸線 -->
+            <div v-if="idx < trips[selectedTripIndex].itinerary.length - 1" class="absolute left-6 top-12 w-1 h-12 bg-gradient-to-b from-purple-300 to-pink-300"></div>
+
+            <!-- 日期節點 -->
+            <div class="flex gap-4">
+              <div class="relative">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm">
+                  {{ idx + 1 }}
+                </div>
+              </div>
+
+              <!-- 詳細內容卡片 -->
+              <div class="flex-1 cute-card rounded-xl p-4 border border-pink-100">
+                <h3 class="font-bold text-gray-800 mb-2">{{ item.date }}</h3>
+                <p class="text-gray-600 text-sm mb-3">{{ item.activities }}</p>
+                <div class="flex gap-2 flex-wrap">
+                  <span v-if="item.meal" class="px-2 py-1 bg-orange-100 text-orange-600 text-xs rounded-full">🍽️ {{ item.meal }}</span>
+                  <span v-if="item.location" class="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded-full">📍 {{ item.location }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="text-center py-12 text-gray-400">
+          <div class="text-3xl mb-4">📝</div>
+          <p class="text-lg font-medium">暫無行程詳情</p>
+          <p class="text-sm mt-2">在底部導航欄新增行程</p>
+        </div>
+      </div>
+
+      <!-- 底部導航欄 -->
+      <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 shadow-2xl">
+        <div class="flex justify-around items-center">
+          <button 
+            @click="activeTab = 'itinerary'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'itinerary' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">✈️</span>
+            <span>行程</span>
+          </button>
+          <button 
+            @click="activeTab = 'reservation'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'reservation' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">🏨</span>
+            <span>預約</span>
+          </button>
+          <button 
+            @click="activeTab = 'expense'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'expense' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">💰</span>
+            <span>記賬</span>
+          </button>
+          <button 
+            @click="activeTab = 'shopping'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'shopping' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">🛍️</span>
+            <span>購物</span>
+          </button>
+          <button 
+            @click="activeTab = 'checklist'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'checklist' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">✓</span>
+            <span>準備</span>
+          </button>
+          <button 
+            @click="activeTab = 'members'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'members' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">👥</span>
+            <span>成員</span>
+          </button>
+          <button 
+            @click="activeTab = 'settings'" 
+            :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all', activeTab === 'settings' ? 'nav-active' : 'text-gray-500']"
+          >
+            <span class="text-xl mb-1">⚙️</span>
+            <span>設定</span>
+          </button>
+        </div>
+      </nav>
+    </template>
 
     <!-- 新增/編輯表單 (彈出) -->
     <div v-if="showAddForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -82,7 +204,7 @@
               v-model="currentTrip.title" 
               required 
               class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
-              placeholder="例如：巴黎浪漫之旅"
+              placeholder="例如：香港自由行"
             >
           </div>
           <div>
@@ -91,16 +213,25 @@
               v-model="currentTrip.location" 
               required 
               class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
-              placeholder="例如：巴黎、日本"
+              placeholder="例如：香港"
             >
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
             <input 
-              v-model="currentTrip.dates" 
+              v-model="currentTrip.startDate" 
+              type="date"
               required 
               class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
-              placeholder="例如：2026/03/01, 2026/03/05, 2026/03/10"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
+            <input 
+              v-model="currentTrip.endDate" 
+              type="date"
+              required 
+              class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none"
             >
           </div>
           <div>
@@ -130,68 +261,127 @@
         </form>
       </div>
     </div>
+
+    <!-- 刪除確認對話 -->
+    <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-sm">
+        <h2 class="text-xl font-bold text-center mb-4 text-gray-800">確定刪除嗎？</h2>
+        <p class="text-center text-gray-600 mb-6">{{ trips[deletingIndex].title }} 將被永久刪除</p>
+        <div class="flex gap-3">
+          <button 
+            @click="confirmDelete" 
+            class="flex-1 bg-red-500 text-white font-bold py-3 px-6 rounded-xl hover:scale-105 transition-all"
+          >
+            刪除
+          </button>
+          <button 
+            @click="showDeleteConfirm = false" 
+            class="flex-1 bg-gray-200 text-gray-700 font-bold py-3 px-6 rounded-xl hover:bg-gray-300 transition-all"
+          >
+            取消
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const { createApp, ref, reactive, onMounted, watch } = Vue;
+    const { createApp, ref, reactive, onMounted, watch, computed } = Vue;
 
     createApp({
       setup() {
         const trips = ref([]);
+        const currentPage = ref('home');
         const showAddForm = ref(false);
+        const showDeleteConfirm = ref(false);
         const editingIndex = ref(-1);
+        const selectedTripIndex = ref(0);
+        const deletingIndex = ref(-1);
+        const activeTab = ref('itinerary');
+        
         const currentTrip = reactive({
           title: '',
           location: '',
-          dates: '',
-          description: ''
+          startDate: '',
+          endDate: '',
+          description: '',
+          itinerary: []
         });
 
-        const getEmojiForTrip = (trip) => {
-          const emojis = ['✈️', '🌟', '🏖️', '🗺️', '🎒', '🌺', '🏰', '🗽'];
-          return emojis[Math.floor(Math.random() * emojis.length)];
+        const formatDateRange = (dates) => {
+          if (Array.isArray(dates) && dates.length >= 2) {
+            return `${dates[0]} - ${dates[dates.length - 1]}`;
+          }
+          return dates;
         };
 
-        const addTrip = () => {
-          const dates = currentTrip.dates.split(',').map(d => d.trim()).filter(Boolean);
-          trips.value.push({
-            title: currentTrip.title,
-            location: currentTrip.location,
-            dates: dates,
-            description: currentTrip.description
-          });
-          resetForm();
+        const calculateDays = (dates) => {
+          if (Array.isArray(dates) && dates.length >= 2) {
+            const start = new Date(dates[0]);
+            const end = new Date(dates[dates.length - 1]);
+            return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+          }
+          return 0;
+        };
+
+        const viewTripDetail = (index) => {
+          selectedTripIndex.value = index;
+          currentPage.value = 'detail';
+          activeTab.value = 'itinerary';
+        };
+
+        const backToHome = () => {
+          currentPage.value = 'home';
         };
 
         const editTrip = (index) => {
           const trip = trips.value[index];
           currentTrip.title = trip.title;
           currentTrip.location = trip.location;
-          currentTrip.dates = trip.dates.join(', ');
+          currentTrip.startDate = trip.startDate;
+          currentTrip.endDate = trip.endDate;
           currentTrip.description = trip.description;
+          currentTrip.itinerary = JSON.parse(JSON.stringify(trip.itinerary || []));
           editingIndex.value = index;
           showAddForm.value = true;
         };
 
         const saveTrip = () => {
-          if (editingIndex.value >= 0) {
-            const dates = currentTrip.dates.split(',').map(d => d.trim()).filter(Boolean);
-            trips.value[editingIndex.value] = {
-              title: currentTrip.title,
-              location: currentTrip.location,
-              dates: dates,
-              description: currentTrip.description
-            };
-          } else {
-            addTrip();
+          const dates = [];
+          const start = new Date(currentTrip.startDate);
+          const end = new Date(currentTrip.endDate);
+          
+          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            dates.push(d.toISOString().split('T')[0]);
           }
+
+          const tripData = {
+            title: currentTrip.title,
+            location: currentTrip.location,
+            startDate: currentTrip.startDate,
+            endDate: currentTrip.endDate,
+            dates: dates,
+            description: currentTrip.description,
+            itinerary: currentTrip.itinerary
+          };
+
+          if (editingIndex.value >= 0) {
+            trips.value[editingIndex.value] = tripData;
+          } else {
+            trips.value.push(tripData);
+          }
+          
           resetForm();
         };
 
         const deleteTrip = (index) => {
-          if (confirm('確定刪除這個旅行計劃嗎？')) {
-            trips.value.splice(index, 1);
-          }
+          deletingIndex.value = index;
+          showDeleteConfirm.value = true;
+        };
+
+        const confirmDelete = () => {
+          trips.value.splice(deletingIndex.value, 1);
+          showDeleteConfirm.value = false;
         };
 
         const cancelEdit = () => {
@@ -199,7 +389,14 @@
         };
 
         const resetForm = () => {
-          Object.assign(currentTrip, { title: '', location: '', dates: '', description: '' });
+          Object.assign(currentTrip, { 
+            title: '', 
+            location: '', 
+            startDate: '', 
+            endDate: '', 
+            description: '',
+            itinerary: []
+          });
           editingIndex.value = -1;
           showAddForm.value = false;
         };
@@ -221,13 +418,22 @@
 
         return {
           trips,
+          currentPage,
           showAddForm,
+          showDeleteConfirm,
           editingIndex,
+          selectedTripIndex,
+          deletingIndex,
+          activeTab,
           currentTrip,
-          getEmojiForTrip,
+          formatDateRange,
+          calculateDays,
+          viewTripDetail,
+          backToHome,
           editTrip,
           saveTrip,
           deleteTrip,
+          confirmDelete,
           cancelEdit
         };
       }
