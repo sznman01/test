@@ -325,6 +325,7 @@
                 @change="onImageSelected"
                 class="hidden"
                 id="imageFileInput"
+                key="imageInput"
               >
               <button
                 type="button"
@@ -418,8 +419,8 @@
               💾 保存
             </button>
             <button 
-              @click.prevent="cancelEdit" 
               type="button"
+              @click.prevent="cancelEdit" 
               class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all"
               style="background-color: #E9D5C8;"
             >
@@ -456,7 +457,7 @@
   </div>
 
   <script>
-    const { createApp, ref, reactive, onMounted, watch } = Vue;
+    const { createApp, ref, reactive, onMounted, watch, nextTick } = Vue;
 
     createApp({
       setup() {
@@ -507,7 +508,8 @@
           return 0;
         };
 
-        const triggerFileInput = () => {
+        const triggerFileInput = async () => {
+          await nextTick();
           const fileInput = document.getElementById('imageFileInput');
           if (fileInput) {
             fileInput.click();
@@ -523,6 +525,8 @@
             };
             reader.readAsDataURL(file);
           }
+          // 重置 input value 以便重新選擇檔案
+          event.target.value = '';
         };
 
         const openAddForm = () => {
@@ -608,6 +612,12 @@
           });
           editingIndex.value = -1;
           showAddForm.value = false;
+          
+          // 重置 file input
+          const fileInput = document.getElementById('imageFileInput');
+          if (fileInput) {
+            fileInput.value = '';
+          }
         };
 
         // 本地儲存
