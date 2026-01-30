@@ -3701,7 +3701,8 @@ const handleSavePayment = () => {
             totalBudget: formData.value.totalBudget,
             expenses: formData.value.expenses,
             shoppingList: formData.value.shoppingList || [],
-            checklist: formData.value.checklist || []
+            checklist: formData.value.checklist || [],
+            members: formData.value.members
           };
 
           if (editingIndex.value >= 0) {
