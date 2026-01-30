@@ -3666,7 +3666,8 @@ const handleSavePayment = () => {
             totalBudget: trip.totalBudget || 0,
             expenses: JSON.parse(JSON.stringify(trip.expenses || [])),
             shoppingList: JSON.parse(JSON.stringify(trip.shoppingList || [])),
-            checklist: JSON.parse(JSON.stringify(trip.checklist || []))
+            checklist: JSON.parse(JSON.stringify(trip.checklist || [])),
+            members: JSON.parse(JSON.stringify(trip.members || []))
           };
           editingIndex.value = index;
           showAddForm.value = true;
