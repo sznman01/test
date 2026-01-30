@@ -893,6 +893,137 @@
     .checklist-menu button:hover {
       background: #FFF7EB;
     }
+
+    /* 成員頁樣式，類似準備但有頭像 */
+    .members-stat-card {
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: #F4FBF4;
+      border: 1px solid #CFE8CF;
+    }
+
+    .members-stat-card-secondary {
+      background: #FFF9EC;
+      border-color: #F3E0B5;
+    }
+
+    .members-stat-label {
+      font-size: 12px;
+      color: #7A6A56;
+    }
+
+    .members-stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #3C3C3C;
+      line-height: 1.1;
+    }
+
+    .members-item-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid #E9D5C8;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 14px rgba(233,157,153,0.08);
+    }
+
+    .members-item-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #FFE5EC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+
+    .members-item-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .members-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333333;
+    }
+
+    .members-item-role {
+      font-size: 12px;
+      color: #9B8B80;
+    }
+
+    .members-menu-button {
+      margin-left: 6px;
+      color: #B0A29A;
+      font-size: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .members-menu-button:hover {
+      color: #8B6B6B;
+    }
+
+    .members-menu {
+      position: absolute;
+      right: 8px;
+      top: 38px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #E9D5C8;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      z-index: 20;
+      overflow: hidden;
+    }
+
+    .members-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .members-menu button:hover {
+      background: #FFF7EB;
+    }
+
+    .settlement-table {
+      background: white;
+      border: 1px solid #E9D5C8;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .settlement-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #8B6B6B;
+      margin-bottom: 12px;
+    }
+
+    .settlement-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .settlement-positive {
+      color: #4CAF50;
+    }
+
+    .settlement-negative {
+      color: #E99D99;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -1320,115 +1451,88 @@
               <div class="flex justify-end mb-4">
                 <button 
                   @click="showSetBudgetForm = true"
-                  class="bg-white border-2 border-[#E99D99] text-[#E99D99] rounded-2xl px-4 py-2 text-sm font-bold hover:bg-[#FFF7EB] transition-all"
+                  class="bg-white border-2 border-[#E99D99] text-[#E99D99] rounded-2xl px-4 py-2 text-sm font-bold hover:bg-[#FFF7EB]"
                 >
-                  ⚙️ 設定預算
+                  💡 設定預算
                 </button>
               </div>
 
-              <!-- 即時匯率計算機 -->
-              <div class="currency-converter">
-                <p class="text-sm font-bold text-gray-700 mb-3">💱 即時匯率轉換</p>
-                <div class="converter-row">
-                  <input 
-                    v-model.number="currencyAmount" 
-                    type="number" 
-                    placeholder="輸入金額" 
-                    class="converter-input"
-                  >
-                  <span class="converter-label">{{ currentTripCurrency }}</span>
-                </div>
-                <div class="converter-row">
-                  <input 
-                    :value="convertedAmount" 
-                    type="text" 
-                    disabled 
-                    class="converter-input opacity-70 bg-gray-100"
-                  >
-                  <span class="converter-label">HKD</span>
-                </div>
-                <div class="converter-rate">
-                  💱 匯率：1 {{ currentTripCurrency }} = {{ exchangeRate }} HKD
-                </div>
-              </div>
-
-              <!-- 預算主卡片 -->
+              <!-- 預算卡片 -->
               <div class="budget-main-card">
                 <div class="budget-header">
                   <div class="budget-header-item">
-                    <div class="budget-header-label">總預算</div>
-                    <div class="budget-header-value">{{ formatCurrency(currentTripData.totalBudget) }}</div>
+                    <div class="budget-header-label">設定預算</div>
+                    <div class="budget-header-value">{{ formatCurrency(totalBudget) }}</div>
                   </div>
                   <div class="budget-header-item">
-                    <div class="budget-header-label">已花費 (HKD)</div>
+                    <div class="budget-header-label">已支出</div>
                     <div class="budget-header-value">{{ formatCurrency(getTotalExpense()) }}</div>
                   </div>
                 </div>
-
                 <div class="budget-progress">
                   <div class="budget-progress-bar">
-                    <div 
-                      class="budget-progress-fill"
-                      :style="{ width: getBudgetPercentage() + '%' }"
-                    ></div>
+                    <div class="budget-progress-fill" :style="{ width: getBudgetPercentage() + '%' }"></div>
                   </div>
                   <div class="budget-remaining">
-                    <span>進度</span>
-                    <span>{{ getBudgetPercentage().toFixed(1) }}%</span>
+                    <span>剩餘: {{ formatCurrency(totalBudget - getTotalExpense()) }}</span>
+                    <span>{{ getBudgetPercentage().toFixed(0) }}%</span>
                   </div>
-                </div>
-
-                <div class="border-t border-white border-opacity-30 pt-3">
-                  <p class="text-sm">剩餘額度</p>
-                  <p class="text-2xl font-bold">{{ formatCurrency(getRemainingBudget()) }}</p>
                 </div>
               </div>
 
-              <!-- 支出記錄區 -->
-              <div class="pt-4">
-                <div class="expense-record-header">
-                  <select 
-                    v-model="selectedExpenseCategory"
-                    class="expense-category-select"
-                  >
-                    <option value="">全部支出</option>
-                    <option value="food">🍽️ 餐飲</option>
-                    <option value="attraction">🎫 景點</option>
-                    <option value="shopping">🛍️ 紀念品</option>
-                    <option value="transport">🚕 交通</option>
-                    <option value="other">📌 其他</option>
-                  </select>
-                  <button 
-                    @click="showAddExpenseForm = true"
-                    class="expense-add-btn"
-                  >
-                    ➕ 新增支出
-                  </button>
-                </div>
+              <!-- 支出記錄標題 + 新增按鈕 -->
+              <div class="expense-record-header">
+                <h3 class="text-lg font-bold text-gray-800">支出記錄</h3>
+                <select 
+                  v-model="filterExpenseCategory" 
+                  class="expense-category-select"
+                >
+                  <option value="">所有分類</option>
+                  <option value="accommodation">🏨 住宿</option>
+                  <option value="food">🍽️ 飲食</option>
+                  <option value="transport">🚗 交通</option>
+                  <option value="activity">🎉 活動</option>
+                  <option value="shopping">🛍️ 購物</option>
+                  <option value="other">📝 其他</option>
+                </select>
+                <button 
+                  @click="showAddExpenseForm = true"
+                  class="expense-add-btn"
+                >
+                  ➕ 新增
+                </button>
+              </div>
 
-                <!-- 支出列表 -->
-                <div v-if="getFilteredExpenses().length > 0" class="space-y-2">
-                  <div v-for="(expense, idx) in getFilteredExpenses()" :key="idx" class="expense-item">
-                    <div class="expense-item-left">
-                      <div class="expense-item-title">{{ expense.title }}</div>
-                      <div class="expense-item-category">{{ getCategoryLabel(expense.category) }} · {{ expense.date }}</div>
-                      <div class="expense-item-currencies">
-                        {{ expense.originalCurrency }} {{ formatCurrency(expense.originalAmount) }} 
-                        <span class="text-gray-400">≈ HKD {{ formatCurrency(expense.amountHKD) }}</span>
+              <!-- 支出列表 -->
+              <div v-if="getFilteredExpenses().length > 0" class="space-y-2">
+                <div v-for="(expense, idx) in getFilteredExpenses()" :key="idx" class="expense-item">
+                  <div class="expense-item-left">
+                    <div class="expense-item-title">{{ expense.description }}</div>
+                    <div class="expense-item-category">{{ getExpenseCategoryLabel(expense.category) }}</div>
+                    <div v-if="expense.currency && expense.convertedAmount" class="expense-item-currencies">
+                      {{ expense.amount }} {{ expense.currency }} = {{ formatCurrency(expense.convertedAmount) }}
+                    </div>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="expense-item-amount">{{ formatCurrency(expense.convertedAmount || expense.amount) }}</div>
+                    <div class="relative">
+                      <button 
+                        @click="openExpenseMenu(idx)"
+                        class="expense-item-menu"
+                      >
+                        ⋯
+                      </button>
+                      <div v-if="activeExpenseMenuIndex === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
+                        <button @click="editExpense(idx)" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]">✏️ 編輯</button>
+                        <button @click="deleteExpense(idx)" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]">🗑️ 刪除</button>
                       </div>
                     </div>
-                    <div class="expense-item-amount">HKD {{ formatCurrency(expense.amountHKD) }}</div>
-                    <button 
-                      @click="deleteExpense(idx)"
-                      class="expense-item-menu"
-                    >
-                      ⋯
-                    </button>
                   </div>
                 </div>
-                <div v-else class="text-center py-8 text-gray-400">
-                  <p class="text-sm">暫無支出記錄</p>
-                </div>
+              </div>
+              <div v-else class="text-center py-12 text-gray-400">
+                <div class="text-4xl mb-3">💸</div>
+                <p class="text-sm">暫無支出記錄</p>
               </div>
             </div>
           </template>
@@ -1436,119 +1540,79 @@
           <!-- 購物頁 -->
           <template v-if="currentScreen === 'shopping'">
             <div class="p-4 pb-24">
-              <!-- 無框浮動標題 + 新增按鈕 -->
+              <!-- 無框浮動標題 -->
               <div class="floating-section-header">
-                <div class="flex items-start justify-between gap-3">
-                  <div>
-                    <div class="floating-section-header-title">🛍️ 購物清單</div>
-                    <div class="floating-section-header-description">規劃你的購物清單</div>
-                  </div>
-                  <button 
-                    @click="openShoppingForm"
-                    class="bg-white text-[#E99D99] text-sm font-bold px-3 py-1.5 rounded-full shadow-sm hover:bg-[#FFF7EB] flex items-center gap-1"
-                  >
-                    <span>➕</span>
-                    <span>新增</span>
-                  </button>
-                </div>
+                <div class="floating-section-header-title">🛍️ 購物清單</div>
+                <div class="floating-section-header-description">旅行必買清單</div>
               </div>
 
-              <!-- 統計卡片 -->
+              <!-- 統計卡片 (已勾選 + 待購買) -->
               <div class="mt-2 grid grid-cols-2 gap-3">
                 <div class="shopping-stat-card">
                   <div class="shopping-stat-label mb-1">待購買</div>
-                  <div class="shopping-stat-value">{{ pendingShoppingCount }}</div>
+                  <div class="shopping-stat-value">{{ getUncompletedShoppingCount() }}</div>
                 </div>
                 <div class="shopping-stat-card shopping-stat-card-secondary">
                   <div class="shopping-stat-label mb-1">已購買</div>
-                  <div class="shopping-stat-value">{{ purchasedShoppingCount }}</div>
+                  <div class="shopping-stat-value">{{ getCompletedShoppingCount() }}</div>
                 </div>
               </div>
 
-              <!-- 篩選條 -->
-              <div class="mt-4 mb-2">
-                <button 
-                  class="shopping-filter-bar w-full"
-                  @click="toggleShoppingFilterDropdown"
-                >
-                  <span>{{ shoppingFilterLabel }}</span>
-                  <span class="text-xs">⌄</span>
-                </button>
-                <div v-if="showShoppingFilterDropdown" class="shopping-filter-dropdown">
-                  <div 
-                    class="shopping-filter-option"
-                    @click="setShoppingFilter('all')"
-                  >
-                    <span>全部</span>
-                    <span>{{ totalShoppingCount }}</span>
+              <!-- 篩選欄 (分類) -->
+              <div class="relative mt-4">
+                <div class="shopping-filter-bar" @click="showShoppingCategoryFilter = !showShoppingCategoryFilter">
+                  <span>{{ filterShoppingCategory || '所有類別' }}</span>
+                  <span>▼</span>
+                </div>
+                <div v-if="showShoppingCategoryFilter" class="shopping-filter-dropdown">
+                  <div class="shopping-filter-option" @click="filterShoppingCategory = ''; showShoppingCategoryFilter = false">
+                    所有類別
                   </div>
-                  <div 
-                    class="shopping-filter-option"
-                    @click="setShoppingFilter('normal')"
-                  >
-                    <span>一般</span>
-                    <span>{{ shoppingCategoryCount('normal') }}</span>
+                  <div class="shopping-filter-option" @click="filterShoppingCategory = 'normal'; showShoppingCategoryFilter = false">
+                    普通
                   </div>
-                  <div 
-                    class="shopping-filter-option"
-                    @click="setShoppingFilter('important')"
-                  >
-                    <span>重要</span>
-                    <span>{{ shoppingCategoryCount('important') }}</span>
+                  <div class="shopping-filter-option" @click="filterShoppingCategory = 'important'; showShoppingCategoryFilter = false">
+                    重要
                   </div>
-                  <div 
-                    class="shopping-filter-option"
-                    @click="setShoppingFilter('snack')"
-                  >
-                    <span>零食</span>
-                    <span>{{ shoppingCategoryCount('snack') }}</span>
+                  <div class="shopping-filter-option" @click="filterShoppingCategory = 'snack'; showShoppingCategoryFilter = false">
+                    零食
                   </div>
                 </div>
               </div>
 
               <!-- 主列表區 -->
-              <div class="pt-2">
-                <div v-if="shoppingDisplayList.length > 0">
+              <div class="pt-4">
+                <div v-if="getFilteredShoppingItems().length > 0" class="space-y-2">
                   <div 
-                    v-for="(item, idx) in shoppingDisplayList" 
+                    v-for="(item, idx) in getFilteredShoppingItems()" 
                     :key="idx"
                     class="shopping-item-card relative"
                   >
-                    <!-- Checkbox -->
+                    <!-- 勾選框 -->
                     <div 
                       class="shopping-item-checkbox"
-                      :class="item.purchased ? 'shopping-item-checkbox-checked' : ''"
-                      @click="toggleShoppingItemPurchased(item)"
+                      :class="{ 'shopping-item-checkbox-checked': item.completed }"
+                      @click="toggleShoppingItemCompletion(idx)"
                     >
-                      <span v-if="item.purchased">✓</span>
+                      <span v-if="item.completed">✓</span>
                     </div>
 
                     <!-- 圖片 -->
-                    <div class="shopping-item-image">
-                      <template v-if="item.image">
-                        <img :src="item.image" :alt="item.name">
-                      </template>
-                      <template v-else>
-                        <span class="text-2xl">🛍️</span>
-                      </template>
+                    <div class="shopping-item-image" v-if="item.image">
+                      <img :src="item.image" :alt="item.name">
                     </div>
 
                     <!-- 文字區 -->
                     <div class="shopping-item-main">
                       <div class="shopping-item-title-row">
-                        <div class="shopping-item-title" :class="item.purchased ? 'line-through text-gray-400' : ''">
+                        <div class="shopping-item-title" :style="{ textDecoration: item.completed ? 'line-through' : 'none', opacity: item.completed ? 0.5 : 1 }">
                           {{ item.name }}
                         </div>
-                        <span 
-                          class="shopping-tag"
-                          :class="shoppingTagClass(item.category)"
-                        >
-                          {{ shoppingTagLabel(item.category) }}
+                        <span v-if="item.category" class="shopping-tag" :class="'shopping-tag-' + item.category">
+                          {{ item.category === 'important' ? '重要' : item.category === 'normal' ? '普通' : '零食' }}
                         </span>
                       </div>
-                      <div class="shopping-item-subtitle">
-                        {{ item.shop || '—' }}
-                      </div>
+                      <div class="shopping-item-subtitle">{{ item.subtitle || '—' }}</div>
                     </div>
 
                     <!-- 更多選單 -->
@@ -1560,16 +1624,26 @@
                         ⋯
                       </button>
                       <div v-if="activeShoppingMenuIndex === idx" class="shopping-menu">
-                        <button @click="openShoppingForm(item, idx)">✏️ 編輯</button>
-                        <button class="text-red-600" @click="deleteShoppingItem(idx)">🗑️ 剷除</button>
+                        <button @click="editShoppingItem(idx)">✏️ 編輯</button>
+                        <button class="text-red-600" @click="deleteShoppingItem(idx)">🗑️ 刪除</button>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div v-else class="text-center text-gray-400 py-12">
-                  <div class="text-4xl mb-3">🧺</div>
-                  <p class="text-sm">暫無購物項目，點擊「+ 新增」開始規劃吧！</p>
+                  <div class="text-4xl mb-3">🛍️</div>
+                  <p class="text-sm">暫無購物項目，點擊「+ 新增」開始添加吧！</p>
                 </div>
+              </div>
+
+              <!-- 新增按鈕 -->
+              <div class="fixed bottom-20 right-4">
+                <button 
+                  @click="openAddShoppingItemForm"
+                  class="bg-[#E99D99] hover:bg-[#D88888] text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg transition-all"
+                >
+                  ➕
+                </button>
               </div>
             </div>
           </template>
@@ -1577,15 +1651,96 @@
           <!-- 準備清單頁 -->
           <template v-if="currentScreen === 'checklist'">
             <div class="p-4 pb-24">
+              <!-- 無框浮動標題 -->
+              <div class="floating-section-header">
+                <div class="floating-section-header-title">📝 準備清單</div>
+                <div class="floating-section-header-description">出發前的準備</div>
+              </div>
+
+              <!-- 統計卡片 (已準備 + 待準備) -->
+              <div class="mt-2 grid grid-cols-2 gap-3">
+                <div class="checklist-stat-card">
+                  <div class="checklist-stat-label mb-1">待準備</div>
+                  <div class="checklist-stat-value">{{ getUncompletedChecklistCount() }}</div>
+                </div>
+                <div class="checklist-stat-card checklist-stat-card-secondary">
+                  <div class="checklist-stat-label mb-1">已準備</div>
+                  <div class="checklist-stat-value">{{ getCompletedChecklistCount() }}</div>
+                </div>
+              </div>
+
+              <!-- 主列表區 -->
+              <div class="pt-4">
+                <div v-if="checklistItems.length > 0" class="space-y-2">
+                  <div v-for="(item, idx) in checklistItems" :key="idx" class="checklist-item-card relative">
+                    <!-- 勾選框 -->
+                    <div 
+                      class="checklist-item-checkbox"
+                      :class="{ 'checklist-item-checkbox-checked': item.completed }"
+                      @click="toggleChecklistItemCompletion(idx)"
+                    >
+                      <span v-if="item.completed">✓</span>
+                    </div>
+
+                    <!-- 文字區 -->
+                    <div class="checklist-item-main">
+                      <div class="checklist-item-title-row">
+                        <div class="checklist-item-title" :style="{ textDecoration: item.completed ? 'line-through' : 'none', opacity: item.completed ? 0.5 : 1 }">
+                          {{ item.name }}
+                        </div>
+                        <span v-if="item.category" class="checklist-tag" :class="'checklist-tag-' + item.category">
+                          {{ item.category === 'important' ? '重要' : '日常' }}
+                        </span>
+                      </div>
+                      <div class="checklist-item-subtitle">{{ item.subtitle || '—' }}</div>
+                      <div v-if="item.dueDate" class="checklist-item-date">截止：{{ item.dueDate }}</div>
+                    </div>
+
+                    <!-- 更多選單 -->
+                    <div class="relative">
+                      <button 
+                        class="checklist-menu-button"
+                        @click="toggleChecklistMenu(idx)"
+                      >
+                        ⋯
+                      </button>
+                      <div v-if="activeChecklistMenuIndex === idx" class="checklist-menu">
+                        <button @click="editChecklistItem(idx)">✏️ 編輯</button>
+                        <button class="text-red-600" @click="deleteChecklistItem(idx)">🗑️ 刪除</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="text-center text-gray-400 py-12">
+                  <div class="text-4xl mb-3">📝</div>
+                  <p class="text-sm">暫無準備項目，點擊「+ 新增」開始添加吧！</p>
+                </div>
+              </div>
+
+              <!-- 新增按鈕 -->
+              <div class="fixed bottom-20 right-4">
+                <button 
+                  @click="openAddChecklistItemForm"
+                  class="bg-[#E99D99] hover:bg-[#D88888] text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl shadow-lg transition-all"
+                >
+                  ➕
+                </button>
+              </div>
+            </div>
+          </template>
+
+          <!-- 成員頁 -->
+          <template v-if="currentScreen === 'members'">
+            <div class="p-4 pb-24">
               <!-- 無框浮動標題 + 新增按鈕 -->
               <div class="floating-section-header">
                 <div class="flex items-start justify-between gap-3">
                   <div>
-                    <div class="floating-section-header-title">✓ 待辦清單</div>
-                    <div class="floating-section-header-description">記錄想辦的事項</div>
+                    <div class="floating-section-header-title">👥 成員管理</div>
+                    <div class="floating-section-header-description">旅行夥伴</div>
                   </div>
                   <button 
-                    @click="openChecklistForm"
+                    @click="openMemberForm"
                     class="bg-white text-[#E99D99] text-sm font-bold px-3 py-1.5 rounded-full shadow-sm hover:bg-[#FFF7EB] flex items-center gap-1"
                   >
                     <span>➕</span>
@@ -1594,620 +1749,207 @@
                 </div>
               </div>
 
-              <!-- 統計卡片 -->
+              <!-- 統計卡片 (總成員 + 總付款額) -->
               <div class="mt-2 grid grid-cols-2 gap-3">
-                <div class="checklist-stat-card">
-                  <div class="checklist-stat-label mb-1">待完成</div>
-                  <div class="checklist-stat-value">{{ pendingChecklistCount }}</div>
+                <div class="members-stat-card">
+                  <div class="members-stat-label mb-1">總成員</div>
+                  <div class="members-stat-value">{{ totalMembersCount }}</div>
                 </div>
-                <div class="checklist-stat-card checklist-stat-card-secondary">
-                  <div class="checklist-stat-label mb-1">已完成</div>
-                  <div class="checklist-stat-value">{{ completedChecklistCount }}</div>
+                <div class="members-stat-card members-stat-card-secondary">
+                  <div class="members-stat-label mb-1">總付款 (HKD)</div>
+                  <div class="members-stat-value">{{ formatCurrency(totalPayments) }}</div>
                 </div>
               </div>
 
-              <!-- 主列表區，按群組顯示 -->
+              <!-- 主列表區 -->
               <div class="pt-4">
-                <div v-if="checklistGroups.length > 0">
-                  <div v-for="group in checklistGroups" :key="group">
-                    <p class="checklist-group-title">{{ group }} {{ checklistGroupCount(group) }}</p>
-                    <div v-if="getChecklistGroupItems(group).length > 0" class="space-y-2">
-                      <div 
-                        v-for="(item, idx) in getChecklistGroupItems(group)" 
-                        :key="idx"
-                        class="checklist-item-card relative"
-                      >
-                        <!-- Checkbox -->
-                        <div 
-                          class="checklist-item-checkbox"
-                          :class="item.completed ? 'checklist-item-checkbox-checked' : ''"
-                          @click="toggleChecklistItemCompleted(item)"
-                        >
-                          <span v-if="item.completed">✓</span>
-                        </div>
-
-                        <!-- 文字區 (無圖片) -->
-                        <div class="checklist-item-main">
-                          <div class="checklist-item-title-row">
-                            <div class="checklist-item-title" :class="item.completed ? 'line-through text-gray-400' : ''">
-                              {{ item.name }}
-                            </div>
-                            <span 
-                              class="checklist-tag"
-                              :class="checklistTagClass(item.tag)"
-                            >
-                              {{ checklistTagLabel(item.tag) }}
-                            </span>
-                          </div>
-                          <div class="checklist-item-subtitle">
-                            {{ item.subtitle || '—' }}
-                          </div>
-                          <div v-if="item.date" class="checklist-item-date">
-                            {{ item.date }}
-                          </div>
-                        </div>
-
-                        <!-- 更多選單 -->
-                        <div class="relative">
-                          <button 
-                            class="checklist-menu-button"
-                            @click="toggleChecklistMenu(idx, group)"
-                          >
-                            ⋯
-                          </button>
-                          <div v-if="activeChecklistMenuIndex === `${group}-${idx}`" class="checklist-menu">
-                            <button @click="openChecklistForm(item, idx, group)">✏️ 編輯</button>
-                            <button class="text-red-600" @click="deleteChecklistItem(idx, group)">🗑️ 刪除</button>
-                          </div>
-                        </div>
-                      </div>
+                <div v-if="membersList.length > 0" class="space-y-2">
+                  <div 
+                    v-for="(member, idx) in membersList" 
+                    :key="idx"
+                    class="members-item-card relative"
+                  >
+                    <!-- 頭像 (隨機男孩/女孩) -->
+                    <div class="members-item-avatar">
+                      <span>{{ member.gender === 'male' ? '👦' : '👧' }}</span>
                     </div>
-                    <div v-else class="text-center py-4 text-gray-400 text-sm">
-                      <p>暫無項目</p>
+
+                    <!-- 文字區 -->
+                    <div class="members-item-main">
+                      <div class="members-item-title">{{ member.name }}</div>
+                      <div class="members-item-role">{{ member.role || '—' }}</div>
+                    </div>
+
+                    <!-- 更多選單 -->
+                    <div class="relative">
+                      <button 
+                        class="members-menu-button"
+                        @click="toggleMembersMenu(idx)"
+                      >
+                        ⋯
+                      </button>
+                      <div v-if="activeMembersMenuIndex === idx" class="members-menu">
+                        <button @click="openMemberForm(member, idx)">✏️ 編輯</button>
+                        <button @click="openPaymentForm(member, idx)">💰 新增付款</button>
+                        <button class="text-red-600" @click="deleteMember(idx)">🗑️ 刪除</button>
+                      </div>
                     </div>
                   </div>
                 </div>
                 <div v-else class="text-center text-gray-400 py-12">
-                  <div class="text-4xl mb-3">💭</div>
-                  <p class="text-sm">暫無待辦項目，點擊「+ 新增」開始規劃吧！</p>
+                  <div class="text-4xl mb-3">👥</div>
+                  <p class="text-sm">暫無成員，點擊「+ 新增」開始添加吧！</p>
+                </div>
+              </div>
+
+              <!-- 結算表 -->
+              <div class="settlement-table" v-if="membersList.length > 0">
+                <p class="settlement-title">結算表 (每人應付: {{ formatCurrency(perPersonShare) }})</p>
+                <div v-for="(member, idx) in membersList" :key="idx" class="settlement-row">
+                  <span>{{ member.name }} 已付 {{ formatCurrency(getMemberTotalPayment(member)) }}</span>
+                  <span :class="getSettlementClass(getSettlementAmount(member))">
+                    {{ getSettlementText(getSettlementAmount(member)) }}
+                  </span>
                 </div>
               </div>
             </div>
           </template>
-
-          <!-- 成員頁 -->
-          <template v-if="currentScreen === 'members'">
-            <div class="p-4 pb-24">
-              <!-- 無框浮動標題 -->
-              <div class="floating-section-header">
-                <div class="floating-section-header-title">👥 成員</div>
-                <div class="floating-section-header-description">邀請朋友加入你的旅行</div>
-              </div>
-              <div class="text-center text-gray-400 py-12">
-                <div class="text-4xl mb-4">💭</div>
-                <p class="text-lg font-medium">此功能開發中...</p>
-                <p class="text-sm mt-1">成員管理功能即將推出！</p>
-              </div>
-            </div>
-          </template>
-
-          <!-- 設定頁 -->
-          <template v-if="currentScreen === 'settings'">
-            <div class="p-4 pb-24">
-              <!-- 無框浮動標題 -->
-              <div class="floating-section-header">
-                <div class="floating-section-header-title">⚙️ 設定</div>
-                <div class="floating-section-header-description">自訂你的應用偏好設定</div>
-              </div>
-              <div class="text-center text-gray-400 py-12">
-                <div class="text-4xl mb-4">💭</div>
-                <p class="text-lg font-medium">此功能開發中...</p>
-                <p class="text-sm mt-1">應用設定功能即將推出！</p>
-              </div>
-            </div>
-          </template>
         </div>
+
+        <!-- Bottom Nav -->
+        <nav class="bottom-nav" v-if="currentScreen !== 'home'">
+          <div class="flex items-center justify-around h-20">
+            <button 
+              @click="currentScreen = 'detail'"
+              :class="['flex flex-col items-center justify-center flex-1 h-full text-center', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']"
+            >
+              📅
+              <span class="text-xs mt-1">行程</span>
+            </button>
+            <button 
+              @click="currentScreen = 'reservation'"
+              :class="['flex flex-col items-center justify-center flex-1 h-full text-center', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']"
+            >
+              📋
+              <span class="text-xs mt-1">預約</span>
+            </button>
+            <button 
+              @click="currentScreen = 'expense'"
+              :class="['flex flex-col items-center justify-center flex-1 h-full text-center', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']"
+            >
+              💸
+              <span class="text-xs mt-1">預算</span>
+            </button>
+            <button 
+              @click="currentScreen = 'shopping'"
+              :class="['flex flex-col items-center justify-center flex-1 h-full text-center', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']"
+            >
+              🛍️
+              <span class="text-xs mt-1">購物</span>
+            </button>
+            <button 
+              @click="currentScreen = 'checklist'"
+              :class="['flex flex-col items-center justify-center flex-1 h-full text-center', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']"
+            >
+              📝
+              <span class="text-xs mt-1">準備</span>
+            </button>
+            <button 
+              @click="currentScreen = 'members'"
+              :class="['flex flex-col items-center justify-center flex-1 h-full text-center', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']"
+            >
+              👥
+              <span class="text-xs mt-1">成員</span>
+            </button>
+          </div>
+        </nav>
       </div>
-
-      <!-- 底部導航欄（只在詳情及其他頁顯示）-->
-      <nav class="bottom-nav">
-        <div class="flex justify-around items-center overflow-x-auto">
-          <button @click="currentScreen = 'detail'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">✈️</span>
-            <span>行程</span>
-          </button>
-          <button @click="currentScreen = 'reservation'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'reservation' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">🎫</span>
-            <span>預約</span>
-          </button>
-          <button @click="currentScreen = 'expense'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'expense' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">💰</span>
-            <span>預算</span>
-          </button>
-          <button @click="currentScreen = 'shopping'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'shopping' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">🛍️</span>
-            <span>購物</span>
-          </button>
-          <button @click="currentScreen = 'checklist'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'checklist' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">✓</span>
-            <span>準備</span>
-          </button>
-          <button @click="currentScreen = 'members'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'members' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">👥</span>
-            <span>成員</span>
-          </button>
-          <button @click="currentScreen = 'settings'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'settings' ? 'nav-active' : 'text-gray-500']">
-            <span class="text-xl mb-1">⚙️</span>
-            <span>設定</span>
-          </button>
-        </div>
-      </nav>
     </template>
 
-    <!-- 新增/編輯行程表單 -->
+    <!-- 新增/編輯旅行表單 -->
     <div v-if="showAddForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-          {{ editingIndex >= 0 ? '編輯行程' : '新增旅行計劃' }} ✨
+          {{ editingTripIndex >= 0 ? '編輯旅行' : '新增旅行' }} ✨
         </h2>
         <form @submit.prevent="handleSaveTrip" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">旅行封面圖片</label>
-            <div class="relative">
-              <input type="file" accept="image/*" @change="handleImageChange" class="hidden" id="imageFileInput">
-              <button type="button" @click="openFilePicker" class="w-full p-4 border-2 border-dashed rounded-xl hover:bg-opacity-50 transition-all flex items-center justify-center gap-2 font-medium" :style="{ borderColor: '#E99D99', backgroundColor: '#FFFBF7', color: '#8B6B6B' }">
-                📷 點擊選擇圖片
-              </button>
-            </div>
-            <img v-if="formData.coverImage" :src="formData.coverImage" :alt="formData.title" class="image-preview">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">行程名稱</label>
-            <input v-model="formData.title" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：香港自由行">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
-            <select v-model="formData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-              <option value="">選擇目的地</option>
-              <option value="日本">日本 (¥ JPY)</option>
-              <option value="香港">香港 ($ HKD)</option>
-              <option value="台灣">台灣 (NT$ TWD)</option>
-              <option value="韓國">韓國 (₩ KRW)</option>
-              <option value="泰國">泰國 (฿ THB)</option>
-              <option value="新加坡">新加坡 ($ SGD)</option>
-              <option value="美國">美國 ($ USD)</option>
-              <option value="英國">英國 (£ GBP)</option>
-              <option value="法國">法國 (€ EUR)</option>
-              <option value="荷蘭">荷蘭 (€ EUR)</option>
-              <option value="瑞士">瑞士 (CHF CHF)</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
-            <input v-model="formData.startDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
-            <input v-model="formData.endDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
-            <textarea v-model="formData.description" rows="3" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none form-input" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="計劃中的亮點、注意事項..."></textarea>
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              💾 保存
-            </button>
-            <button type="button" @click="closeForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 編輯住宿表單 -->
-    <div v-if="showEditAccommodationForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-          編輯住宿 (Day {{ getCurrentDayNumber() }}) ✨
-        </h2>
-        <form @submit.prevent="handleSaveAccommodation" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">住宿名稱</label>
-            <input v-model="accommodationFormData.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：Shinjuku Hotel">
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 保存
-            </button>
-            <button type="button" @click="closeEditAccommodationForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 新增/編輯活動表單 -->
-    <div v-if="showAddActivityForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-          {{ editingActivityIndex >= 0 ? '編輯活動' : '新增活動/提醒' }} ✨
-        </h2>
-        <form @submit.prevent="handleSaveActivity" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">時間</label>
-            <input v-model="activityFormData.time" type="time" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">活動名稱</label>
-            <input v-model="activityFormData.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：逛街購物">
+            <label class="block text-sm font-medium text-gray-700 mb-2">旅行名稱</label>
+            <input 
+              v-model="formData.title" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：日本東京之旅"
+            >
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">地點</label>
-            <input v-model="activityFormData.location" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：銅鑼灣時代廣場">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">活動類型</label>
-            <select v-model="activityFormData.type" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-              <option value="sightseeing">景點遊覽</option>
-              <option value="food">飲食</option>
-              <option value="shopping">購物</option>
-              <option value="transport">交通</option>
-              <option value="accommodation">住宿</option>
-              <option value="relaxation">休閒</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea v-model="activityFormData.notes" rows="3" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="添加任何備註..."></textarea>
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              {{ editingActivityIndex >= 0 ? '✓ 更新' : '✓ 新增' }}
-            </button>
-            <button type="button" @click="closeAddActivityForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 預約類型選擇菜單 -->
-    <div v-if="showReservationTypeMenu" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">選擇預約類型 ✨</h2>
-        <div class="space-y-3">
-          <button @click="openFlightForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
-            <p class="font-semibold text-gray-800">✈️ 機票</p>
-            <p class="text-xs text-gray-600 mt-1">航班預訂資訊</p>
-          </button>
-          <button @click="openHotelForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
-            <p class="font-semibold text-gray-800">🏨 住宿</p>
-            <p class="text-xs text-gray-600 mt-1">酒店預訂資訊</p>
-          </button>
-          <button @click="openTicketForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
-            <p class="font-semibold text-gray-800">🎫 其他票券</p>
-            <p class="text-xs text-gray-600 mt-1">門票、演唱會等</p>
-          </button>
-          <button @click="showReservationTypeMenu = false" class="w-full p-4 border rounded-xl text-gray-700 font-bold" style="border-color: #E9D5C8; background-color: #E9D5C8;">
-            ❌ 取消
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 新增機票表單 -->
-    <div v-if="showFlightForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯機票' : '新增機票' }} ✈️</h2>
-        <form @submit.prevent="handleSaveFlight" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">航班編號</label>
-            <input v-model="flightForm.flightNumber" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：CX880">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">出發地點</label>
-            <input v-model="flightForm.departureLocation" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：香港">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
-            <input v-model="flightForm.arrivalLocation" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">登機時間</label>
-            <input v-model="flightForm.departureTime" type="datetime-local" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">到達時間</label>
-            <input v-model="flightForm.arrivalTime" type="datetime-local" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
-            <input type="file" accept="image/*" @change="handleFlightCertificate" class="w-full p-2 border rounded-xl" :style="{ borderColor: '#E9D5C8' }">
-            <img v-if="flightForm.certificate" :src="flightForm.certificate" :alt="flightForm.flightNumber" class="image-preview">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea v-model="flightForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 保存
-            </button>
-            <button type="button" @click="closeFlightForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 新增住宿表單 -->
-    <div v-if="showHotelForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯住宿' : '新增住宿' }} 🏨</h2>
-        <form @submit.prevent="handleSaveHotel" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">酒店名稱</label>
-            <input v-model="hotelForm.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：Shinjuku Hotel">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">酒店地址</label>
-            <input v-model="hotelForm.address" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京都新宿区...">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">入住日期</label>
-            <input v-model="hotelForm.checkInDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">退房日期</label>
-            <input v-model="hotelForm.checkOutDate" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">退房時間</label>
-            <input v-model="hotelForm.checkOutTime" type="time" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
-            <input type="file" accept="image/*" @change="handleHotelCertificate" class="w-full p-2 border rounded-xl" :style="{ borderColor: '#E9D5C8' }">
-            <img v-if="hotelForm.certificate" :src="hotelForm.certificate" :alt="hotelForm.name" class="image-preview">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea v-model="hotelForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 保存
-            </button>
-            <button type="button" @click="closeHotelForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 新增其他票券表單 -->
-    <div v-if="showTicketForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯票券' : '新增票券' }} 🎫</h2>
-        <form @submit.prevent="handleSaveTicket" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">票券名稱</label>
-            <input v-model="ticketForm.name" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京迪士尼樂園">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-            <input v-model="ticketForm.date" type="date" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">時間</label>
-            <input v-model="ticketForm.time" type="time" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
-            <input type="file" accept="image/*" @change="handleTicketCertificate" class="w-full p-2 border rounded-xl" :style="{ borderColor: '#E9D5C8' }">
-            <img v-if="ticketForm.certificate" :src="ticketForm.certificate" :alt="ticketForm.name" class="image-preview">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea v-model="ticketForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 保存
-            </button>
-            <button type="button" @click="closeTicketForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 設定預算表單 -->
-    <div v-if="showSetBudgetForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">設定預算 ✨</h2>
-        <form @submit.prevent="handleSetBudget" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">總預算 (HKD)</label>
             <input 
-              v-model.number="budgetFormData.totalBudget" 
-              type="number" 
+              v-model="formData.location" 
               required 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
-              @blur="$event.target.style.borderColor = '#E9D5C8'" 
-              placeholder="例如：10000"
-            >
-          </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 確定
-            </button>
-            <button type="button" @click="showSetBudgetForm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 新增支出表單 - 自動貨幣轉換版 -->
-    <div v-if="showAddExpenseForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">新增支出 ✨</h2>
-        <form @submit.prevent="handleAddExpense" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">支出項目</label>
-            <input 
-              v-model="expenseFormData.title" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
-              @blur="$event.target.style.borderColor = '#E9D5C8'" 
-              placeholder="例如：午餐"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-            <select 
-              v-model="expenseFormData.category" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：東京"
             >
-              <option value="">選擇分類</option>
-              <option value="food">🍽️ 餐飲</option>
-              <option value="attraction">🎫 景點</option>
-              <option value="shopping">🛍️ 紀念品</option>
-              <option value="transport">🚕 交通</option>
-              <option value="other">📌 其他</option>
-            </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              金額 <span class="expense-form-currency">{{ currentTripCurrency }}</span>
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">開始日期</label>
             <input 
-              v-model.number="expenseFormData.originalAmount" 
-              type="number" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
-              @blur="$event.target.style.borderColor = '#E9D5C8'" 
-              @input="updateExpenseConversion"
-              placeholder="輸入本地貨幣金額"
-            >
-            <div class="expense-form-conversion" v-if="expenseConversionHKD > 0">
-              ≈ HKD {{ expenseConversionHKD.toFixed(2) }}
-            </div>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-            <input 
-              v-model="expenseFormData.date" 
+              v-model="formData.startDate" 
               type="date" 
               required 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
             >
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea 
-              v-model="expenseFormData.notes" 
-              rows="2" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" 
+            <label class="block text-sm font-medium text-gray-700 mb-2">結束日期</label>
+            <input 
+              v-model="formData.endDate" 
+              type="date" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+            <textarea 
+              v-model="formData.description" 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：與朋友的海灘度假..."
+              rows="3"
             ></textarea>
           </div>
-          <div class="flex gap-3 pt-4">
-            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
-              ✓ 新增支出
-            </button>
-            <button type="button" @click="showAddExpenseForm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-              ❌ 取消
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- 新增/編輯購物項目表單 -->
-    <div v-if="showShoppingForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
-        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-          {{ editingShoppingIndex >= 0 ? '編輯購物項目' : '新增購物項目' }} ✨
-        </h2>
-        <form @submit.prevent="handleSaveShoppingItem" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">品名</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">封面圖片 (URL)</label>
             <input 
-              v-model="shoppingFormData.name" 
-              required 
+              v-model="formData.coverImage" 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="例如：朱古力、護膚品"
+              placeholder="https://example.com/image.jpg"
             >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">商店 / 備註</label>
-            <input 
-              v-model="shoppingFormData.shop" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="例如：Coop 超市 / 百佳"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-            <select 
-              v-model="shoppingFormData.category" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-            >
-              <option value="normal">一般</option>
-              <option value="important">重要</option>
-              <option value="snack">零食</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">圖片網址（選填）</label>
-            <input 
-              v-model="shoppingFormData.image" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="貼上產品圖片 URL"
-            >
+            <img v-if="formData.coverImage" :src="formData.coverImage" :alt="formData.title" class="image-preview">
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
               ✓ 保存
             </button>
-            <button type="button" @click="closeShoppingForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+            <button type="button" @click="closeAddForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
               ❌ 取消
             </button>
           </div>
@@ -2215,80 +1957,54 @@
       </div>
     </div>
 
-    <!-- 新增/編輯準備清單項目表單 -->
-    <div v-if="showChecklistForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <!-- 新增/編輯成員表單 -->
+    <div v-if="showMemberForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
-          {{ editingChecklistIndex >= 0 ? '編輯待辦項目' : '新增待辦項目' }} ✨
+          {{ editingMemberIndex >= 0 ? '編輯成員' : '新增成員' }} ✨
         </h2>
-        <form @submit.prevent="handleSaveChecklistItem" class="space-y-4">
+        <form @submit.prevent="handleSaveMember" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">項目名稱</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">名字</label>
             <input 
-              v-model="checklistFormData.name" 
+              v-model="memberFormData.name" 
               required 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="例如：帶車牌"
+              placeholder="例如：Miles Suen"
             >
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">子描述 / 備註</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">角色 / 備註</label>
             <input 
-              v-model="checklistFormData.subtitle" 
+              v-model="memberFormData.role" 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
-              placeholder="例如：4/1 1am 倫敦時間 Book: 21/11 11:30"
+              placeholder="例如：負責 sharon 錢相、找醫護員"
             >
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">日期（選填）</label>
-            <input 
-              v-model="checklistFormData.date" 
-              type="date"
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-            >
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">群組</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">性別 (用於頭像)</label>
             <select 
-              v-model="checklistFormData.group" 
-              required
+              v-model="memberFormData.gender" 
               class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
             >
-              <option value="待辦事項">待辦事項</option>
-              <option value="簽證">簽證</option>
-              <option value="保險">保險</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">標籤</label>
-            <select 
-              v-model="checklistFormData.tag" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
-              @focus="$event.target.style.borderColor = '#E99D99'"
-              @blur="$event.target.style.borderColor = '#E9D5C8'"
-            >
-              <option value="general">一般</option>
-              <option value="important">重要</option>
+              <option value="male">男孩</option>
+              <option value="female">女孩</option>
             </select>
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
               ✓ 保存
             </button>
-            <button type="button" @click="closeChecklistForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+            <button type="button" @click="closeMemberForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
               ❌ 取消
             </button>
           </div>
@@ -2296,80 +2012,110 @@
       </div>
     </div>
 
-    <!-- 刪除確認對話 -->
-    <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div class="cute-card rounded-3xl p-8 w-full max-w-sm" style="border-color:#E9D5C8;">
-        <h2 class="text-xl font-bold text-center mb-4 text-gray-800">確定刪除嗎？</h2>
-        <p class="text-center text-gray-600 mb-6">
-          {{ deleteType === 'trip' ? (trips[deletingIndex] ? trips[deletingIndex].title : '') : '此項目' }} 將被永久刪除
-        </p>
-        <div class="flex gap-3">
-          <button @click="handleConfirmDelete" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all" style="background-color: #E99D99;">
-            刪除
-          </button>
-          <button @click="showDeleteConfirm = false" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
-            取消
-          </button>
-        </div>
+    <!-- 新增付款表單 (為特定成員) -->
+    <div v-if="showPaymentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          新增付款 ({{ currentMember.name }}) ✨
+        </h2>
+        <form @submit.prevent="handleSavePayment" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">金額 (HKD)</label>
+            <input 
+              v-model.number="paymentFormData.amount" 
+              type="number" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：500"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+            <input 
+              v-model="paymentFormData.description" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：機票費用"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+            <input 
+              v-model="paymentFormData.date" 
+              type="date" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closePaymentForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 
   <script>
-    const { createApp, ref, watch, onMounted, computed } = Vue;
-
-    // 完整匯率數據 - 包含瑞士郎和歐羅
-    const currencyRates = {
-      '日本': { code: 'JPY', symbol: '¥', rate: 0.052 },
-      '香港': { code: 'HKD', symbol: '$', rate: 1 },
-      '台灣': { code: 'TWD', symbol: 'NT$', rate: 0.25 },
-      '韓國': { code: 'KRW', symbol: '₩', rate: 0.0055 },
-      '泰國': { code: 'THB', symbol: '฿', rate: 0.2 },
-      '新加坡': { code: 'SGD', symbol: '$', rate: 5.5 },
-      '美國': { code: 'USD', symbol: '$', rate: 7.8 },
-      '英國': { code: 'GBP', symbol: '£', rate: 9.8 },
-      '法國': { code: 'EUR', symbol: '€', rate: 8.5 },
-      '荷蘭': { code: 'EUR', symbol: '€', rate: 8.5 },
-      '瑞士': { code: 'CHF', symbol: 'CHF', rate: 8.8 }
-    };
+    const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
     createApp({
       setup() {
+        // 全局變數
         const trips = ref([]);
         const currentScreen = ref('home');
-        const showAddForm = ref(false);
-        const showAddActivityForm = ref(false);
-        const showEditAccommodationForm = ref(false);
-        const showDeleteConfirm = ref(false);
-        const showReservationTypeMenu = ref(false);
-        const showFlightForm = ref(false);
-        const showHotelForm = ref(false);
-        const showTicketForm = ref(false);
-        const showSetBudgetForm = ref(false);
-        const showAddExpenseForm = ref(false);
-        const showShoppingForm = ref(false);
-        const showChecklistForm = ref(false);
-        const editingIndex = ref(-1);
-        const selectedTripIndex = ref(0);
-        const deletingIndex = ref(-1);
-        const deleteType = ref('trip');
+        const currentTripIndex = ref(0);
         const selectedDateIndex = ref(0);
+        const showAddForm = ref(false);
+        const editingTripIndex = ref(-1);
         const activeActivityMenu = ref(-1);
-        const editingActivityIndex = ref(-1);
-        const editingReservationIndex = ref(-1);
-        const activeReservationMenu = ref(null);
-        const currencyAmount = ref(0);
-        const selectedExpenseCategory = ref('');
-        const expenseConversionHKD = ref(0);
-
-        const selectedShoppingFilter = ref('all');
-        const showShoppingFilterDropdown = ref(false);
+        const activeExpenseMenuIndex = ref(-1);
         const activeShoppingMenuIndex = ref(-1);
-        const editingShoppingIndex = ref(-1);
-
         const activeChecklistMenuIndex = ref(-1);
-        const editingChecklistIndex = ref(-1);
-        const editingChecklistGroup = ref('');
+        const showAddExpenseForm = ref(false);
+        const showSetBudgetForm = ref(false);
+        const showAddShoppingItemForm = ref(false);
+        const showAddChecklistItemForm = ref(false);
+        const showReservationTypeMenu = ref(false);
+        const activeReservationMenu = ref(null);
+        const filterExpenseCategory = ref('');
+        const showShoppingCategoryFilter = ref(false);
+        const filterShoppingCategory = ref('');
+        const totalBudget = ref(0);
+        const editingShoppingItemIndex = ref(-1);
+        const editingChecklistItemIndex = ref(-1);
+        const editingExpenseIndex = ref(-1);
+
+        // 成員相關變數
+        const showMemberForm = ref(false);
+        const showPaymentForm = ref(false);
+        const editingMemberIndex = ref(-1);
+        const activeMembersMenuIndex = ref(-1);
+        const currentMember = ref({});
+        const memberFormData = ref({
+          name: '',
+          role: '',
+          gender: 'male',
+          payments: []
+        });
+        const paymentFormData = ref({
+          amount: 0,
+          description: '',
+          date: new Date().toISOString().split('T')[0]
+        });
 
         const formData = ref({
           title: '',
@@ -2378,260 +2124,249 @@
           endDate: '',
           description: '',
           coverImage: '',
-          itinerary: [],
-          accommodations: {},
+          dates: [],
+          accommodations: [],
+          activities: [],
+          weather: [],
           reservations: { flights: [], hotels: [], tickets: [] },
-          currency: '',
-          totalBudget: 0,
           expenses: [],
-          shoppingList: [],
-          checklist: []
+          shoppingItems: [],
+          checklistItems: [],
+          members: []
         });
 
-        const budgetFormData = ref({
-          totalBudget: 0
+        // Computed Properties
+        const currentTripData = computed(() => {
+          return trips.value[currentTripIndex.value] || {
+            title: '',
+            location: '',
+            startDate: '',
+            endDate: '',
+            description: '',
+            coverImage: '',
+            dates: [],
+            accommodations: [],
+            activities: [],
+            weather: [],
+            reservations: { flights: [], hotels: [], tickets: [] },
+            expenses: [],
+            shoppingItems: [],
+            checklistItems: [],
+            members: []
+          };
         });
 
-        const expenseFormData = ref({
-          title: '',
-          category: '',
-          originalAmount: 0,
-          amountHKD: 0,
-          originalCurrency: '',
-          date: new Date().toISOString().split('T')[0],
-          notes: ''
-        });
-
-        const accommodationFormData = ref({
-          name: ''
-        });
-
-        const activityFormData = ref({
-          time: '',
-          name: '',
-          location: '',
-          type: 'sightseeing',
-          notes: ''
-        });
-
-        const flightForm = ref({
-          flightNumber: '',
-          departureLocation: '',
-          arrivalLocation: '',
-          departureTime: '',
-          arrivalTime: '',
-          certificate: '',
-          notes: ''
-        });
-
-        const hotelForm = ref({
-          name: '',
-          address: '',
-          checkInDate: '',
-          checkOutDate: '',
-          checkOutTime: '',
-          certificate: '',
-          notes: ''
-        });
-
-        const ticketForm = ref({
-          name: '',
-          date: '',
-          time: '',
-          certificate: '',
-          notes: ''
-        });
-
-        const shoppingFormData = ref({
-          name: '',
-          shop: '',
-          category: 'normal',
-          image: '',
-          purchased: false
-        });
-
-        const checklistFormData = ref({
-          name: '',
-          subtitle: '',
-          date: '',
-          group: '待辦事項',
-          tag: 'general',
-          completed: false
-        });
-
-        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-        const weekdayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-        const countryWeatherData = {
-          '日本': { sunny: { icon: '☀️', temp: 28, feelsLike: 30, description: '晴朗溫暖' }, cloudy: { icon: '☁️', temp: 22, feelsLike: 20, description: '多雲天氣' }, rainy: { icon: '🌧️', temp: 18, feelsLike: 15, description: '有雨預報' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' } },
-          '香港': { sunny: { icon: '☀️', temp: 32, feelsLike: 35, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 28, feelsLike: 30, description: '多雲溫暖' }, rainy: { icon: '🌧️', temp: 24, feelsLike: 22, description: '有雨預報' }, snowy: { icon: '❄️', temp: 15, feelsLike: 12, description: '罕見寒冷' } },
-          '台灣': { sunny: { icon: '☀️', temp: 30, feelsLike: 32, description: '晴朗溫暖' }, cloudy: { icon: '☁️', temp: 26, feelsLike: 25, description: '多雲舒適' }, rainy: { icon: '🌧️', temp: 22, feelsLike: 20, description: '有雨預報' }, snowy: { icon: '❄️', temp: 10, feelsLike: 8, description: '罕見寒冷' } },
-          '韓國': { sunny: { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' }, cloudy: { icon: '☁️', temp: 18, feelsLike: 17, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '冰雪寒冷' } },
-          '泰國': { sunny: { icon: '☀️', temp: 35, feelsLike: 38, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 32, feelsLike: 34, description: '多雲炎熱' }, rainy: { icon: '🌧️', temp: 28, feelsLike: 30, description: '雨季潮濕' }, snowy: { icon: '❄️', temp: 20, feelsLike: 18, description: '少見涼爽' } },
-          '新加坡': { sunny: { icon: '☀️', temp: 33, feelsLike: 36, description: '炎熱晴朗' }, cloudy: { icon: '☁️', temp: 30, feelsLike: 32, description: '多雲炎熱' }, rainy: { icon: '🌧️', temp: 28, feelsLike: 30, description: '多雨潮濕' }, snowy: { icon: '❄️', temp: 22, feelsLike: 20, description: '罕見涼爽' } },
-          '美國': { sunny: { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' }, cloudy: { icon: '☁️', temp: 18, feelsLike: 17, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 14, feelsLike: 12, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '冰雪寒冷' } },
-          '英國': { sunny: { icon: '☀️', temp: 20, feelsLike: 18, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 15, feelsLike: 13, description: '多雲寒冷' }, rainy: { icon: '🌧️', temp: 12, feelsLike: 10, description: '多雨陰濕' }, snowy: { icon: '❄️', temp: 0, feelsLike: -3, description: '偶有降雪' } },
-          '法國': { sunny: { icon: '☀️', temp: 23, feelsLike: 22, description: '晴朗舒適' }, cloudy: { icon: '☁️', temp: 17, feelsLike: 15, description: '多雲涼爽' }, rainy: { icon: '🌧️', temp: 13, feelsLike: 11, description: '有雨預報' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '冰凍寒冷' } },
-          '荷蘭': { sunny: { icon: '☀️', temp: 18, feelsLike: 16, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 13, feelsLike: 11, description: '多雲潮濕' }, rainy: { icon: '🌧️', temp: 10, feelsLike: 8, description: '多雨潮濕' }, snowy: { icon: '❄️', temp: -2, feelsLike: -5, description: '偶有降雪' } },
-          '瑞士': { sunny: { icon: '☀️', temp: 15, feelsLike: 13, description: '晴朗涼爽' }, cloudy: { icon: '☁️', temp: 10, feelsLike: 8, description: '多雲寒冷' }, rainy: { icon: '🌧️', temp: 7, feelsLike: 5, description: '有雨預報' }, snowy: { icon: '❄️', temp: -5, feelsLike: -8, description: '山區降雪' } }
-        };
-
-        const exchangeRate = computed(() => {
-          const location = currentTripData.value.location;
-          return currencyRates[location]?.rate || 1;
-        });
-
-        const convertedAmount = computed(() => {
-          return (currencyAmount.value * exchangeRate.value).toFixed(2);
-        });
-
-        const currentTripCurrency = computed(() => {
-          const location = currentTripData.value.location;
-          return currencyRates[location]?.code || 'HKD';
-        });
-
-        const formatDateRangeEnglish = (dates) => {
-          if (Array.isArray(dates) && dates.length >= 2) {
-            const startDate = new Date(dates[0]);
-            const endDate = new Date(dates[dates.length - 1]);
-            const startMonth = monthNames[startDate.getMonth()];
-            const startDay = startDate.getDate();
-            const endMonth = monthNames[endDate.getMonth()];
-            const endDay = endDate.getDate();
-            const year = endDate.getFullYear();
-            return `${startMonth} ${startDay} - ${endMonth} ${endDay} ${year}`;
+        const dateOptions = computed(() => {
+          const options = [];
+          const startDate = new Date(currentTripData.value.startDate);
+          const endDate = new Date(currentTripData.value.endDate);
+          
+          for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+            const date = new Date(d);
+            const weekday = ['日', '一', '二', '三', '四', '五', '六'][date.getDay()];
+            const day = date.getDate();
+            options.push({ date: date.toISOString().split('T')[0], weekday, day });
           }
-          return dates;
+          
+          return options;
+        });
+
+        const currentSelectedDateLabel = computed(() => {
+          if (dateOptions.value.length === 0) return '';
+          const selected = dateOptions.value[selectedDateIndex.value];
+          return `${selected.date} (星期${selected.weekday})`;
+        });
+
+        const countdownDays = computed(() => {
+          const startDate = new Date(currentTripData.value.startDate);
+          const today = new Date();
+          const diffTime = startDate - today;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          return diffDays;
+        });
+
+        const countdownDaysText = computed(() => {
+          const days = countdownDays.value;
+          if (days > 0) return days;
+          if (days === 0) return '今天!';
+          return Math.abs(days);
+        });
+
+        const countdownProgress = computed(() => {
+          const startDate = new Date(currentTripData.value.startDate);
+          const endDate = new Date(currentTripData.value.endDate);
+          const today = new Date();
+          
+          const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+          const passedDays = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24));
+          
+          const progress = Math.min((passedDays / totalDays) * 100, 100);
+          return Math.max(progress, 0);
+        });
+
+        const membersList = computed(() => currentTripData.value.members || []);
+
+        const totalMembersCount = computed(() => membersList.value.length);
+
+        const totalPayments = computed(() => {
+          return membersList.value.reduce((sum, member) => sum + getMemberTotalPayment(member), 0);
+        });
+
+        const perPersonShare = computed(() => {
+          const totalExpense = getTotalExpense();
+          const memberCount = totalMembersCount.value;
+          return memberCount > 0 ? totalExpense / memberCount : 0;
+        });
+
+        const shoppingItems = computed(() => currentTripData.value.shoppingItems || []);
+        const checklistItems = computed(() => currentTripData.value.checklistItems || []);
+
+        // Methods
+        const formatDateRangeEnglish = (dates) => {
+          if (!dates || dates.length === 0) return '';
+          return `${dates[0]} ~ ${dates[dates.length - 1]}`;
         };
 
         const formatDateDisplay = (dateStr) => {
           if (!dateStr) return '';
-          const d = new Date(dateStr);
-          if (isNaN(d)) return dateStr;
-          return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+          const date = new Date(dateStr);
+          return date.toLocaleDateString('zh-HK', { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' });
         };
 
-        const formatTimeOnly = (dateTimeStr) => {
-          if (!dateTimeStr) return '';
-          const d = new Date(dateTimeStr);
-          return d.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit' });
+        const formatDateOnly = (dateStr) => {
+          if (!dateStr) return '';
+          const date = new Date(dateStr);
+          return date.toLocaleDateString('zh-HK', { month: '2-digit', day: '2-digit' });
         };
 
-        const formatDateOnly = (dateTimeStr) => {
-          if (!dateTimeStr) return '';
-          const d = new Date(dateTimeStr);
-          const month = String(d.getMonth() + 1).padStart(2, '0');
-          const date = String(d.getDate()).padStart(2, '0');
-          return `${d.getFullYear()}-${month}-${date}`;
-        };
-
-        const formatCurrency = (amount) => {
-          return amount.toLocaleString('zh-HK', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-          });
+        const formatTimeOnly = (dateStr) => {
+          if (!dateStr) return '';
+          const date = new Date(dateStr);
+          return date.toLocaleTimeString('zh-HK', { hour: '2-digit', minute: '2-digit', hour12: false });
         };
 
         const calculateDays = (dates) => {
-          if (Array.isArray(dates) && dates.length >= 2) {
-            const start = new Date(dates[0]);
-            const end = new Date(dates[dates.length - 1]);
-            return Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-          }
-          return 0;
+          if (!dates || dates.length === 0) return 0;
+          const startDate = new Date(dates[0]);
+          const endDate = new Date(dates[dates.length - 1]);
+          return Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        };
+
+        const getCurrentDayNumber = () => {
+          const selected = dateOptions.value[selectedDateIndex.value];
+          if (!selected) return 0;
+          return selectedDateIndex.value + 1;
+        };
+
+        const getCurrentDayWeather = () => {
+          const selected = dateOptions.value[selectedDateIndex.value];
+          if (!selected) return { icon: '☁️', temp: '-', feelsLike: '-', description: '無氣象資料' };
+          const weatherData = currentTripData.value.weather || [];
+          return weatherData[selectedDateIndex.value] || { icon: '☁️', temp: 20, feelsLike: 18, description: '未知' };
+        };
+
+        const getCurrentDayActivities = () => {
+          const selected = dateOptions.value[selectedDateIndex.value];
+          if (!selected) return [];
+          const activities = currentTripData.value.activities || [];
+          return activities.filter(a => a.date === selected.date);
+        };
+
+        const getCurrentDayAccommodation = () => {
+          const selected = dateOptions.value[selectedDateIndex.value];
+          if (!selected) return null;
+          const accommodations = currentTripData.value.accommodations || [];
+          return accommodations.find(a => a.startDate <= selected.date && selected.date <= a.endDate);
+        };
+
+        const getActivityIcon = (type) => {
+          const icons = {
+            transport: '🚗',
+            food: '🍽️',
+            activity: '🎉',
+            shopping: '🛍️',
+            rest: '😴'
+          };
+          return icons[type] || '📍';
+        };
+
+        const formatCurrency = (amount) => {
+          if (amount === undefined || amount === null) return 'HKD 0';
+          return 'HKD ' + amount.toFixed(2);
         };
 
         const getTotalExpense = () => {
-          return (currentTripData.value.expenses || []).reduce((sum, exp) => sum + exp.amountHKD, 0);
-        };
-
-        const getRemainingBudget = () => {
-          return currentTripData.value.totalBudget - getTotalExpense();
+          const expenses = currentTripData.value.expenses || [];
+          return expenses.reduce((sum, e) => sum + (e.convertedAmount || e.amount), 0);
         };
 
         const getBudgetPercentage = () => {
-          if (currentTripData.value.totalBudget === 0) return 0;
-          return Math.min((getTotalExpense() / currentTripData.value.totalBudget) * 100, 100);
+          if (totalBudget.value === 0) return 0;
+          return (getTotalExpense() / totalBudget.value) * 100;
         };
 
-        const getCategoryLabel = (category) => {
+        const getExpenseCategoryLabel = (category) => {
           const labels = {
-            'food': '🍽️ 餐飲',
-            'attraction': '🎫 景點',
-            'shopping': '🛍️ 紀念品',
-            'transport': '🚕 交通',
-            'other': '📌 其他'
+            accommodation: '🏨 住宿',
+            food: '🍽️ 飲食',
+            transport: '🚗 交通',
+            activity: '🎉 活動',
+            shopping: '🛍️ 購物',
+            other: '📝 其他'
           };
           return labels[category] || category;
         };
 
         const getFilteredExpenses = () => {
           const expenses = currentTripData.value.expenses || [];
-          if (!selectedExpenseCategory.value) return expenses;
-          return expenses.filter(exp => exp.category === selectedExpenseCategory.value);
+          if (!filterExpenseCategory.value) return expenses;
+          return expenses.filter(e => e.category === filterExpenseCategory.value);
         };
 
-        const updateExpenseConversion = () => {
-          const rate = exchangeRate.value;
-          expenseConversionHKD.value = expenseFormData.value.originalAmount * rate;
+        const getCompletedShoppingCount = () => {
+          return shoppingItems.value.filter(item => item.completed).length;
         };
 
-        const openFilePicker = () => {
-          const fileInput = document.getElementById('imageFileInput');
-          if (fileInput) {
-            fileInput.click();
-          }
+        const getUncompletedShoppingCount = () => {
+          return shoppingItems.value.filter(item => !item.completed).length;
         };
 
-        const handleImageChange = (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              formData.value.coverImage = e.target.result;
-            };
-            reader.readAsDataURL(file);
-          }
-          if (event.target) {
-            event.target.value = '';
-          }
+        const getFilteredShoppingItems = () => {
+          if (!filterShoppingCategory.value) return shoppingItems.value;
+          return shoppingItems.value.filter(item => item.category === filterShoppingCategory.value);
         };
 
-        const handleFlightCertificate = (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              flightForm.value.certificate = e.target.result;
-            };
-            reader.readAsDataURL(file);
-          }
+        const getCompletedChecklistCount = () => {
+          return checklistItems.value.filter(item => item.completed).length;
         };
 
-        const handleHotelCertificate = (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              hotelForm.value.certificate = e.target.result;
-            };
-            reader.readAsDataURL(file);
-          }
+        const getUncompletedChecklistCount = () => {
+          return checklistItems.value.filter(item => !item.completed).length;
         };
 
-        const handleTicketCertificate = (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              ticketForm.value.certificate = e.target.result;
-            };
-            reader.readAsDataURL(file);
-          }
+        const getMemberTotalPayment = (member) => {
+          return (member.payments || []).reduce((sum, pay) => sum + pay.amount, 0);
+        };
+
+        const getSettlementAmount = (member) => {
+          return getMemberTotalPayment(member) - perPersonShare.value;
+        };
+
+        const getSettlementText = (amount) => {
+          if (amount > 0) return `+${formatCurrency(amount)} (多付)`;
+          if (amount < 0) return `${formatCurrency(amount)} (欠)`;
+          return '0 (平衡)';
+        };
+
+        const getSettlementClass = (amount) => {
+          if (amount > 0) return 'settlement-positive';
+          if (amount < 0) return 'settlement-negative';
+          return '';
         };
 
         const openAddForm = () => {
-          editingIndex.value = -1;
+          showAddForm.value = true;
+          editingTripIndex.value = -1;
           formData.value = {
             title: '',
             location: '',
@@ -2639,107 +2374,131 @@
             endDate: '',
             description: '',
             coverImage: '',
-            itinerary: [],
-            accommodations: {},
+            dates: [],
+            accommodations: [],
+            activities: [],
+            weather: [],
             reservations: { flights: [], hotels: [], tickets: [] },
-            currency: '',
-            totalBudget: 0,
             expenses: [],
-            shoppingList: [],
-            checklist: []
+            shoppingItems: [],
+            checklistItems: [],
+            members: []
+          };
+        };
+
+        const closeAddForm = () => {
+          showAddForm.value = false;
+        };
+
+        const handleSaveTrip = () => {
+          if (!formData.value.title || !formData.value.location || !formData.value.startDate || !formData.value.endDate) {
+            alert('請填寫所有必填項目');
+            return;
+          }
+
+          const newTrip = {
+            title: formData.value.title,
+            location: formData.value.location,
+            startDate: formData.value.startDate,
+            endDate: formData.value.endDate,
+            description: formData.value.description,
+            coverImage: formData.value.coverImage,
+            dates: [formData.value.startDate, formData.value.endDate],
+            accommodations: formData.value.accommodations || [],
+            activities: formData.value.activities || [],
+            weather: formData.value.weather || [],
+            reservations: formData.value.reservations || { flights: [], hotels: [], tickets: [] },
+            expenses: formData.value.expenses || [],
+            shoppingItems: formData.value.shoppingItems || [],
+            checklistItems: formData.value.checklistItems || [],
+            members: JSON.parse(JSON.stringify(formData.value.members || []))
+          };
+
+          if (editingTripIndex.value >= 0) {
+            trips.value.splice(editingTripIndex.value, 1, newTrip);
+          } else {
+            trips.value.push(newTrip);
+          }
+
+          closeAddForm();
+        };
+
+        const editTrip = (index) => {
+          editingTripIndex.value = index;
+          const trip = trips.value[index];
+          formData.value = {
+            title: trip.title,
+            location: trip.location,
+            startDate: trip.startDate,
+            endDate: trip.endDate,
+            description: trip.description,
+            coverImage: trip.coverImage,
+            dates: trip.dates || [],
+            accommodations: trip.accommodations || [],
+            activities: trip.activities || [],
+            weather: trip.weather || [],
+            reservations: trip.reservations || { flights: [], hotels: [], tickets: [] },
+            expenses: trip.expenses || [],
+            shoppingItems: trip.shoppingItems || [],
+            checklistItems: trip.checklistItems || [],
+            members: JSON.parse(JSON.stringify(trip.members || []))
           };
           showAddForm.value = true;
         };
 
-        const closeForm = () => {
-          showAddForm.value = false;
-          formData.value = {
-            title: '',
-            location: '',
-            startDate: '',
-            endDate: '',
-            description: '',
-            coverImage: '',
-            itinerary: [],
-            accommodations: {},
-            reservations: { flights: [], hotels: [], tickets: [] },
-            currency: '',
-            totalBudget: 0,
-            expenses: [],
-            shoppingList: [],
-            checklist: []
-          };
-          editingIndex.value = -1;
-          const fileInput = document.getElementById('imageFileInput');
-          if (fileInput) {
-            fileInput.value = '';
+        const confirmDeleteTrip = (index) => {
+          if (confirm('確定要刪除此旅行計劃嗎？')) {
+            trips.value.splice(index, 1);
           }
         };
 
-        const openAddActivityForm = () => {
-          editingActivityIndex.value = -1;
-          activityFormData.value = {
-            time: '',
-            name: '',
-            location: '',
-            type: 'sightseeing',
-            notes: ''
-          };
-          showAddActivityForm.value = true;
-          activeActivityMenu.value = -1;
+        const enterTrip = (index) => {
+          currentTripIndex.value = index;
+          currentScreen.value = 'detail';
+          selectedDateIndex.value = 0;
+          totalBudget.value = 0;
         };
 
-        const closeAddActivityForm = () => {
-          showAddActivityForm.value = false;
-          activityFormData.value = {
-            time: '',
-            name: '',
-            location: '',
-            type: 'sightseeing',
-            notes: ''
-          };
-          editingActivityIndex.value = -1;
+        const backToHome = () => {
+          currentScreen.value = 'home';
         };
 
         const openActivityMenu = (idx) => {
           activeActivityMenu.value = activeActivityMenu.value === idx ? -1 : idx;
         };
 
-        const openEditActivityForm = (idx) => {
-          const activity = getCurrentDayActivities()[idx];
-          activityFormData.value = {
-            time: activity.time,
-            name: activity.name,
-            location: activity.location,
-            type: activity.type,
-            notes: activity.notes || ''
-          };
-          editingActivityIndex.value = idx;
-          showAddActivityForm.value = true;
-          activeActivityMenu.value = -1;
+        const openAddActivityForm = () => {
+          alert('開發中...');
         };
 
-        const confirmDeleteTrip = (index) => {
-          deletingIndex.value = index;
-          deleteType.value = 'trip';
-          showDeleteConfirm.value = true;
+        const openEditActivityForm = (idx) => {
+          alert('開發中...');
         };
 
         const confirmDeleteActivity = (idx) => {
-          deletingIndex.value = idx;
-          deleteType.value = 'activity';
-          showDeleteConfirm.value = true;
+          if (confirm('確定要刪除此活動嗎？')) {
+            currentTripData.value.activities.splice(idx, 1);
+            activeActivityMenu.value = -1;
+          }
         };
 
         const openEditAccommodationForm = () => {
-          const currentAccom = getCurrentDayAccommodation();
-          accommodationFormData.value.name = currentAccom?.name || '';
-          showEditAccommodationForm.value = true;
+          alert('開發中...');
         };
 
-        const closeEditAccommodationForm = () => {
-          showEditAccommodationForm.value = false;
-          accommodationFormData.value.name = '';
+        const openExpenseMenu = (idx) => {
+          activeExpenseMenuIndex.value = activeExpenseMenuIndex.value === idx ? -1 : idx;
+        };
+
+        const editExpense = (idx) => {
+          alert('開發中...');
+        };
+
+        const deleteExpense = (idx) => {
+          if (confirm('確定要刪除此支出嗎？')) {
+            currentTripData.value.expenses.splice(idx, 1);
+            activeExpenseMenuIndex.value = -1;
+          }
         };
 
         const openReservationMenu = (type, idx) => {
@@ -2750,856 +2509,296 @@
           }
         };
 
-        const openFlightForm = () => {
-          editingReservationIndex.value = -1;
-          flightForm.value = {
-            flightNumber: '',
-            departureLocation: '',
-            arrivalLocation: '',
-            departureTime: '',
-            arrivalTime: '',
-            certificate: '',
-            notes: ''
-          };
-          showFlightForm.value = true;
-          showReservationTypeMenu.value = false;
-        };
-
-        const closeFlightForm = () => {
-          showFlightForm.value = false;
-          editingReservationIndex.value = -1;
-        };
-
-        const openHotelForm = () => {
-          editingReservationIndex.value = -1;
-          hotelForm.value = {
-            name: '',
-            address: '',
-            checkInDate: '',
-            checkOutDate: '',
-            checkOutTime: '',
-            certificate: '',
-            notes: ''
-          };
-          showHotelForm.value = true;
-          showReservationTypeMenu.value = false;
-        };
-
-        const closeHotelForm = () => {
-          showHotelForm.value = false;
-          editingReservationIndex.value = -1;
-        };
-
-        const openTicketForm = () => {
-          editingReservationIndex.value = -1;
-          ticketForm.value = {
-            name: '',
-            date: '',
-            time: '',
-            certificate: '',
-            notes: ''
-          };
-          showTicketForm.value = true;
-          showReservationTypeMenu.value = false;
-        };
-
-        const closeTicketForm = () => {
-          showTicketForm.value = false;
-          editingReservationIndex.value = -1;
-        };
-
         const editReservation = (type, idx) => {
-          editingReservationIndex.value = idx;
-          if (type === 'flight') {
-            const flight = currentTripData.value.reservations.flights[idx];
-            flightForm.value = JSON.parse(JSON.stringify(flight));
-            showFlightForm.value = true;
-          } else if (type === 'hotel') {
-            const hotel = currentTripData.value.reservations.hotels[idx];
-            hotelForm.value = JSON.parse(JSON.stringify(hotel));
-            showHotelForm.value = true;
-          } else if (type === 'ticket') {
-            const ticket = currentTripData.value.reservations.tickets[idx];
-            ticketForm.value = JSON.parse(JSON.stringify(ticket));
-            showTicketForm.value = true;
-          }
-          activeReservationMenu.value = null;
+          alert('開發中...');
         };
 
         const deleteReservation = (type, idx) => {
-          if (type === 'flight') {
-            currentTripData.value.reservations.flights.splice(idx, 1);
-          } else if (type === 'hotel') {
-            currentTripData.value.reservations.hotels.splice(idx, 1);
-          } else if (type === 'ticket') {
-            currentTripData.value.reservations.tickets.splice(idx, 1);
-          }
-          activeReservationMenu.value = null;
-        };
-
-        const deleteExpense = (idx) => {
-          const expenses = currentTripData.value.expenses || [];
-          expenses.splice(idx, 1);
-        };
-
-        const handleSaveFlight = () => {
-          if (!flightForm.value.flightNumber || !flightForm.value.departureLocation || !flightForm.value.arrivalLocation || !flightForm.value.departureTime || !flightForm.value.arrivalTime) {
-            alert('請填寫所有必填欄位');
-            return;
-          }
-
-          if (!currentTripData.value.reservations) {
-            currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
-          }
-
-          if (editingReservationIndex.value >= 0) {
-            currentTripData.value.reservations.flights[editingReservationIndex.value] = JSON.parse(JSON.stringify(flightForm.value));
-          } else {
-            currentTripData.value.reservations.flights.push(JSON.parse(JSON.stringify(flightForm.value)));
-          }
-
-          closeFlightForm();
-        };
-
-        const handleSaveHotel = () => {
-          if (!hotelForm.value.name || !hotelForm.value.address || !hotelForm.value.checkInDate || !hotelForm.value.checkOutDate) {
-            alert('請填寫所有必填欄位');
-            return;
-          }
-
-          if (!currentTripData.value.reservations) {
-            currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
-          }
-
-          if (editingReservationIndex.value >= 0) {
-            currentTripData.value.reservations.hotels[editingReservationIndex.value] = JSON.parse(JSON.stringify(hotelForm.value));
-          } else {
-            currentTripData.value.reservations.hotels.push(JSON.parse(JSON.stringify(hotelForm.value)));
-          }
-
-          closeHotelForm();
-        };
-
-        const handleSaveTicket = () => {
-          if (!ticketForm.value.name || !ticketForm.value.date || !ticketForm.value.time) {
-            alert('請填寫所有必填欄位');
-            return;
-          }
-
-          if (!currentTripData.value.reservations) {
-            currentTripData.value.reservations = { flights: [], hotels: [], tickets: [] };
-          }
-
-          if (editingReservationIndex.value >= 0) {
-            currentTripData.value.reservations.tickets[editingReservationIndex.value] = JSON.parse(JSON.stringify(ticketForm.value));
-          } else {
-            currentTripData.value.reservations.tickets.push(JSON.parse(JSON.stringify(ticketForm.value)));
-          }
-
-          closeTicketForm();
-        };
-
-        const handleSaveActivity = () => {
-          if (!activityFormData.value.time || !activityFormData.value.name || !activityFormData.value.location) {
-            alert('請填寫所有必填欄位');
-            return;
-          }
-
-          const dayNum = getCurrentDayNumber();
-          if (!trips.value[selectedTripIndex.value].itinerary) {
-            trips.value[selectedTripIndex.value].itinerary = [];
-          }
-
-          if (editingActivityIndex.value >= 0) {
-            const activities = getCurrentDayActivities();
-            const activity = activities[editingActivityIndex.value];
-            activity.time = activityFormData.value.time;
-            activity.name = activityFormData.value.name;
-            activity.type = activityFormData.value.type;
-            activity.location = activityFormData.value.location;
-            activity.notes = activityFormData.value.notes;
-          } else {
-            trips.value[selectedTripIndex.value].itinerary.push({
-              day: dayNum,
-              time: activityFormData.value.time,
-              name: activityFormData.value.name,
-              type: activityFormData.value.type,
-              location: activityFormData.value.location,
-              notes: activityFormData.value.notes
-            });
-          }
-
-          closeAddActivityForm();
-        };
-
-        const handleSaveAccommodation = () => {
-          if (!accommodationFormData.value.name) {
-            alert('請填寫住宿名稱');
-            return;
-          }
-
-          const dayNum = getCurrentDayNumber();
-          if (!trips.value[selectedTripIndex.value].accommodations) {
-            trips.value[selectedTripIndex.value].accommodations = {};
-          }
-
-          trips.value[selectedTripIndex.value].accommodations[dayNum] = {
-            name: accommodationFormData.value.name
+          const types = {
+            flight: 'flights',
+            hotel: 'hotels',
+            ticket: 'tickets'
           };
-
-          closeEditAccommodationForm();
-        };
-
-        const handleSetBudget = () => {
-          if (budgetFormData.value.totalBudget <= 0) {
-            alert('請輸入有效金額');
-            return;
+          const key = types[type];
+          if (confirm('確定要刪除此預約嗎？')) {
+            currentTripData.value.reservations[key].splice(idx, 1);
+            activeReservationMenu.value = null;
           }
-
-          currentTripData.value.totalBudget = budgetFormData.value.totalBudget;
-          showSetBudgetForm.value = false;
         };
 
-        const handleAddExpense = () => {
-          if (!expenseFormData.value.title || !expenseFormData.value.category || expenseFormData.value.originalAmount <= 0) {
-            alert('請填寫所有必填欄位');
-            return;
+        const toggleShoppingItemCompletion = (idx) => {
+          const allItems = currentTripData.value.shoppingItems || [];
+          const filtered = getFilteredShoppingItems();
+          const originalIndex = allItems.indexOf(filtered[idx]);
+          if (originalIndex >= 0) {
+            allItems[originalIndex].completed = !allItems[originalIndex].completed;
           }
-
-          if (!currentTripData.value.expenses) {
-            currentTripData.value.expenses = [];
-          }
-
-          currentTripData.value.expenses.push({
-            title: expenseFormData.value.title,
-            category: expenseFormData.value.category,
-            originalAmount: expenseFormData.value.originalAmount,
-            amountHKD: expenseConversionHKD.value,
-            originalCurrency: currentTripCurrency.value,
-            date: expenseFormData.value.date,
-            notes: expenseFormData.value.notes
-          });
-
-          expenseFormData.value = {
-            title: '',
-            category: '',
-            originalAmount: 0,
-            amountHKD: 0,
-            originalCurrency: '',
-            date: new Date().toISOString().split('T')[0],
-            notes: ''
-          };
-          expenseConversionHKD.value = 0;
-          showAddExpenseForm.value = false;
-        };
-
-        // 購物清單相關
-        const openShoppingForm = (item = null, index = -1) => {
-          if (item) {
-            shoppingFormData.value = {
-              name: item.name,
-              shop: item.shop || '',
-              category: item.category || 'normal',
-              image: item.image || '',
-              purchased: item.purchased || false
-            };
-            editingShoppingIndex.value = index;
-          } else {
-            shoppingFormData.value = {
-              name: '',
-              shop: '',
-              category: 'normal',
-              image: '',
-              purchased: false
-            };
-            editingShoppingIndex.value = -1;
-          }
-          showShoppingForm.value = true;
-          activeShoppingMenuIndex.value = -1;
-        };
-
-        const closeShoppingForm = () => {
-          showShoppingForm.value = false;
-          shoppingFormData.value = {
-            name: '',
-            shop: '',
-            category: 'normal',
-            image: '',
-            purchased: false
-          };
-          editingShoppingIndex.value = -1;
-        };
-
-        const handleSaveShoppingItem = () => {
-          if (!shoppingFormData.value.name) {
-            alert('請輸入品名');
-            return;
-          }
-
-          if (!currentTripData.value.shoppingList) {
-            currentTripData.value.shoppingList = [];
-          }
-
-          const newItem = {
-            name: shoppingFormData.value.name,
-            shop: shoppingFormData.value.shop,
-            category: shoppingFormData.value.category || 'normal',
-            image: shoppingFormData.value.image,
-            purchased: shoppingFormData.value.purchased || false
-          };
-
-          if (editingShoppingIndex.value >= 0) {
-            currentTripData.value.shoppingList.splice(editingShoppingIndex.value, 1, newItem);
-          } else {
-            currentTripData.value.shoppingList.push(newItem);
-          }
-
-          closeShoppingForm();
-        };
-
-        const deleteShoppingItem = (index) => {
-          if (!currentTripData.value.shoppingList) return;
-          currentTripData.value.shoppingList.splice(index, 1);
-          activeShoppingMenuIndex.value = -1;
-        };
-
-        const toggleShoppingItemPurchased = (item) => {
-          item.purchased = !item.purchased;
-        };
-
-        const toggleShoppingFilterDropdown = () => {
-          showShoppingFilterDropdown.value = !showShoppingFilterDropdown.value;
-        };
-
-        const setShoppingFilter = (filter) => {
-          selectedShoppingFilter.value = filter;
-          showShoppingFilterDropdown.value = false;
         };
 
         const toggleShoppingMenu = (idx) => {
           activeShoppingMenuIndex.value = activeShoppingMenuIndex.value === idx ? -1 : idx;
         };
 
-        // 準備清單相關
-        const openChecklistForm = (item = null, index = -1, group = '') => {
-          if (item) {
-            checklistFormData.value = {
-              name: item.name,
-              subtitle: item.subtitle || '',
-              date: item.date || '',
-              group: item.group || '待辦事項',
-              tag: item.tag || 'general',
-              completed: item.completed || false
+        const editShoppingItem = (idx) => {
+          alert('開發中...');
+        };
+
+        const deleteShoppingItem = (idx) => {
+          const filtered = getFilteredShoppingItems();
+          const allItems = currentTripData.value.shoppingItems || [];
+          const originalIndex = allItems.indexOf(filtered[idx]);
+          if (originalIndex >= 0 && confirm('確定要刪除此項目嗎？')) {
+            allItems.splice(originalIndex, 1);
+            activeShoppingMenuIndex.value = -1;
+          }
+        };
+
+        const openAddShoppingItemForm = () => {
+          alert('開發中...');
+        };
+
+        const toggleChecklistItemCompletion = (idx) => {
+          checklistItems.value[idx].completed = !checklistItems.value[idx].completed;
+        };
+
+        const toggleChecklistMenu = (idx) => {
+          activeChecklistMenuIndex.value = activeChecklistMenuIndex.value === idx ? -1 : idx;
+        };
+
+        const editChecklistItem = (idx) => {
+          alert('開發中...');
+        };
+
+        const deleteChecklistItem = (idx) => {
+          if (confirm('確定要刪除此項目嗎？')) {
+            checklistItems.value.splice(idx, 1);
+            activeChecklistMenuIndex.value = -1;
+          }
+        };
+
+        const openAddChecklistItemForm = () => {
+          alert('開發中...');
+        };
+
+        // 成員相關方法
+        const openMemberForm = (member = null, index = -1) => {
+          if (member) {
+            memberFormData.value = {
+              name: member.name,
+              role: member.role || '',
+              gender: member.gender || 'male',
+              payments: JSON.parse(JSON.stringify(member.payments || []))
             };
-            editingChecklistIndex.value = index;
-            editingChecklistGroup.value = group;
+            editingMemberIndex.value = index;
           } else {
-            checklistFormData.value = {
+            memberFormData.value = {
               name: '',
-              subtitle: '',
-              date: '',
-              group: '待辦事項',
-              tag: 'general',
-              completed: false
+              role: '',
+              gender: 'male',
+              payments: []
             };
-            editingChecklistIndex.value = -1;
-            editingChecklistGroup.value = '';
+            editingMemberIndex.value = -1;
           }
-          showChecklistForm.value = true;
-          activeChecklistMenuIndex.value = -1;
+          showMemberForm.value = true;
+          activeMembersMenuIndex.value = -1;
         };
 
-        const closeChecklistForm = () => {
-          showChecklistForm.value = false;
-          checklistFormData.value = {
+        const closeMemberForm = () => {
+          showMemberForm.value = false;
+          memberFormData.value = {
             name: '',
-            subtitle: '',
-            date: '',
-            group: '待辦事項',
-            tag: 'general',
-            completed: false
+            role: '',
+            gender: 'male',
+            payments: []
           };
-          editingChecklistIndex.value = -1;
-          editingChecklistGroup.value = '';
+          editingMemberIndex.value = -1;
         };
 
-        const handleSaveChecklistItem = () => {
-          if (!checklistFormData.value.name || !checklistFormData.value.group) {
-            alert('請填寫項目名稱和群組');
+        const handleSaveMember = () => {
+          if (!memberFormData.value.name) {
+            alert('請輸入名字');
             return;
           }
 
-          if (!currentTripData.value.checklist) {
-            currentTripData.value.checklist = [];
+          if (!currentTripData.value.members) {
+            currentTripData.value.members = [];
           }
 
-          const newItem = {
-            name: checklistFormData.value.name,
-            subtitle: checklistFormData.value.subtitle,
-            date: checklistFormData.value.date,
-            group: checklistFormData.value.group,
-            tag: checklistFormData.value.tag || 'general',
-            completed: checklistFormData.value.completed || false
+          const newMember = {
+            name: memberFormData.value.name,
+            role: memberFormData.value.role,
+            gender: memberFormData.value.gender,
+            payments: memberFormData.value.payments || []
           };
 
-          if (editingChecklistIndex.value >= 0) {
-            const groupItems = getChecklistGroupItems(editingChecklistGroup.value);
-            groupItems.splice(editingChecklistIndex.value, 1, newItem);
+          if (editingMemberIndex.value >= 0) {
+            currentTripData.value.members.splice(editingMemberIndex.value, 1, newMember);
           } else {
-            currentTripData.value.checklist.push(newItem);
+            currentTripData.value.members.push(newMember);
           }
 
-          closeChecklistForm();
+          closeMemberForm();
         };
 
-        const deleteChecklistItem = (index, group) => {
-          const groupItems = getChecklistGroupItems(group);
-          groupItems.splice(index, 1);
-          activeChecklistMenuIndex.value = -1;
-        };
-
-        const toggleChecklistItemCompleted = (item) => {
-          item.completed = !item.completed;
-        };
-
-        const toggleChecklistMenu = (idx, group) => {
-          const key = `${group}-${idx}`;
-          activeChecklistMenuIndex.value = activeChecklistMenuIndex.value === key ? -1 : key;
-        };
-
-        const checklistGroups = computed(() => {
-          const groups = [...new Set(currentTripData.value.checklist.map(item => item.group))];
-          return groups.sort((a, b) => {
-            const order = ['待辦事項', '簽證', '保險'];
-            return order.indexOf(a) - order.indexOf(b);
-          });
-        });
-
-        const getChecklistGroupItems = (group) => {
-          return currentTripData.value.checklist.filter(item => item.group === group);
-        };
-
-        const checklistGroupCount = (group) => {
-          return getChecklistGroupItems(group).length;
-        };
-
-        const pendingChecklistCount = computed(() => {
-          return currentTripData.value.checklist.filter(i => !i.completed).length;
-        });
-
-        const completedChecklistCount = computed(() => {
-          return currentTripData.value.checklist.filter(i => i.completed).length;
-        });
-
-        const checklistTagLabel = (tag) => {
-          if (tag === 'important') return '重要';
-          return '一般';
-        };
-
-        const checklistTagClass = (tag) => {
-          if (tag === 'important') return 'checklist-tag-important';
-          return 'checklist-tag-general';
-        };
-
-        const enterTrip = (index) => {
-          selectedTripIndex.value = index;
-          selectedDateIndex.value = 0;
-          currentScreen.value = 'detail';
-        };
-
-        const backToHome = () => {
-          currentScreen.value = 'home';
-          selectedDateIndex.value = 0;
-        };
-
-        const editTrip = (index) => {
-          const trip = trips.value[index];
-          formData.value = {
-            title: trip.title,
-            location: trip.location,
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            description: trip.description,
-            coverImage: trip.coverImage || '',
-            itinerary: JSON.parse(JSON.stringify(trip.itinerary || [])),
-            accommodations: JSON.parse(JSON.stringify(trip.accommodations || {})),
-            reservations: JSON.parse(JSON.stringify(trip.reservations || { flights: [], hotels: [], tickets: [] })),
-            currency: trip.currency || '',
-            totalBudget: trip.totalBudget || 0,
-            expenses: JSON.parse(JSON.stringify(trip.expenses || [])),
-            shoppingList: JSON.parse(JSON.stringify(trip.shoppingList || [])),
-            checklist: JSON.parse(JSON.stringify(trip.checklist || []))
-          };
-          editingIndex.value = index;
-          showAddForm.value = true;
-        };
-
-        const handleSaveTrip = () => {
-          if (!formData.value.title || !formData.value.location || !formData.value.startDate || !formData.value.endDate) {
-            alert('請填寫所有必填欄位');
-            return;
+        const deleteMember = (index) => {
+          if (confirm('確定要刪除此成員嗎？')) {
+            currentTripData.value.members.splice(index, 1);
+            activeMembersMenuIndex.value = -1;
           }
-
-          const dates = [];
-          const start = new Date(formData.value.startDate);
-          const end = new Date(formData.value.endDate);
-          for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-            dates.push(d.toISOString().split('T')[0]);
-          }
-
-          const tripData = {
-            title: formData.value.title,
-            location: formData.value.location,
-            startDate: formData.value.startDate,
-            endDate: formData.value.endDate,
-            dates: dates,
-            description: formData.value.description,
-            coverImage: formData.value.coverImage,
-            itinerary: formData.value.itinerary,
-            accommodations: formData.value.accommodations,
-            reservations: formData.value.reservations,
-            currency: currencyRates[formData.value.location]?.code || 'HKD',
-            totalBudget: formData.value.totalBudget,
-            expenses: formData.value.expenses,
-            shoppingList: formData.value.shoppingList || [],
-            checklist: formData.value.checklist || []
-          };
-
-          if (editingIndex.value >= 0) {
-            trips.value[editingIndex.value] = tripData;
-          } else {
-            trips.value.push(tripData);
-          }
-          closeForm();
         };
 
-        const handleConfirmDelete = () => {
-          if (deleteType.value === 'trip') {
-            trips.value.splice(deletingIndex.value, 1);
-          } else if (deleteType.value === 'activity') {
-            const dayNum = getCurrentDayNumber();
-            const itinerary = trips.value[selectedTripIndex.value].itinerary;
-            const activities = itinerary.filter(item => item.day === dayNum);
-            const activityToDelete = activities[deletingIndex.value];
-            const indexInFullList = itinerary.indexOf(activityToDelete);
-            if (indexInFullList !== -1) {
-              itinerary.splice(indexInFullList, 1);
-            }
-          }
-          showDeleteConfirm.value = false;
+        const toggleMembersMenu = (idx) => {
+          activeMembersMenuIndex.value = activeMembersMenuIndex.value === idx ? -1 : idx;
         };
 
-        onMounted(() => {
-          const saved = localStorage.getItem('travelTrips');
-          if (saved) {
-            try {
-              const parsed = JSON.parse(saved);
-              // 確保每個行程都帶有 shoppingList 和 checklist
-              trips.value = parsed.map(trip => ({
-                ...trip,
-                shoppingList: trip.shoppingList || [],
-                checklist: trip.checklist || []
-              }));
-            } catch (e) {
-              console.error('Failed to load trips:', e);
-            }
-          }
-        });
-
-        watch(trips, () => {
-          localStorage.setItem('travelTrips', JSON.stringify(trips.value));
-        }, { deep: true });
-
-        const currentTripData = computed(() => {
-          return trips.value[selectedTripIndex.value] || {
-            title: '',
-            location: '',
-            startDate: '',
-            endDate: '',
-            dates: [],
+        const openPaymentForm = (member, index) => {
+          currentMember.value = member;
+          editingMemberIndex.value = index;
+          paymentFormData.value = {
+            amount: 0,
             description: '',
-            coverImage: '',
-            itinerary: [],
-            accommodations: {},
-            reservations: { flights: [], hotels: [], tickets: [] },
-            currency: '',
-            totalBudget: 0,
-            expenses: [],
-            shoppingList: [],
-            checklist: []
+            date: new Date().toISOString().split('T')[0]
           };
-        });
-
-        const countdownDays = computed(() => {
-          if (!currentTripData.value.startDate) return 0;
-          const today = new Date();
-          const start = new Date(currentTripData.value.startDate);
-          const diff = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
-          return diff;
-        });
-
-        const countdownDaysText = computed(() => {
-          if (countdownDays.value > 0) return countdownDays.value;
-          if (countdownDays.value === 0) return '今天';
-          return '已出發';
-        });
-
-        const countdownProgress = computed(() => {
-          const trip = currentTripData.value;
-          if (!trip.startDate || !trip.endDate) return 0;
-          const start = new Date(trip.startDate);
-          const end = new Date(trip.endDate);
-          const today = new Date();
-          const total = end - start;
-          if (total <= 0) return 100;
-          const current = Math.min(Math.max(today - start, 0), total);
-          return Math.round((current / total) * 100);
-        });
-
-        const dateOptions = computed(() => {
-          const dates = currentTripData.value.dates || [];
-          return dates.map(d => {
-            const dt = new Date(d);
-            return {
-              date: d,
-              weekday: weekdayNames[dt.getDay()],
-              day: dt.getDate()
-            };
-          });
-        });
-
-        const currentSelectedDateLabel = computed(() => {
-          if (!dateOptions.value.length) return '';
-          const d = dateOptions.value[selectedDateIndex.value] || dateOptions.value[0];
-          return `${d.weekday} ${d.day} Jan`;
-        });
-
-        const getCurrentDayNumber = () => {
-          return selectedDateIndex.value + 1;
+          showPaymentForm.value = true;
+          activeMembersMenuIndex.value = -1;
         };
 
-        const getCurrentDayWeather = () => {
-          const dayNum = getCurrentDayNumber();
-          const location = currentTripData.value.location;
-          const weatherData = countryWeatherData[location];
-          
-          if (!weatherData) {
-            return { icon: '☀️', temp: 25, feelsLike: 26, description: '晴朗宜人' };
+        const closePaymentForm = () => {
+          showPaymentForm.value = false;
+          currentMember.value = {};
+          paymentFormData.value = {
+            amount: 0,
+            description: '',
+            date: new Date().toISOString().split('T')[0]
+          };
+        };
+
+        const handleSavePayment = () => {
+          if (paymentFormData.value.amount <= 0 || !paymentFormData.value.description) {
+            alert('請輸入有效金額和描述');
+            return;
           }
 
-          const weatherTypes = Object.keys(weatherData);
-          const weatherType = weatherTypes[dayNum % weatherTypes.length];
-          return weatherData[weatherType];
-        };
+          if (!currentMember.value.payments) {
+            currentMember.value.payments = [];
+          }
 
-        const getCurrentDayAccommodation = () => {
-          const dayNum = getCurrentDayNumber();
-          return currentTripData.value.accommodations?.[dayNum] || null;
-        };
-
-        const getCurrentDayActivities = () => {
-          const dayNum = getCurrentDayNumber();
-          const activities = (currentTripData.value.itinerary || []).filter(item => item.day === dayNum);
-          return activities.sort((a, b) => {
-            const timeA = a.time ? parseInt(a.time.replace(':', '')) : 0;
-            const timeB = b.time ? parseInt(b.time.replace(':', '')) : 0;
-            return timeA - timeB;
+          currentMember.value.payments.push({
+            amount: paymentFormData.value.amount,
+            description: paymentFormData.value.description,
+            date: paymentFormData.value.date
           });
-        };
 
-        const getActivityIcon = (type) => {
-          const icons = {
-            'transport': '✈️',
-            'food': '🍽️',
-            'accommodation': '🏨',
-            'sightseeing': '🏯',
-            'shopping': '🛍️',
-            'relaxation': '🧖'
-          };
-          return icons[type] || '📍';
-        };
-
-        // 購物清單計算
-        const shoppingListComputed = computed(() => currentTripData.value.shoppingList || []);
-
-        const pendingShoppingCount = computed(() => {
-          return shoppingListComputed.value.filter(i => !i.purchased).length;
-        });
-
-        const purchasedShoppingCount = computed(() => {
-          return shoppingListComputed.value.filter(i => i.purchased).length;
-        });
-
-        const totalShoppingCount = computed(() => shoppingListComputed.value.length);
-
-        const shoppingCategoryCount = (category) => {
-          return shoppingListComputed.value.filter(i => i.category === category).length;
-        };
-
-        const shoppingFilterLabel = computed(() => {
-          const total = totalShoppingCount.value;
-          return `全部 (${total})`;
-        });
-
-        const shoppingDisplayList = computed(() => {
-          if (selectedShoppingFilter.value === 'all') return shoppingListComputed.value;
-          return shoppingListComputed.value.filter(i => i.category === selectedShoppingFilter.value);
-        });
-
-        const shoppingTagLabel = (category) => {
-          if (category === 'important') return '重要';
-          if (category === 'snack') return '零食';
-          return '一般';
-        };
-
-        const shoppingTagClass = (category) => {
-          if (category === 'important') return 'shopping-tag-important';
-          if (category === 'snack') return 'shopping-tag-snack';
-          return 'shopping-tag-normal';
+          closePaymentForm();
         };
 
         return {
           trips,
           currentScreen,
-          showAddForm,
-          showAddActivityForm,
-          showEditAccommodationForm,
-          showDeleteConfirm,
-          showReservationTypeMenu,
-          showFlightForm,
-          showHotelForm,
-          showTicketForm,
-          showSetBudgetForm,
-          showAddExpenseForm,
-          showShoppingForm,
-          showChecklistForm,
-          editingIndex,
-          selectedTripIndex,
-          deletingIndex,
-          deleteType,
-          formData,
-          budgetFormData,
-          expenseFormData,
-          activityFormData,
-          accommodationFormData,
-          flightForm,
-          hotelForm,
-          ticketForm,
-          shoppingFormData,
-          checklistFormData,
+          currentTripIndex,
           selectedDateIndex,
+          showAddForm,
+          editingTripIndex,
           activeActivityMenu,
-          editingActivityIndex,
-          editingReservationIndex,
-          activeReservationMenu,
-          currencyAmount,
-          selectedExpenseCategory,
-          expenseConversionHKD,
-          selectedShoppingFilter,
-          showShoppingFilterDropdown,
+          activeExpenseMenuIndex,
           activeShoppingMenuIndex,
-          editingShoppingIndex,
           activeChecklistMenuIndex,
-          editingChecklistIndex,
-          editingChecklistGroup,
-          formatDateRangeEnglish,
-          formatDateDisplay,
-          formatTimeOnly,
-          formatDateOnly,
-          formatCurrency,
-          calculateDays,
-          getTotalExpense,
-          getRemainingBudget,
-          getBudgetPercentage,
-          getCategoryLabel,
-          getFilteredExpenses,
-          exchangeRate,
-          convertedAmount,
-          currentTripCurrency,
-          updateExpenseConversion,
-          openFilePicker,
-          handleImageChange,
-          handleFlightCertificate,
-          handleHotelCertificate,
-          handleTicketCertificate,
-          openAddForm,
-          closeForm,
-          openAddActivityForm,
-          closeAddActivityForm,
-          openActivityMenu,
-          openEditActivityForm,
-          confirmDeleteTrip,
-          confirmDeleteActivity,
-          openEditAccommodationForm,
-          closeEditAccommodationForm,
-          openReservationMenu,
-          openFlightForm,
-          closeFlightForm,
-          openHotelForm,
-          closeHotelForm,
-          openTicketForm,
-          closeTicketForm,
-          editReservation,
-          deleteReservation,
-          deleteExpense,
-          handleSaveActivity,
-          handleSaveAccommodation,
-          handleSaveFlight,
-          handleSaveHotel,
-          handleSaveTicket,
-          handleSetBudget,
-          handleAddExpense,
-          // 購物相關
-          openShoppingForm,
-          closeShoppingForm,
-          handleSaveShoppingItem,
-          deleteShoppingItem,
-          toggleShoppingItemPurchased,
-          toggleShoppingFilterDropdown,
-          setShoppingFilter,
-          toggleShoppingMenu,
-          // 準備清單相關
-          openChecklistForm,
-          closeChecklistForm,
-          handleSaveChecklistItem,
-          deleteChecklistItem,
-          toggleChecklistItemCompleted,
-          toggleChecklistMenu,
-          checklistGroups,
-          getChecklistGroupItems,
-          checklistGroupCount,
-          pendingChecklistCount,
-          completedChecklistCount,
-          checklistTagLabel,
-          checklistTagClass,
-          enterTrip,
-          backToHome,
-          editTrip,
-          handleSaveTrip,
-          handleConfirmDelete,
+          showAddExpenseForm,
+          showSetBudgetForm,
+          showAddShoppingItemForm,
+          showAddChecklistItemForm,
+          showReservationTypeMenu,
+          activeReservationMenu,
+          filterExpenseCategory,
+          showShoppingCategoryFilter,
+          filterShoppingCategory,
+          totalBudget,
+          editingShoppingItemIndex,
+          editingChecklistItemIndex,
+          editingExpenseIndex,
+          showMemberForm,
+          showPaymentForm,
+          editingMemberIndex,
+          activeMembersMenuIndex,
+          currentMember,
+          memberFormData,
+          paymentFormData,
+          formData,
           currentTripData,
+          dateOptions,
+          currentSelectedDateLabel,
           countdownDays,
           countdownDaysText,
           countdownProgress,
-          dateOptions,
-          currentSelectedDateLabel,
+          membersList,
+          totalMembersCount,
+          totalPayments,
+          perPersonShare,
+          shoppingItems,
+          checklistItems,
+          formatDateRangeEnglish,
+          formatDateDisplay,
+          formatDateOnly,
+          formatTimeOnly,
+          calculateDays,
           getCurrentDayNumber,
           getCurrentDayWeather,
-          getCurrentDayAccommodation,
           getCurrentDayActivities,
+          getCurrentDayAccommodation,
           getActivityIcon,
-          pendingShoppingCount,
-          purchasedShoppingCount,
-          totalShoppingCount,
-          shoppingCategoryCount,
-          shoppingFilterLabel,
-          shoppingDisplayList,
-          shoppingTagLabel,
-          shoppingTagClass
+          formatCurrency,
+          getTotalExpense,
+          getBudgetPercentage,
+          getExpenseCategoryLabel,
+          getFilteredExpenses,
+          getCompletedShoppingCount,
+          getUncompletedShoppingCount,
+          getFilteredShoppingItems,
+          getCompletedChecklistCount,
+          getUncompletedChecklistCount,
+          getMemberTotalPayment,
+          getSettlementAmount,
+          getSettlementText,
+          getSettlementClass,
+          openAddForm,
+          closeAddForm,
+          handleSaveTrip,
+          editTrip,
+          confirmDeleteTrip,
+          enterTrip,
+          backToHome,
+          openActivityMenu,
+          openAddActivityForm,
+          openEditActivityForm,
+          confirmDeleteActivity,
+          openEditAccommodationForm,
+          openExpenseMenu,
+          editExpense,
+          deleteExpense,
+          openReservationMenu,
+          editReservation,
+          deleteReservation,
+          toggleShoppingItemCompletion,
+          toggleShoppingMenu,
+          editShoppingItem,
+          deleteShoppingItem,
+          openAddShoppingItemForm,
+          toggleChecklistItemCompletion,
+          toggleChecklistMenu,
+          editChecklistItem,
+          deleteChecklistItem,
+          openAddChecklistItemForm,
+          openMemberForm,
+          closeMemberForm,
+          handleSaveMember,
+          deleteMember,
+          toggleMembersMenu,
+          openPaymentForm,
+          closePaymentForm,
+          handleSavePayment
         };
       }
     }).mount('#app');
   </script>
-
 </body>
 </html>
