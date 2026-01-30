@@ -741,6 +741,158 @@
     .shopping-menu button:hover {
       background: #FFF7EB;
     }
+
+    /* 準備清單樣式，類似購物但無圖片 */
+    .checklist-stat-card {
+      border-radius: 16px;
+      padding: 12px 14px;
+      background: #F4FBF4;
+      border: 1px solid #CFE8CF;
+    }
+
+    .checklist-stat-card-secondary {
+      background: #FFF9EC;
+      border-color: #F3E0B5;
+    }
+
+    .checklist-stat-label {
+      font-size: 12px;
+      color: #7A6A56;
+    }
+
+    .checklist-stat-value {
+      font-size: 22px;
+      font-weight: 800;
+      color: #3C3C3C;
+      line-height: 1.1;
+    }
+
+    .checklist-group-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #8B6B6B;
+      margin-bottom: 8px;
+      padding-left: 4px;
+    }
+
+    .checklist-item-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid #E9D5C8;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 14px rgba(233,157,153,0.08);
+    }
+
+    .checklist-item-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid #E9D5C8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #FFFDF8;
+      flex-shrink: 0;
+    }
+
+    .checklist-item-checkbox-checked {
+      background: #E99D99;
+      border-color: #E99D99;
+      color: white;
+    }
+
+    .checklist-item-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .checklist-item-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 2px;
+    }
+
+    .checklist-item-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .checklist-item-subtitle {
+      font-size: 12px;
+      color: #9B8B80;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .checklist-item-date {
+      font-size: 11px;
+      color: #B0A29A;
+      margin-top: 2px;
+    }
+
+    .checklist-tag {
+      font-size: 11px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      white-space: nowrap;
+    }
+
+    .checklist-tag-general {
+      background: #F3E1D1;
+      color: #7A4D2A;
+    }
+
+    .checklist-tag-important {
+      background: #FFE5EC;
+      color: #B24766;
+    }
+
+    .checklist-menu-button {
+      margin-left: 6px;
+      color: #B0A29A;
+      font-size: 20px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .checklist-menu-button:hover {
+      color: #8B6B6B;
+    }
+
+    .checklist-menu {
+      position: absolute;
+      right: 8px;
+      top: 38px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #E9D5C8;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+      z-index: 20;
+      overflow: hidden;
+    }
+
+    .checklist-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .checklist-menu button:hover {
+      background: #FFF7EB;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -1425,15 +1577,100 @@
           <!-- 準備清單頁 -->
           <template v-if="currentScreen === 'checklist'">
             <div class="p-4 pb-24">
-              <!-- 無框浮動標題 -->
+              <!-- 無框浮動標題 + 新增按鈕 -->
               <div class="floating-section-header">
-                <div class="floating-section-header-title">✓ 準備清單</div>
-                <div class="floating-section-header-description">確保你沒有遺漏任何東西</div>
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <div class="floating-section-header-title">✓ 待辦清單</div>
+                    <div class="floating-section-header-description">記錄想辦的事項</div>
+                  </div>
+                  <button 
+                    @click="openChecklistForm"
+                    class="bg-white text-[#E99D99] text-sm font-bold px-3 py-1.5 rounded-full shadow-sm hover:bg-[#FFF7EB] flex items-center gap-1"
+                  >
+                    <span>➕</span>
+                    <span>新增</span>
+                  </button>
+                </div>
               </div>
-              <div class="text-center text-gray-400 py-12">
-                <div class="text-4xl mb-4">💭</div>
-                <p class="text-lg font-medium">此功能開發中...</p>
-                <p class="text-sm mt-1">準備清單功能即將推出！</p>
+
+              <!-- 統計卡片 -->
+              <div class="mt-2 grid grid-cols-2 gap-3">
+                <div class="checklist-stat-card">
+                  <div class="checklist-stat-label mb-1">待完成</div>
+                  <div class="checklist-stat-value">{{ pendingChecklistCount }}</div>
+                </div>
+                <div class="checklist-stat-card checklist-stat-card-secondary">
+                  <div class="checklist-stat-label mb-1">已完成</div>
+                  <div class="checklist-stat-value">{{ completedChecklistCount }}</div>
+                </div>
+              </div>
+
+              <!-- 主列表區，按群組顯示 -->
+              <div class="pt-4">
+                <div v-if="checklistGroups.length > 0">
+                  <div v-for="group in checklistGroups" :key="group">
+                    <p class="checklist-group-title">{{ group }} {{ checklistGroupCount(group) }}</p>
+                    <div v-if="getChecklistGroupItems(group).length > 0" class="space-y-2">
+                      <div 
+                        v-for="(item, idx) in getChecklistGroupItems(group)" 
+                        :key="idx"
+                        class="checklist-item-card relative"
+                      >
+                        <!-- Checkbox -->
+                        <div 
+                          class="checklist-item-checkbox"
+                          :class="item.completed ? 'checklist-item-checkbox-checked' : ''"
+                          @click="toggleChecklistItemCompleted(item)"
+                        >
+                          <span v-if="item.completed">✓</span>
+                        </div>
+
+                        <!-- 文字區 (無圖片) -->
+                        <div class="checklist-item-main">
+                          <div class="checklist-item-title-row">
+                            <div class="checklist-item-title" :class="item.completed ? 'line-through text-gray-400' : ''">
+                              {{ item.name }}
+                            </div>
+                            <span 
+                              class="checklist-tag"
+                              :class="checklistTagClass(item.tag)"
+                            >
+                              {{ checklistTagLabel(item.tag) }}
+                            </span>
+                          </div>
+                          <div class="checklist-item-subtitle">
+                            {{ item.subtitle || '—' }}
+                          </div>
+                          <div v-if="item.date" class="checklist-item-date">
+                            {{ item.date }}
+                          </div>
+                        </div>
+
+                        <!-- 更多選單 -->
+                        <div class="relative">
+                          <button 
+                            class="checklist-menu-button"
+                            @click="toggleChecklistMenu(idx, group)"
+                          >
+                            ⋯
+                          </button>
+                          <div v-if="activeChecklistMenuIndex === `${group}-${idx}`" class="checklist-menu">
+                            <button @click="openChecklistForm(item, idx, group)">✏️ 編輯</button>
+                            <button class="text-red-600" @click="deleteChecklistItem(idx, group)">🗑️ 刪除</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div v-else class="text-center py-4 text-gray-400 text-sm">
+                      <p>暫無項目</p>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="text-center text-gray-400 py-12">
+                  <div class="text-4xl mb-3">💭</div>
+                  <p class="text-sm">暫無待辦項目，點擊「+ 新增」開始規劃吧！</p>
+                </div>
               </div>
             </div>
           </template>
@@ -1978,6 +2215,87 @@
       </div>
     </div>
 
+    <!-- 新增/編輯準備清單項目表單 -->
+    <div v-if="showChecklistForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          {{ editingChecklistIndex >= 0 ? '編輯待辦項目' : '新增待辦項目' }} ✨
+        </h2>
+        <form @submit.prevent="handleSaveChecklistItem" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">項目名稱</label>
+            <input 
+              v-model="checklistFormData.name" 
+              required 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：帶車牌"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">子描述 / 備註</label>
+            <input 
+              v-model="checklistFormData.subtitle" 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：4/1 1am 倫敦時間 Book: 21/11 11:30"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">日期（選填）</label>
+            <input 
+              v-model="checklistFormData.date" 
+              type="date"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">群組</label>
+            <select 
+              v-model="checklistFormData.group" 
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+              <option value="待辦事項">待辦事項</option>
+              <option value="簽證">簽證</option>
+              <option value="保險">保險</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">標籤</label>
+            <select 
+              v-model="checklistFormData.tag" 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+              <option value="general">一般</option>
+              <option value="important">重要</option>
+            </select>
+          </div>
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closeChecklistForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <!-- 刪除確認對話 -->
     <div v-if="showDeleteConfirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-sm" style="border-color:#E9D5C8;">
@@ -2030,6 +2348,7 @@
         const showSetBudgetForm = ref(false);
         const showAddExpenseForm = ref(false);
         const showShoppingForm = ref(false);
+        const showChecklistForm = ref(false);
         const editingIndex = ref(-1);
         const selectedTripIndex = ref(0);
         const deletingIndex = ref(-1);
@@ -2048,6 +2367,10 @@
         const activeShoppingMenuIndex = ref(-1);
         const editingShoppingIndex = ref(-1);
 
+        const activeChecklistMenuIndex = ref(-1);
+        const editingChecklistIndex = ref(-1);
+        const editingChecklistGroup = ref('');
+
         const formData = ref({
           title: '',
           location: '',
@@ -2061,7 +2384,8 @@
           currency: '',
           totalBudget: 0,
           expenses: [],
-          shoppingList: []
+          shoppingList: [],
+          checklist: []
         });
 
         const budgetFormData = ref({
@@ -2124,6 +2448,15 @@
           category: 'normal',
           image: '',
           purchased: false
+        });
+
+        const checklistFormData = ref({
+          name: '',
+          subtitle: '',
+          date: '',
+          group: '待辦事項',
+          tag: 'general',
+          completed: false
         });
 
         const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -2312,7 +2645,8 @@
             currency: '',
             totalBudget: 0,
             expenses: [],
-            shoppingList: []
+            shoppingList: [],
+            checklist: []
           };
           showAddForm.value = true;
         };
@@ -2332,7 +2666,8 @@
             currency: '',
             totalBudget: 0,
             expenses: [],
-            shoppingList: []
+            shoppingList: [],
+            checklist: []
           };
           editingIndex.value = -1;
           const fileInput = document.getElementById('imageFileInput');
@@ -2745,6 +3080,127 @@
           activeShoppingMenuIndex.value = activeShoppingMenuIndex.value === idx ? -1 : idx;
         };
 
+        // 準備清單相關
+        const openChecklistForm = (item = null, index = -1, group = '') => {
+          if (item) {
+            checklistFormData.value = {
+              name: item.name,
+              subtitle: item.subtitle || '',
+              date: item.date || '',
+              group: item.group || '待辦事項',
+              tag: item.tag || 'general',
+              completed: item.completed || false
+            };
+            editingChecklistIndex.value = index;
+            editingChecklistGroup.value = group;
+          } else {
+            checklistFormData.value = {
+              name: '',
+              subtitle: '',
+              date: '',
+              group: '待辦事項',
+              tag: 'general',
+              completed: false
+            };
+            editingChecklistIndex.value = -1;
+            editingChecklistGroup.value = '';
+          }
+          showChecklistForm.value = true;
+          activeChecklistMenuIndex.value = -1;
+        };
+
+        const closeChecklistForm = () => {
+          showChecklistForm.value = false;
+          checklistFormData.value = {
+            name: '',
+            subtitle: '',
+            date: '',
+            group: '待辦事項',
+            tag: 'general',
+            completed: false
+          };
+          editingChecklistIndex.value = -1;
+          editingChecklistGroup.value = '';
+        };
+
+        const handleSaveChecklistItem = () => {
+          if (!checklistFormData.value.name || !checklistFormData.value.group) {
+            alert('請填寫項目名稱和群組');
+            return;
+          }
+
+          if (!currentTripData.value.checklist) {
+            currentTripData.value.checklist = [];
+          }
+
+          const newItem = {
+            name: checklistFormData.value.name,
+            subtitle: checklistFormData.value.subtitle,
+            date: checklistFormData.value.date,
+            group: checklistFormData.value.group,
+            tag: checklistFormData.value.tag || 'general',
+            completed: checklistFormData.value.completed || false
+          };
+
+          if (editingChecklistIndex.value >= 0) {
+            const groupItems = getChecklistGroupItems(editingChecklistGroup.value);
+            groupItems.splice(editingChecklistIndex.value, 1, newItem);
+          } else {
+            currentTripData.value.checklist.push(newItem);
+          }
+
+          closeChecklistForm();
+        };
+
+        const deleteChecklistItem = (index, group) => {
+          const groupItems = getChecklistGroupItems(group);
+          groupItems.splice(index, 1);
+          activeChecklistMenuIndex.value = -1;
+        };
+
+        const toggleChecklistItemCompleted = (item) => {
+          item.completed = !item.completed;
+        };
+
+        const toggleChecklistMenu = (idx, group) => {
+          const key = `${group}-${idx}`;
+          activeChecklistMenuIndex.value = activeChecklistMenuIndex.value === key ? -1 : key;
+        };
+
+        const checklistGroups = computed(() => {
+          const groups = [...new Set(currentTripData.value.checklist.map(item => item.group))];
+          return groups.sort((a, b) => {
+            const order = ['待辦事項', '簽證', '保險'];
+            return order.indexOf(a) - order.indexOf(b);
+          });
+        });
+
+        const getChecklistGroupItems = (group) => {
+          return currentTripData.value.checklist.filter(item => item.group === group);
+        };
+
+        const checklistGroupCount = (group) => {
+          return getChecklistGroupItems(group).length;
+        };
+
+        const pendingChecklistCount = computed(() => {
+          return currentTripData.value.checklist.filter(i => !i.completed).length;
+        });
+
+        const completedChecklistCount = computed(() => {
+          return currentTripData.value.checklist.filter(i => i.completed).length;
+        });
+
+        const checklistTagLabel = (tag) => {
+          if (tag === 'important') return '重要';
+          return '一般';
+        };
+
+        const checklistTagClass = (tag) => {
+          if (tag === 'important') return 'checklist-tag-important';
+          return 'checklist-tag-general';
+        };
+
         const enterTrip = (index) => {
           selectedTripIndex.value = index;
           selectedDateIndex.value = 0;
@@ -2771,7 +3227,8 @@
             currency: trip.currency || '',
             totalBudget: trip.totalBudget || 0,
             expenses: JSON.parse(JSON.stringify(trip.expenses || [])),
-            shoppingList: JSON.parse(JSON.stringify(trip.shoppingList || []))
+            shoppingList: JSON.parse(JSON.stringify(trip.shoppingList || [])),
+            checklist: JSON.parse(JSON.stringify(trip.checklist || []))
           };
           editingIndex.value = index;
           showAddForm.value = true;
@@ -2804,7 +3261,8 @@
             currency: currencyRates[formData.value.location]?.code || 'HKD',
             totalBudget: formData.value.totalBudget,
             expenses: formData.value.expenses,
-            shoppingList: formData.value.shoppingList || []
+            shoppingList: formData.value.shoppingList || [],
+            checklist: formData.value.checklist || []
           };
 
           if (editingIndex.value >= 0) {
@@ -2836,10 +3294,11 @@
           if (saved) {
             try {
               const parsed = JSON.parse(saved);
-              // 確保每個行程都帶有 shoppingList
+              // 確保每個行程都帶有 shoppingList 和 checklist
               trips.value = parsed.map(trip => ({
                 ...trip,
-                shoppingList: trip.shoppingList || []
+                shoppingList: trip.shoppingList || [],
+                checklist: trip.checklist || []
               }));
             } catch (e) {
               console.error('Failed to load trips:', e);
@@ -2866,7 +3325,8 @@
             currency: '',
             totalBudget: 0,
             expenses: [],
-            shoppingList: []
+            shoppingList: [],
+            checklist: []
           };
         });
 
@@ -3012,6 +3472,7 @@
           showSetBudgetForm,
           showAddExpenseForm,
           showShoppingForm,
+          showChecklistForm,
           editingIndex,
           selectedTripIndex,
           deletingIndex,
@@ -3025,6 +3486,7 @@
           hotelForm,
           ticketForm,
           shoppingFormData,
+          checklistFormData,
           selectedDateIndex,
           activeActivityMenu,
           editingActivityIndex,
@@ -3037,6 +3499,9 @@
           showShoppingFilterDropdown,
           activeShoppingMenuIndex,
           editingShoppingIndex,
+          activeChecklistMenuIndex,
+          editingChecklistIndex,
+          editingChecklistGroup,
           formatDateRangeEnglish,
           formatDateDisplay,
           formatTimeOnly,
@@ -3093,6 +3558,20 @@
           toggleShoppingFilterDropdown,
           setShoppingFilter,
           toggleShoppingMenu,
+          // 準備清單相關
+          openChecklistForm,
+          closeChecklistForm,
+          handleSaveChecklistItem,
+          deleteChecklistItem,
+          toggleChecklistItemCompleted,
+          toggleChecklistMenu,
+          checklistGroups,
+          getChecklistGroupItems,
+          checklistGroupCount,
+          pendingChecklistCount,
+          completedChecklistCount,
+          checklistTagLabel,
+          checklistTagClass,
           enterTrip,
           backToHome,
           editTrip,
@@ -3124,3 +3603,4 @@
 
 </body>
 </html>
+```單 -->
