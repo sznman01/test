@@ -144,6 +144,7 @@
 
     .page-header {
       flex-shrink: 0;
+      position: relative;
     }
 
     .page-content {
@@ -648,7 +649,7 @@
     <template v-if="currentScreen !== 'home'">
       <div class="page-container">
         <!-- 詳情頁頂部 -->
-        <div v-if="currentScreen === 'detail'" class="page-header relative">
+        <div v-if="currentScreen === 'detail'" class="page-header">
           <button 
             @click="backToHome"
             class="back-button"
@@ -661,52 +662,14 @@
           </header>
         </div>
 
-        <!-- 預約頁頂部 -->
-        <div v-if="currentScreen === 'reservation'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">🎫 預約管理</h1>
-            <p class="text-sm opacity-90 mt-1">機票、住宿、租車與票券</p>
-          </header>
-        </div>
-
-        <!-- 預算頁頂部 -->
-        <div v-if="currentScreen === 'expense'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">💰 旅行預算</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
-        </div>
-
-        <!-- 購物頁頂部 -->
-        <div v-if="currentScreen === 'shopping'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">🛍️ 購物清單</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
-        </div>
-
-        <!-- 準備清單頁頂部 -->
-        <div v-if="currentScreen === 'checklist'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">✓ 準備清單</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
-        </div>
-
-        <!-- 成員頁頂部 -->
-        <div v-if="currentScreen === 'members'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">👥 成員</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
-        </div>
-
-        <!-- 設定頁頂部 -->
-        <div v-if="currentScreen === 'settings'" class="page-header">
-          <header class="header-bg p-6 text-center text-white shadow-lg">
-            <h1 class="text-2xl font-bold">⚙️ 設定</h1>
-            <p class="text-sm opacity-90 mt-1">{{ currentTripData.title }}</p>
-          </header>
+        <!-- 其他頁面無頂部標題，只保留返回按鈕位置 -->
+        <div v-if="currentScreen !== 'detail'" class="page-header relative h-0">
+          <button 
+            @click="backToHome"
+            class="back-button"
+          >
+            ←
+          </button>
         </div>
 
         <!-- 內容區域 -->
