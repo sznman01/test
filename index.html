@@ -599,7 +599,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      cursor: pointer;
+      cursor: pointer.
     }
 
     .shopping-filter-option:hover {
@@ -1884,7 +1884,7 @@
                 </div>
               </div>
 
-              <!-- 結算表（已修正） -->
+              <!-- 結算表 -->
               <div class="settlement-table" v-if="membersList.length > 1">
                 <p class="settlement-title">結算表（總支出 {{ formatCurrency(totalPayments) }}，每人應付 {{ formatCurrency(perPersonShare) }}）</p>
                 
@@ -1900,7 +1900,6 @@
                   </div>
                 </div>
 
-                <!-- 明確欠款建議 -->
                 <div class="settlement-summary" v-if="getSettlementSummary !== ''">
                   {{ getSettlementSummary }}
                 </div>
@@ -2104,7 +2103,7 @@
             <p class="font-semibold text-gray-800">✈️ 機票</p>
             <p class="text-xs text-gray-600 mt-1">航班預訂資訊</p>
           </button>
-          <button @click="openHotelForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text-left" style="border-color: #E9D5C8;">
+          <button @click="openHotelForm" class="w-full p-4 border rounded-xl hover:bg-[#FFF7EB] transition-all text左" style="border-color: #E9D5C8;">
             <p class="font-semibold text-gray-800">🏨 住宿</p>
             <p class="text-xs text-gray-600 mt-1">酒店預訂資訊</p>
           </button>
@@ -2134,7 +2133,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">目的地</label>
-            <input v-model="flightForm.arrivalLocation" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京">
+            <input v-model="flightForm.arrivalLocation" required class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'" placeholder="例如：東京">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">登機時間</label>
@@ -2142,7 +2141,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">到達時間</label>
-            <input v-model="flightForm.arrivalTime" type="datetime-local" required class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
+            <input v-model="flightForm.arrivalTime" type="datetime-local" required class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">上載憑證</label>
@@ -2151,7 +2150,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea v-model="flightForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
+            <textarea v-model="flightForm.notes" rows="2" class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none resize-none" :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" @focus="$event.target.style.borderColor = '#E99D99'" @blur="$event.target.style.borderColor = '#E9D5C8'"></textarea>
           </div>
           <div class="flex gap-3 pt-4">
             <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
@@ -2166,7 +2165,7 @@
     </div>
 
     <!-- 新增住宿表單 -->
-    <div v-if="showHotelForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div v-if="showHotelForm" class="fixed inset-0 bg黑 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">{{ editingReservationIndex >= 0 ? '編輯住宿' : '新增住宿' }} 🏨</h2>
         <form @submit.prevent="handleSaveHotel" class="space-y-4">
@@ -2279,7 +2278,7 @@
       </div>
     </div>
 
-    <!-- 新增支出表單 - 自動貨幣轉換版 -->
+    <!-- 新增支出表單 -->
     <div v-if="showAddExpenseForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
         <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">新增支出 ✨</h2>
@@ -2339,7 +2338,7 @@
               v-model="expenseFormData.date"
               type="date"
               required
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2350,7 +2349,7 @@
             <textarea
               v-model="expenseFormData.notes"
               rows="2"
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none resize-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2495,7 +2494,7 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">標籤</label>
             <select
               v-model="checklistFormData.tag"
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2533,6 +2532,129 @@
         </div>
       </div>
     </div>
+
+    <!-- 成員：新增/編輯成員表單（新增：修正重點） -->
+    <div v-if="showMemberForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+          {{ editingMemberIndex >= 0 ? '編輯成員' : '新增成員' }} ✨
+        </h2>
+        <form @submit.prevent="handleSaveMember" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">名字</label>
+            <input
+              v-model="memberFormData.name"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：阿明"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">角色（選填）</label>
+            <input
+              v-model="memberFormData.role"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：領隊 / 財務"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">性別</label>
+            <select
+              v-model="memberFormData.gender"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+              <option value="male">男</option>
+              <option value="female">女</option>
+            </select>
+          </div>
+
+          <!-- 付款列表（只顯示，不在此新增，新增付款用另一個表單） -->
+          <div v-if="memberFormData.payments && memberFormData.payments.length" class="mt-2">
+            <p class="text-sm font-semibold text-gray-700 mb-2">已有付款紀錄</p>
+            <div class="space-y-2">
+              <div v-for="(p, i) in memberFormData.payments" :key="i" class="flex justify-between text-sm border rounded-lg px-3 py-2" style="border-color:#E9D5C8;">
+                <span class="text-gray-700">{{ p.date }} · {{ p.description }}</span>
+                <span class="text-[#E99D99] font-semibold">{{ formatCurrency(p.amount) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closeMemberForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 成員：新增付款表單（沿用原有方法） -->
+    <div v-if="showPaymentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="cute-card rounded-3xl p-8 w-full max-w-md" style="border-color:#E9D5C8;">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">新增付款 💰</h2>
+        <form @submit.prevent="handleSavePayment" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">金額 (HKD)</label>
+            <input
+              v-model.number="paymentFormData.amount"
+              type="number"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：200"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">描述</label>
+            <input
+              v-model="paymentFormData.description"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+              placeholder="例如：晚餐AA"
+            >
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
+            <input
+              v-model="paymentFormData.date"
+              type="date"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus-outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
+            >
+          </div>
+
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="flex-1 text-white font-bold py-3 px-6 rounded-xl hover:opacity-90 transition-all shadow-lg" style="background-color: #E99D99;">
+              ✓ 保存
+            </button>
+            <button type="button" @click="closePaymentForm" class="flex-1 text-gray-700 font-bold py-3 px-6 rounded-xl hover:opacity-80 transition-all" style="background-color: #E9D5C8;">
+              ❌ 取消
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <script>
@@ -3230,7 +3352,7 @@
           showAddExpenseForm.value = false;
         };
 
-        // 購物相關方法（保持不變）
+        // 購物相關方法
         const openShoppingForm = (item = null, index = -1) => {
           if (item) {
             shoppingFormData.value = {
@@ -3317,7 +3439,7 @@
           activeShoppingMenuIndex.value = activeShoppingMenuIndex.value === idx ? -1 : idx;
         };
 
-        // 準備清單相關方法（保持不變）
+        // 準備清單相關方法
         const openChecklistForm = (item = null, index = -1, group = '') => {
           if (item) {
             checklistFormData.value = {
@@ -3683,7 +3805,7 @@
             const dt = new Date(d);
             return {
               date: d,
-              weekday: weekdayNames[dt.getDay()],
+              weekday: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()],
               day: dt.getDate()
             };
           });
@@ -3810,11 +3932,11 @@
         };
 
         const checklistTagClass = (tag) => {
-          if (tag === 'important') return 'checklist-tag-important';
+          if (tag === '重要' || tag === 'important') return 'checklist-tag-important';
           return 'checklist-tag-general';
         };
 
-        // 成員計算（已修正）
+        // 成員計算
         const membersList = computed(() => currentTripData.value.members || []);
 
         const totalMembersCount = computed(() => membersList.value.length);
@@ -3824,7 +3946,7 @@
         });
 
         const perPersonShare = computed(() => {
-          const total = totalPayments.value; // 使用成員付款總和作為總支出基準
+          const total = totalPayments.value;
           const count = totalMembersCount.value;
           return count > 0 ? total / count : 0;
         });
@@ -3961,8 +4083,6 @@
           closeFlightForm,
           openHotelForm,
           closeHotelForm,
-          openTicketForm,
-          closeTicketForm,
           editReservation,
           deleteReservation,
           deleteExpense,
