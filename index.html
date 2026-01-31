@@ -1025,6 +1025,7 @@
     .settlement-negative {
       color: #E99D99;
     }
+
     .settlement-summary {
       font-size: 13px;
       color: #8B6B6B;
@@ -1036,7 +1037,7 @@
 <body class="min-h-screen font-sans antialiased">
 
   <div id="app" class="h-screen flex flex-col max-w-md mx-auto bg-white shadow-2xl overflow-hidden">
-    
+   
     <!-- 主頁（無 Bottom Nav）-->
     <template v-if="currentScreen === 'home'">
       <div class="home-container">
@@ -1044,7 +1045,6 @@
           <h1 class="text-2xl font-bold">✨ 我的旅行計劃 ✨</h1>
           <p class="text-sm opacity-90 mt-1">輕鬆管理你的行程！</p>
         </header>
-
         <div class="home-content">
           <div v-if="trips.length === 0" class="text-center py-12 text-gray-400">
             <div class="text-4xl mb-4">🌍</div>
@@ -1052,8 +1052,8 @@
             <p class="text-sm mt-1">點擊下方按鈕新增第一個行程吧！</p>
           </div>
           <div v-else class="space-y-4">
-            <div 
-              v-for="(trip, index) in trips" 
+            <div
+              v-for="(trip, index) in trips"
               :key="index"
               class="cute-card rounded-2xl overflow-hidden transform transition-all hover:scale-105 border cursor-pointer"
               :style="{ borderColor: '#E9D5C8' }"
@@ -1062,15 +1062,15 @@
               <div v-if="trip.coverImage" class="relative overflow-hidden">
                 <img :src="trip.coverImage" :alt="trip.title" class="w-full h-40 object-cover">
                 <div class="absolute top-3 right-3 flex gap-2">
-                  <button 
-                    @click.stop="editTrip(index)" 
+                  <button
+                    @click.stop="editTrip(index)"
                     class="rounded-full p-2 shadow-lg transition-all"
                     :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
                   >
                     ✏️
                   </button>
-                  <button 
-                    @click.stop="confirmDeleteTrip(index)" 
+                  <button
+                    @click.stop="confirmDeleteTrip(index)"
                     class="rounded-full p-2 shadow-lg transition-all"
                     :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
                   >
@@ -1083,15 +1083,15 @@
                   <span class="text-4xl">🌍</span>
                 </div>
                 <div class="absolute top-3 right-3 flex gap-2">
-                  <button 
-                    @click.stop="editTrip(index)" 
+                  <button
+                    @click.stop="editTrip(index)"
                     class="rounded-full p-2 shadow-lg transition-all"
                     :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
                   >
                     ✏️
                   </button>
-                  <button 
-                    @click.stop="confirmDeleteTrip(index)" 
+                  <button
+                    @click.stop="confirmDeleteTrip(index)"
                     class="rounded-full p-2 shadow-lg transition-all"
                     :style="{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }"
                   >
@@ -1099,7 +1099,6 @@
                   </button>
                 </div>
               </div>
-
               <div class="p-5">
                 <h3 class="font-bold text-lg text-gray-800 mb-2">{{ trip.title }}</h3>
                 <div class="space-y-2 mb-4">
@@ -1118,10 +1117,9 @@
             </div>
           </div>
         </div>
-
         <div class="home-footer">
-          <button 
-            @click="openAddForm" 
+          <button
+            @click="openAddForm"
             class="w-full cute-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-xl transition-all duration-200 flex items-center justify-center gap-2"
           >
             ➕ 新增旅行計劃
@@ -1135,7 +1133,7 @@
       <div class="page-container">
         <!-- 詳情頁頂部：只保留返回按鈕 -->
         <div v-if="currentScreen === 'detail'" class="page-header">
-          <button 
+          <button
             @click="backToHome"
             class="back-button"
           >
@@ -1167,14 +1165,14 @@
                   </div>
                   <div class="mt-2">
                     <div class="w-full h-3 rounded-full bg-[#FFE3DD] overflow-hidden relative">
-                      <div 
+                      <div
                         class="h-3 rounded-full"
                         :style="{
                           width: countdownProgress + '%',
                           background: 'linear-gradient(90deg,#E99D99,#D88888)'
                         }"
                       ></div>
-                      <div 
+                      <div
                         class="absolute -top-3 text-lg"
                         :style="{ left: `calc(${countdownProgress}% - 10px)` }"
                       >
@@ -1194,8 +1192,8 @@
                     :key="day.date"
                     class="date-pill flex-shrink-0 px-3 py-2 rounded-xl text-center text-xs border transition-all"
                     :class="selectedDateIndex === idx ? 'font-bold text-white' : 'text-gray-700'"
-                    :style="selectedDateIndex === idx 
-                      ? { backgroundColor:'#E99D99', borderColor:'#E99D99' } 
+                    :style="selectedDateIndex === idx
+                      ? { backgroundColor:'#E99D99', borderColor:'#E99D99' }
                       : { backgroundColor:'#FFFBF7', borderColor:'#E9D5C8' }"
                     @click="selectedDateIndex = idx"
                   >
@@ -1237,14 +1235,14 @@
                         <p class="font-semibold text-gray-800">{{ getCurrentDayAccommodation()?.name || '待添加' }}</p>
                       </div>
                     </div>
-                    <button 
+                    <button
                       @click="openEditAccommodationForm"
                       class="text-gray-400 hover:text-gray-600 p-1 ml-2"
                     >
                       ⋯
                     </button>
                   </div>
-                  <a 
+                  <a
                     v-if="getCurrentDayAccommodation()?.name"
                     :href="`https://www.google.com/maps/search/${encodeURIComponent(getCurrentDayAccommodation().name)}`"
                     target="_blank"
@@ -1258,23 +1256,22 @@
               <div class="pt-4">
                 <div v-if="getCurrentDayActivities().length > 0" class="cute-card rounded-2xl p-4 border space-y-3" style="border-color:#E9D5C8;">
                   <p class="text-sm font-semibold text-gray-800 mb-4">行程安排</p>
-                  
+                 
                   <div v-for="(activity, idx) in getCurrentDayActivities()" :key="idx" class="timeline-item relative pb-6">
                     <div v-if="idx < getCurrentDayActivities().length - 1" class="absolute left-5 top-10 w-1 h-8" style="background: linear-gradient(to bottom,#E99D99,#D88888);"></div>
-                    
+                   
                     <div class="flex gap-3">
                       <div class="relative mt-1">
                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background: linear-gradient(135deg,#E99D99,#D88888);">
                           {{ activity.time || '—' }}
                         </div>
                       </div>
-
                       <div class="flex-1">
                         <div class="flex items-start justify-between">
                           <div class="flex-1">
                             <p class="text-sm font-semibold text-gray-800">{{ activity.name }}</p>
                             <p class="text-xs text-gray-600 mt-1">{{ getActivityIcon(activity.type) }} {{ activity.location }}</p>
-                            <a 
+                            <a
                               :href="`https://www.google.com/maps/search/${encodeURIComponent(activity.location)}`"
                               target="_blank"
                               class="text-xs text-[#E99D99] hover:underline mt-1 inline-block"
@@ -1283,21 +1280,20 @@
                             </a>
                           </div>
                           <div class="relative">
-                            <button 
+                            <button
                               @click="openActivityMenu(idx)"
                               class="text-gray-400 hover:text-gray-600 p-1"
                             >
                               ⋯
                             </button>
-
                             <div v-if="activeActivityMenu === idx" class="absolute right-0 top-8 bg-white rounded-lg shadow-lg border border-[#E9D5C8] z-10">
-                              <button 
+                              <button
                                 @click="openEditActivityForm(idx)"
                                 class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#FFF7EB] border-b border-[#E9D5C8]"
                               >
                                 ✏️ 編輯
                               </button>
-                              <button 
+                              <button
                                 @click="confirmDeleteActivity(idx)"
                                 class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[#FFF7EB]"
                               >
@@ -1316,7 +1312,7 @@
               </div>
 
               <div class="pt-4 pb-4">
-                <button 
+                <button
                   @click="openAddActivityForm"
                   class="w-full add-activity-btn text-white font-bold py-4 px-6 rounded-2xl text-lg shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
                 >
@@ -1337,7 +1333,7 @@
 
               <div class="flex items-center justify-between mb-6">
                 <h2 class="text-lg font-bold text-gray-800">預約管理</h2>
-                <button 
+                <button
                   @click="showReservationTypeMenu = true"
                   class="bg-[#E99D99] text-white rounded-full w-10 h-10 flex items-center justify-center text-lg hover:bg-[#D88888]"
                 >
@@ -1456,7 +1452,7 @@
 
               <!-- 設定預算按鈕 -->
               <div class="flex justify-end mb-4">
-                <button 
+                <button
                   @click="showSetBudgetForm = true"
                   class="bg-white border-2 border-[#E99D99] text-[#E99D99] rounded-2xl px-4 py-2 text-sm font-bold hover:bg-[#FFF7EB] transition-all"
                 >
@@ -1468,19 +1464,19 @@
               <div class="currency-converter">
                 <p class="text-sm font-bold text-gray-700 mb-3">💱 即時匯率轉換</p>
                 <div class="converter-row">
-                  <input 
-                    v-model.number="currencyAmount" 
-                    type="number" 
-                    placeholder="輸入金額" 
+                  <input
+                    v-model.number="currencyAmount"
+                    type="number"
+                    placeholder="輸入金額"
                     class="converter-input"
                   >
                   <span class="converter-label">{{ currentTripCurrency }}</span>
                 </div>
                 <div class="converter-row">
-                  <input 
-                    :value="convertedAmount" 
-                    type="text" 
-                    disabled 
+                  <input
+                    :value="convertedAmount"
+                    type="text"
+                    disabled
                     class="converter-input opacity-70 bg-gray-100"
                   >
                   <span class="converter-label">HKD</span>
@@ -1505,7 +1501,7 @@
 
                 <div class="budget-progress">
                   <div class="budget-progress-bar">
-                    <div 
+                    <div
                       class="budget-progress-fill"
                       :style="{ width: getBudgetPercentage() + '%' }"
                     ></div>
@@ -1525,7 +1521,7 @@
               <!-- 支出記錄區 -->
               <div class="pt-4">
                 <div class="expense-record-header">
-                  <select 
+                  <select
                     v-model="selectedExpenseCategory"
                     class="expense-category-select"
                   >
@@ -1536,7 +1532,7 @@
                     <option value="transport">🚕 交通</option>
                     <option value="other">📌 其他</option>
                   </select>
-                  <button 
+                  <button
                     @click="showAddExpenseForm = true"
                     class="expense-add-btn"
                   >
@@ -1551,12 +1547,12 @@
                       <div class="expense-item-title">{{ expense.title }}</div>
                       <div class="expense-item-category">{{ getCategoryLabel(expense.category) }} · {{ expense.date }}</div>
                       <div class="expense-item-currencies">
-                        {{ expense.originalCurrency }} {{ formatCurrency(expense.originalAmount) }} 
+                        {{ expense.originalCurrency }} {{ formatCurrency(expense.originalAmount) }}
                         <span class="text-gray-400">≈ HKD {{ formatCurrency(expense.amountHKD) }}</span>
                       </div>
                     </div>
                     <div class="expense-item-amount">HKD {{ formatCurrency(expense.amountHKD) }}</div>
-                    <button 
+                    <button
                       @click="deleteExpense(idx)"
                       class="expense-item-menu"
                     >
@@ -1581,7 +1577,7 @@
                     <div class="floating-section-header-title">🛍️ 購物清單</div>
                     <div class="floating-section-header-description">規劃你的購物清單</div>
                   </div>
-                  <button 
+                  <button
                     @click="openShoppingForm"
                     class="bg-white text-[#E99D99] text-sm font-bold px-3 py-1.5 rounded-full shadow-sm hover:bg-[#FFF7EB] flex items-center gap-1"
                   >
@@ -1605,7 +1601,7 @@
 
               <!-- 篩選條 -->
               <div class="mt-4 mb-2">
-                <button 
+                <button
                   class="shopping-filter-bar w-full"
                   @click="toggleShoppingFilterDropdown"
                 >
@@ -1613,28 +1609,28 @@
                   <span class="text-xs">⌄</span>
                 </button>
                 <div v-if="showShoppingFilterDropdown" class="shopping-filter-dropdown">
-                  <div 
+                  <div
                     class="shopping-filter-option"
                     @click="setShoppingFilter('all')"
                   >
                     <span>全部</span>
                     <span>{{ totalShoppingCount }}</span>
                   </div>
-                  <div 
+                  <div
                     class="shopping-filter-option"
                     @click="setShoppingFilter('normal')"
                   >
                     <span>一般</span>
                     <span>{{ shoppingCategoryCount('normal') }}</span>
                   </div>
-                  <div 
+                  <div
                     class="shopping-filter-option"
                     @click="setShoppingFilter('important')"
                   >
                     <span>重要</span>
                     <span>{{ shoppingCategoryCount('important') }}</span>
                   </div>
-                  <div 
+                  <div
                     class="shopping-filter-option"
                     @click="setShoppingFilter('snack')"
                   >
@@ -1647,13 +1643,13 @@
               <!-- 主列表區 -->
               <div class="pt-2">
                 <div v-if="shoppingDisplayList.length > 0">
-                  <div 
-                    v-for="(item, idx) in shoppingDisplayList" 
+                  <div
+                    v-for="(item, idx) in shoppingDisplayList"
                     :key="idx"
                     class="shopping-item-card relative"
                   >
                     <!-- Checkbox -->
-                    <div 
+                    <div
                       class="shopping-item-checkbox"
                       :class="item.purchased ? 'shopping-item-checkbox-checked' : ''"
                       @click="toggleShoppingItemPurchased(item)"
@@ -1677,7 +1673,7 @@
                         <div class="shopping-item-title" :class="item.purchased ? 'line-through text-gray-400' : ''">
                           {{ item.name }}
                         </div>
-                        <span 
+                        <span
                           class="shopping-tag"
                           :class="shoppingTagClass(item.category)"
                         >
@@ -1691,7 +1687,7 @@
 
                     <!-- 更多選單 -->
                     <div class="relative">
-                      <button 
+                      <button
                         class="shopping-menu-button"
                         @click="toggleShoppingMenu(idx)"
                       >
@@ -1722,7 +1718,7 @@
                     <div class="floating-section-header-title">✓ 待辦清單</div>
                     <div class="floating-section-header-description">記錄想辦的事項</div>
                   </div>
-                  <button 
+                  <button
                     @click="openChecklistForm"
                     class="bg-white text-[#E99D99] text-sm font-bold px-3 py-1.5 rounded-full shadow-sm hover:bg-[#FFF7EB] flex items-center gap-1"
                   >
@@ -1750,13 +1746,13 @@
                   <div v-for="group in checklistGroups" :key="group">
                     <p class="checklist-group-title">{{ group }} {{ checklistGroupCount(group) }}</p>
                     <div v-if="getChecklistGroupItems(group).length > 0" class="space-y-2">
-                      <div 
-                        v-for="(item, idx) in getChecklistGroupItems(group)" 
+                      <div
+                        v-for="(item, idx) in getChecklistGroupItems(group)"
                         :key="idx"
                         class="checklist-item-card relative"
                       >
                         <!-- Checkbox -->
-                        <div 
+                        <div
                           class="checklist-item-checkbox"
                           :class="item.completed ? 'checklist-item-checkbox-checked' : ''"
                           @click="toggleChecklistItemCompleted(item)"
@@ -1770,7 +1766,7 @@
                             <div class="checklist-item-title" :class="item.completed ? 'line-through text-gray-400' : ''">
                               {{ item.name }}
                             </div>
-                            <span 
+                            <span
                               class="checklist-tag"
                               :class="checklistTagClass(item.tag)"
                             >
@@ -1787,7 +1783,7 @@
 
                         <!-- 更多選單 -->
                         <div class="relative">
-                          <button 
+                          <button
                             class="checklist-menu-button"
                             @click="toggleChecklistMenu(idx, group)"
                           >
@@ -1813,7 +1809,7 @@
             </div>
           </template>
 
-          <!-- 成員頁 -->
+          <!-- 成員頁（已修正） -->
           <template v-if="currentScreen === 'members'">
             <div class="p-4 pb-24">
               <!-- 無框浮動標題 + 新增按鈕 -->
@@ -1823,7 +1819,7 @@
                     <div class="floating-section-header-title">👥 成員管理</div>
                     <div class="floating-section-header-description">旅行夥伴</div>
                   </div>
-                  <button 
+                  <button
                     @click="openMemberForm"
                     class="bg-white text-[#E99D99] text-sm font-bold px-3 py-1.5 rounded-full shadow-sm hover:bg-[#FFF7EB] flex items-center gap-1"
                     :disabled="membersList.length >= 10"
@@ -1842,7 +1838,7 @@
                   <div class="members-stat-value">{{ totalMembersCount }}</div>
                 </div>
                 <div class="members-stat-card members-stat-card-secondary">
-                  <div class="members-stat-label mb-1">總付款 (HKD)</div>
+                  <div class="members-stat-label mb-1">總支出 (HKD)</div>
                   <div class="members-stat-value">{{ formatCurrency(totalPayments) }}</div>
                 </div>
               </div>
@@ -1850,8 +1846,8 @@
               <!-- 主列表區 -->
               <div class="pt-4">
                 <div v-if="membersList.length > 0" class="space-y-2">
-                  <div 
-                    v-for="(member, idx) in membersList" 
+                  <div
+                    v-for="(member, idx) in membersList"
                     :key="idx"
                     class="members-item-card relative"
                   >
@@ -1868,7 +1864,7 @@
 
                     <!-- 更多選單 -->
                     <div class="relative">
-                      <button 
+                      <button
                         class="members-menu-button"
                         @click="toggleMembersMenu(idx)"
                       >
@@ -1888,7 +1884,7 @@
                 </div>
               </div>
 
-              <!-- 結算表 -->
+              <!-- 結算表（已修正） -->
               <div class="settlement-table" v-if="membersList.length > 1">
                 <p class="settlement-title">結算表（總支出 {{ formatCurrency(totalPayments) }}，每人應付 {{ formatCurrency(perPersonShare) }}）</p>
                 
@@ -1903,6 +1899,17 @@
                     </span>
                   </div>
                 </div>
+
+                <!-- 明確欠款建議 -->
+                <div class="settlement-summary" v-if="getSettlementSummary !== ''">
+                  {{ getSettlementSummary }}
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                  建議：欠款成員可以轉帳畀多付嘅成員（例如畀 {{ getCreditorName }}）。
+                </p>
+              </div>
+            </div>
+          </template>
 
           <!-- 設定頁 -->
           <template v-if="currentScreen === 'settings'">
@@ -1922,7 +1929,7 @@
         </div>
       </div>
 
-      <!-- 底部導航欄（只在詳情及其他頁顯示）-->
+      <!-- 底部導航欄 -->
       <nav class="bottom-nav">
         <div class="flex justify-around items-center overflow-x-auto">
           <button @click="currentScreen = 'detail'" :class="['flex flex-col items-center py-3 px-4 text-sm font-medium transition-all whitespace-nowrap', currentScreen === 'detail' ? 'nav-active' : 'text-gray-500']">
@@ -2249,14 +2256,14 @@
         <form @submit.prevent="handleSetBudget" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">總預算 (HKD)</label>
-            <input 
-              v-model.number="budgetFormData.totalBudget" 
-              type="number" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
-              @blur="$event.target.style.borderColor = '#E9D5C8'" 
+            <input
+              v-model.number="budgetFormData.totalBudget"
+              type="number"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
               placeholder="例如：10000"
             >
           </div>
@@ -2279,24 +2286,24 @@
         <form @submit.prevent="handleAddExpense" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">支出項目</label>
-            <input 
-              v-model="expenseFormData.title" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
-              @blur="$event.target.style.borderColor = '#E9D5C8'" 
+            <input
+              v-model="expenseFormData.title"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
               placeholder="例如：午餐"
             >
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-            <select 
-              v-model="expenseFormData.category" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
+            <select
+              v-model="expenseFormData.category"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
             >
               <option value="">選擇分類</option>
@@ -2311,14 +2318,14 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">
               金額 <span class="expense-form-currency">{{ currentTripCurrency }}</span>
             </label>
-            <input 
-              v-model.number="expenseFormData.originalAmount" 
-              type="number" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
-              @blur="$event.target.style.borderColor = '#E9D5C8'" 
+            <input
+              v-model.number="expenseFormData.originalAmount"
+              type="number"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
+              @blur="$event.target.style.borderColor = '#E9D5C8'"
               @input="updateExpenseConversion"
               placeholder="輸入本地貨幣金額"
             >
@@ -2328,24 +2335,24 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">日期</label>
-            <input 
-              v-model="expenseFormData.date" 
-              type="date" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
+            <input
+              v-model="expenseFormData.date"
+              type="date"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
             >
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">備註</label>
-            <textarea 
-              v-model="expenseFormData.notes" 
-              rows="2" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
-              @focus="$event.target.style.borderColor = '#E99D99'" 
+            <textarea
+              v-model="expenseFormData.notes"
+              rows="2"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none resize-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
+              @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
             ></textarea>
           </div>
@@ -2370,11 +2377,11 @@
         <form @submit.prevent="handleSaveShoppingItem" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">品名</label>
-            <input 
-              v-model="shoppingFormData.name" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+            <input
+              v-model="shoppingFormData.name"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
               placeholder="例如：朱古力、護膚品"
@@ -2382,10 +2389,10 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">商店 / 備註</label>
-            <input 
-              v-model="shoppingFormData.shop" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+            <input
+              v-model="shoppingFormData.shop"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
               placeholder="例如：Coop 超市 / 百佳"
@@ -2393,9 +2400,9 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">分類</label>
-            <select 
-              v-model="shoppingFormData.category" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+            <select
+              v-model="shoppingFormData.category"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2407,9 +2414,9 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">圖片網址（選填）</label>
-            <input 
-              v-model="shoppingFormData.image" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+            <input
+              v-model="shoppingFormData.image"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2437,11 +2444,11 @@
         <form @submit.prevent="handleSaveChecklistItem" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">項目名稱</label>
-            <input 
-              v-model="checklistFormData.name" 
-              required 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+            <input
+              v-model="checklistFormData.name"
+              required
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
               placeholder="例如：帶車牌"
@@ -2449,10 +2456,10 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">子描述 / 備註</label>
-            <input 
-              v-model="checklistFormData.subtitle" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+            <input
+              v-model="checklistFormData.subtitle"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
               placeholder="例如：4/1 1am 倫敦時間 Book: 21/11 11:30"
@@ -2460,21 +2467,21 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">日期（選填）</label>
-            <input 
-              v-model="checklistFormData.date" 
+            <input
+              v-model="checklistFormData.date"
               type="date"
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
-              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }" 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
+              :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
             >
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">群組</label>
-            <select 
-              v-model="checklistFormData.group" 
+            <select
+              v-model="checklistFormData.group"
               required
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2486,9 +2493,9 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">標籤</label>
-            <select 
-              v-model="checklistFormData.tag" 
-              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none" 
+            <select
+              v-model="checklistFormData.tag"
+              class="w-full p-4 border rounded-xl focus:ring-2 focus:outline-none"
               :style="{ borderColor: '#E9D5C8', backgroundColor: '#FFFBF7' }"
               @focus="$event.target.style.borderColor = '#E99D99'"
               @blur="$event.target.style.borderColor = '#E9D5C8'"
@@ -2531,7 +2538,7 @@
   <script>
     const { createApp, ref, watch, onMounted, computed } = Vue;
 
-    // 完整匯率數據 - 包含瑞士郎和歐羅
+    // 匯率數據
     const currencyRates = {
       '日本': { code: 'JPY', symbol: '¥', rate: 0.052 },
       '香港': { code: 'HKD', symbol: '$', rate: 1 },
@@ -2576,16 +2583,13 @@
         const currencyAmount = ref(0);
         const selectedExpenseCategory = ref('');
         const expenseConversionHKD = ref(0);
-
         const selectedShoppingFilter = ref('all');
         const showShoppingFilterDropdown = ref(false);
         const activeShoppingMenuIndex = ref(-1);
         const editingShoppingIndex = ref(-1);
-
         const activeChecklistMenuIndex = ref(-1);
         const editingChecklistIndex = ref(-1);
         const editingChecklistGroup = ref('');
-
         const editingMemberIndex = ref(-1);
         const activeMembersMenuIndex = ref(-1);
         const currentMember = ref({});
@@ -2739,7 +2743,7 @@
           if (!dateStr) return '';
           const d = new Date(dateStr);
           if (isNaN(d)) return dateStr;
-          return `${monthNames[d.getMonth()] } ${d.getDate()}, ${d.getFullYear()}`;
+          return `${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
         };
 
         const formatTimeOnly = (dateTimeStr) => {
@@ -3226,7 +3230,7 @@
           showAddExpenseForm.value = false;
         };
 
-        // 購物清單相關
+        // 購物相關方法（保持不變）
         const openShoppingForm = (item = null, index = -1) => {
           if (item) {
             shoppingFormData.value = {
@@ -3313,7 +3317,7 @@
           activeShoppingMenuIndex.value = activeShoppingMenuIndex.value === idx ? -1 : idx;
         };
 
-        // 準備清單相關
+        // 準備清單相關方法（保持不變）
         const openChecklistForm = (item = null, index = -1, group = '') => {
           if (item) {
             checklistFormData.value = {
@@ -3400,7 +3404,7 @@
           activeChecklistMenuIndex.value = activeChecklistMenuIndex.value === key ? -1 : key;
         };
 
-        // 成員相關
+        // 成員相關方法
         const openMemberForm = (member = null, index = -1) => {
           if (member) {
             memberFormData.value = {
@@ -3476,7 +3480,7 @@
 
         const openPaymentForm = (member, index) => {
           currentMember.value = member;
-          editingMemberIndex.value = index;  // 用於保存回原成員
+          editingMemberIndex.value = index;
           paymentFormData.value = {
             amount: 0,
             description: '',
@@ -3810,7 +3814,7 @@
           return 'checklist-tag-general';
         };
 
-        // 成員計算
+        // 成員計算（已修正）
         const membersList = computed(() => currentTripData.value.members || []);
 
         const totalMembersCount = computed(() => membersList.value.length);
@@ -3820,13 +3824,13 @@
         });
 
         const perPersonShare = computed(() => {
-  const total = totalPayments.value;  // 用成員已付總和作為總支出（你截圖顯示 330 來自付款）
-  const count = totalMembersCount.value;
-  return count > 0 ? total / count : 0;
-});
+          const total = totalPayments.value; // 使用成員付款總和作為總支出基準
+          const count = totalMembersCount.value;
+          return count > 0 ? total / count : 0;
+        });
 
         const getMemberTotalPayment = (member) => {
-          return (member.payments || []).reduce((sum, pay) => sum + pay.amount, 0);
+          return (member.payments || []).reduce((sum, pay) => sum + (pay.amount || 0), 0);
         };
 
         const getSettlementAmount = (member) => {
@@ -3845,18 +3849,6 @@
           return '';
         };
 
-        const getSettlementSummary = computed(() => {
-  if (membersList.value.length < 2) return '';
-  let summary = [];
-  membersList.value.forEach(member => {
-    const amount = getSettlementAmount(member);
-    if (amount < 0) {
-      summary.push(`${member.name} 需畀 ${formatCurrency(Math.abs(amount))} 畀 ${getCreditorName.value}`);
-    }
-  });
-  return summary.length > 0 ? summary.join('；') + '。' : '大家已經平衡！';
-});
-
         const getCreditorName = computed(() => {
           if (!membersList.value.length) return '';
           let maxPositive = -Infinity;
@@ -3869,6 +3861,18 @@
             }
           }
           return creditor || '某位成員';
+        });
+
+        const getSettlementSummary = computed(() => {
+          if (membersList.value.length < 2) return '';
+          let summary = [];
+          membersList.value.forEach(member => {
+            const amount = getSettlementAmount(member);
+            if (amount < 0) {
+              summary.push(`${member.name} 需畀 ${formatCurrency(Math.abs(amount))} 畀 ${getCreditorName.value}`);
+            }
+          });
+          return summary.length > 0 ? summary.join('；') + '。' : '大家已經平衡！';
         });
 
         return {
@@ -4036,6 +4040,5 @@
       }
     }).mount('#app');
   </script>
-
 </body>
 </html>
