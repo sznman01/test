@@ -1025,6 +1025,12 @@
     .settlement-negative {
       color: #E99D99;
     }
+    .settlement-summary {
+      font-size: 13px;
+      color: #8B6B6B;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
@@ -1883,8 +1889,9 @@
               </div>
 
               <!-- 結算表 -->
-              <div class="settlement-table" v-if="membersList.length > 0">
-                <p class="settlement-title">結算表 (總支出 {{ formatCurrency(totalPayments) }}，每人應付 {{ formatCurrency(perPersonShare) }})</p>
+              <div class="settlement-table" v-if="membersList.length > 1">
+                <p class="settlement-title">結算表（總支出 {{ formatCurrency(totalPayments) }}，每人應付 {{ formatCurrency(perPersonShare) }}）</p>
+                
                 <div class="space-y-3">
                   <div v-for="(member, idx) in membersList" :key="idx" class="settlement-row flex justify-between items-center">
                     <div>
@@ -1896,12 +1903,6 @@
                     </span>
                   </div>
                 </div>
-                <p class="text-xs text-gray-500 mt-4">
-                  建議：欠款成員可以轉帳畀多付嘅成員（例如畀 {{ getCreditorName }}）。
-                </p>
-              </div>
-            </div>
-          </template>
 
           <!-- 設定頁 -->
           <template v-if="currentScreen === 'settings'">
@@ -3819,10 +3820,10 @@
         });
 
         const perPersonShare = computed(() => {
-          const totalExpense = getTotalExpense();
-          const memberCount = totalMembersCount.value;
-          return memberCount > 0 ? totalExpense / memberCount : 0;
-        });
+  const total = totalPayments.value;  // 用成員已付總和作為總支出（你截圖顯示 330 來自付款）
+  const count = totalMembersCount.value;
+  return count > 0 ? total / count : 0;
+});
 
         const getMemberTotalPayment = (member) => {
           return (member.payments || []).reduce((sum, pay) => sum + pay.amount, 0);
@@ -3843,6 +3844,18 @@
           if (amount < 0) return 'settlement-negative';
           return '';
         };
+
+        const getSettlementSummary = computed(() => {
+  if (membersList.value.length < 2) return '';
+  let summary = [];
+  membersList.value.forEach(member => {
+    const amount = getSettlementAmount(member);
+    if (amount < 0) {
+      summary.push(`${member.name} 需畀 ${formatCurrency(Math.abs(amount))} 畀 ${getCreditorName.value}`);
+    }
+  });
+  return summary.length > 0 ? summary.join('；') + '。' : '大家已經平衡！';
+});
 
         const getCreditorName = computed(() => {
           if (!membersList.value.length) return '';
@@ -4017,7 +4030,8 @@
           getSettlementAmount,
           getSettlementText,
           getSettlementClass,
-          getCreditorName
+          getCreditorName,
+          getSettlementSummary
         };
       }
     }).mount('#app');
